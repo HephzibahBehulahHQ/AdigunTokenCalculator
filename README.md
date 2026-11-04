@@ -35,7 +35,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Calorie & macro estimate | Health & Body | Adult BMR/TDEE and macro grams. | Mifflin–St Jeor; activity multipliers are estimates. |
 | Pregnancy due date estimate | Health & Body | LMP/conception date, gestational age and trimester. | Conventional 280/266-day dating; ACOG guidance. |
 | Water intake range | Health & Body | Adjustable estimated total-water range, including food water. | DGE adult reference band 30–35 mL/kg; not a drink-only target. |
-| Blood alcohol estimate | Health & Body | Educational estimate with required acknowledgement and no-driving warning. | Simplified Widmark-style estimate; NIST forensic guidance. |
+| Blood alcohol estimate | Health & Body | Educational estimate with required acknowledgement and no-driving warning. | Simplified Widmark-style estimate; EU road-safety / forensic references; assumptions are not person-specific. |
 | Roman numeral converter | Text & Language | Canonical Arabic/Roman conversion 1–3999. | Canonical Roman numeral rules. |
 | Number base converter | Conversion | Signed BigInt conversion between bases 2–36. | JavaScript BigInt. |
 | Password generator | Security & Privacy | Local cryptographic random password generation. | Browser crypto.getRandomValues. |
