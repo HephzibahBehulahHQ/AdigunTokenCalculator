@@ -36,7 +36,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Calorie & macro estimate | Adult Mifflin–St Jeor BMR/TDEE and macro estimate; not a diet prescription. |
 | Pregnancy due date estimate | LMP/conception-based date estimate; not prenatal care. |
 | Water intake range | Adjustable 30–35 mL/kg planning heuristic plus user adjustment; not medical guidance. |
-| Blood alcohol estimate | Simplified educational Widmark-style estimate with prominent no-driving warning; never a fitness-to-drive test. |
+| Blood alcohol estimate | Simplified educational Widmark-style estimate with mandatory educational-use acknowledgement and prominent no-driving warning; never a fitness-to-drive test. |
 | Roman numeral converter | Canonical conversion for integers 1–3999. |
 | Number base converter | Signed integer conversion between bases 2–36 using BigInt. |
 | Password generator | Local cryptographic random generation; nothing is uploaded or stored. |
