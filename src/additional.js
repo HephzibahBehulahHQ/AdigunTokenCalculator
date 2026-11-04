@@ -171,14 +171,15 @@ export function holidayDates(year,region="US") {
   year=Number(year);if(!Number.isInteger(year)||year<1583||year>4099||!["US","GB","DE","NG","CA"].includes(region))throw Error("number");
   const easter=easterSunday(year),fixed=[["New Year's Day",isoDate(year,1,1)],["Christmas Day",isoDate(year,12,25)]];
   if(["GB","DE","CA"].includes(region))fixed.push(["Boxing Day",isoDate(year,12,26)]);
-  if(region==="US")fixed.push(["Independence Day",isoDate(year,7,4)],["Thanksgiving (fourth Thursday in November)",nthWeekday(year,11,4,4)]);
+  if(region==="US")fixed.push(["Martin Luther King Jr. Day",nthWeekday(year,1,3,1)],["Memorial Day",lastWeekday(year,5,1)],["Independence Day",isoDate(year,7,4)],["Labor Day",nthWeekday(year,9,1,1)],["Veterans Day",isoDate(year,11,11)],["Thanksgiving (fourth Thursday in November)",nthWeekday(year,11,4,4)]);
   if(region==="DE")fixed.push(["German Unity Day",isoDate(year,10,3)],["Good Friday",addDays(easter,-2)],["Easter Monday",addDays(easter,1)]);
-  if(region==="GB")fixed.push(["Good Friday",addDays(easter,-2)],["Easter Monday",addDays(easter,1)]);
-  if(region==="NG")fixed.push(["Good Friday",addDays(easter,-2)],["Easter Monday",addDays(easter,1)],["Independence Day",isoDate(year,10,1)]);
-  if(region==="CA")fixed.push(["Canada Day",isoDate(year,7,1)],["Good Friday",addDays(easter,-2)]);
+  if(region==="GB")fixed.push(["Good Friday",addDays(easter,-2)],["Easter Monday",addDays(easter,1)],["Early May bank holiday",nthWeekday(year,5,1,1)],["Spring bank holiday",lastWeekday(year,5,1)],["Summer bank holiday",lastWeekday(year,8,1)]);
+  if(region==="NG")fixed.push(["Good Friday",addDays(easter,-2)],["Easter Monday",addDays(easter,1)],["Democracy Day",isoDate(year,6,12)],["Independence Day",isoDate(year,10,1)]);
+  if(region==="CA")fixed.push(["Canada Day",isoDate(year,7,1)],["Labour Day",nthWeekday(year,9,1,1)],["Thanksgiving",nthWeekday(year,10,2,1)],["Good Friday",addDays(easter,-2)]);
   return fixed.sort((a,b)=>a[1].localeCompare(b[1]));
 }
 function nthWeekday(y,m,n,weekday) {const first=new Date(Date.UTC(y,m-1,1)).getUTCDay();return isoDate(y,m,1+((weekday-first+7)%7)+(n-1)*7);}
+function lastWeekday(y,m,weekday){const last=new Date(Date.UTC(y,m,0)).getUTCDate(),day=new Date(Date.UTC(y,m-1,last)).getUTCDay();return isoDate(y,m,last-((day-weekday+7)%7));}
 const MORSE={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.",".":".-.-.-",",":"--..--","?":"..--..","'":".----.", "!":"-.-.--","/":"-..-.","(":"-.--.",")":"-.--.-","&":".-...",":":"---...",";":"-.-.-.","=":"-...-","+":".-.-.","-":"-....-","_":"..--.-",'"':".-..-.","$":"...-..-","@":".--.-."};
 const MORSE_REVERSE=Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));
 export function translateMorse(text,direction="text") {
