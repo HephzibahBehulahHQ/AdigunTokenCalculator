@@ -19,3 +19,10 @@ test("temperature rejects unknown conversion modes and absolute zero boundaries"
 test("countdown status distinguishes an event today",()=>{assert.equal(c.dateDifference("2026-11-01","2026-11-04",new Date(2026,10,4)).direction,"today");});
 
 test("world population estimate is anchored to published mid-year baselines",()=>{const r=c.populationEstimate(new Date(Date.UTC(2026,6,1)));assert.equal(r.estimate,8300678395);assert.equal(r.baselineDate,"2026-07-01");assert.ok(r.perDay>0);assert.ok(Math.abs((c.populationEstimate(new Date(Date.UTC(2026,6,2))).estimate-r.estimate)-r.perDay)<1e-6);});
+
+test("BMI rejects implausible measurement ranges",()=>{assert.throws(()=>c.bmi(80,.1));assert.throws(()=>c.bmi(3000,70,"imperial"));assert.throws(()=>c.bmi(150,150,"imperial"));});
+test("age handles leap-day birthdays using February 28 anniversary",()=>{assert.deepEqual(c.age("2000-02-29",new Date(2021,1,28)),{years:21,months:0,days:0});});
+test("unit conversion distinguishes decimal and binary storage",()=>{assert.equal(c.unit(1,"kB","byte","digital"),1000);assert.equal(c.unit(1,"KiB","byte","digital"),1024);assert.equal(c.unit(1,"m/s","km/h","speed"),3.6);});
+test("loan non-zero interest and sleep day rollover",()=>{const r=c.loan(1000,12,1);assert.ok(Math.abs(r.payment-88.8487886783)<1e-8);assert.ok(r.total>1000);assert.equal(c.sleep("00:30","wake",90,15)[0],"22:45");});
+test("Qibla bearing at the Kaaba is due north by convention",()=>{assert.ok(c.bearing(21.4225,39.8262)<1e-8);});
+test("special whitespace-sensitive token examples are distinct",async()=>{const {tokenize}=await import("../src/tokenizer.js");const a=await tokenize("red","cl100k_base"),b=await tokenize(" Red","cl100k_base"),d=await tokenize(" red","cl100k_base");assert.notDeepEqual(a.ids,b.ids);assert.notDeepEqual(a.ids,d.ids);assert.deepEqual(await tokenize("","o200k_base"),{ids:[],pieces:[],chars:0});});
