@@ -21,7 +21,7 @@
 - CI workflow runs on the completion feature branch; high-contrast focus indicator.
 
 ## Verified automated checkpoint
-GitHub Actions **Build and test**, run #98 (41916198986), commit ef334ba15364fc6db6edd1d43278e19a76eadd1c:
+GitHub Actions **Build and test**, run #103 (41916487375), with a clean npm ci after lockfile generation:
 - Dependency install: PASS.
 - Unit tests: **32 passed, 0 failed**.
 - Production build: PASS.
@@ -30,7 +30,7 @@ GitHub Actions **Build and test**, run #98 (41916198986), commit ef334ba15364fc6
 ## Not yet verified
 - **NOT TESTED:** Manual browser interaction for every tool, assistive technology/screen reader, keyboard-only end-to-end, responsive device matrix, full contrast audit, offline behaviour, live-site network/privacy inspection and browser console.
 - Translation quality requires fluent-speaker review.
-- A package lockfile could not be generated in the current execution environment; CI currently installs dependencies without a committed lockfile.
+- A reproducible package-lock.json was generated and committed on the feature branch by the scoped CI lockfile job (commit 4d6648b0e5e050e3c7b9d889e7aa0c033b05e71e). Subsequent CI uses npm ci.
 - Official population baseline values should be rechecked against the official downloadable UN dataset before future data refreshes.
 
 ## Remaining release limitations
