@@ -37,6 +37,8 @@ test("pregnancy dates estimate due date and gestational age",()=>{
 test("water estimate returns a range and validates user adjustment",()=>{
  assert.deepEqual(a.waterRange(70,250),{lowMl:2350,highMl:2700});
  assert.throws(()=>a.waterRange(0));
+ assert.deepEqual(a.waterRange(70,-100),{lowMl:2000,highMl:2350});
+ assert.throws(()=>a.waterRange(70,-3000));
 });
 test("BAC estimate is nonnegative and rejects implausible inputs",()=>{
  assert.equal(a.bloodAlcohol(70,"male",0,330,5,0).bacPercent,0);
