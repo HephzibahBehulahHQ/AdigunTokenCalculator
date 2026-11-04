@@ -1,34 +1,39 @@
 # Project status — AdigunTokenCalculator
 
-**Current state:** Published to GitHub Pages.
-**Production commit:** 4b338de154350437697425a162e342d45702d9b4.
-**Live URL:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
-**Owner decisions:** HB Artificial Intelligence; English/German/Yoruba/Nigerian Pidgin; system-font fallback.
+**Milestone:** 4 — Completion implementation and verification in progress.
+**Branch:** codex/milestone-4-completion.
+**Base:** main at f154de2d80baef52ed66b838ec548fdd1e1f8302.
+**Live site:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
-## Implemented
-- Static Vite app with grouped directory for all 18 tools.
-- Four-language interface foundation: tool names, descriptions, group names, primary form labels, select options and result labels.
-- Local lazy-loaded tokenizer rank chunks for o200k_base and cl100k_base; byte-preserving token segmentation.
-- Scientific engineering operations: arithmetic, modulo, powers, square root, degree-based trigonometry, logarithms and factorial.
-- BMI metric and imperial input modes.
-- Date difference with upcoming/elapsed countdown status.
-- Initial calculators for text statistics, temperature, age, percentages, user-entered demographics, practice time, Zakat arithmetic, Qibla bearing, unit conversions, loans, GPA, fuel and sleep.
-- Vite project-site base path configured as /AdigunTokenCalculator/.
-- GitHub Actions workflow builds, tests and deploys the site from main.
-- Privacy/architecture documentation. Unsourced world-statistics figures remain withheld.
+## Implemented in this milestone
+- Tokenizer live count, reconstructed text and token-ID copy controls, and clear action.
+- Engineering memory controls (M+, M−, MR, MC), clear and backspace; degree-based trig, modulo, logs and factorial.
+- Named editable religion categories with Pew Research Center 2020 shares.
+- World population estimate based on UN WPP 2024 medium-variant mid-year values; rounded to nearest thousand. Births, deaths and CO₂ remain withheld.
+- Qibla compass direction and explicit click-to-request geolocation.
+- Daily practice-time average.
+- Annual recurring event countdown and corrected today/upcoming/elapsed status.
+- GPA percentage mode, clearly distinguished from GPA.
+- Metric and imperial fuel calculations (US and Imperial mpg).
+- More translated labels, outputs, assumptions and validation feedback in four locales.
+- Privacy, architecture, data-source, licensing, third-party notice and test-plan documentation.
+- CI workflow runs on the completion feature branch.
 
-## Verification and deployment evidence
-- Pre-merge GitHub Actions Build and test run #68 (41913773155): **12 tests passed, 0 failed; production build passed**.
-- Post-merge Pages workflow run #1 (41913949546), commit 4b338de154350437697425a162e342d45702d9b4: dependency install PASS, tests PASS, production build PASS, Pages artifact upload PASS, deployment PASS.
-- GitHub Actions reported the deployment URL as https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/.
-- Main app bundle: 46.01 kB (gzip 16.49 kB).
-- Tokenizer rank data is lazy-loaded: cl100k_base 1.09 MB and o200k_base 2.33 MB minified (gzip 502 kB and 1.14 MB respectively), fetched only when the selected encoding is first used.
+## Earlier verified production baseline
+- Main commit before this branch: f154de2d80baef52ed66b838ec548fdd1e1f8302.
+- Previous pre-merge CI: 12 tests passed; production build passed.
+- Previous GitHub Pages deployment: successful at the live URL.
 
-## Remaining validation
-- Manual browser interaction, assistive technology, keyboard-only end-to-end, responsive device matrix, contrast audit, offline behavior and full network/privacy inspection: **NOT TESTED**.
-- Translation quality needs fluent-speaker review.
-- Tokenizer model mappings need release-time verification against official model documentation.
-- No committed npm lockfile yet.
+## Current verification state
+- A first feature-branch CI run failed at setup-node because npm caching was enabled without a lockfile. The cache option was removed; the next run must confirm the corrected workflow.
+- **NOT YET VERIFIED:** current expanded test suite, syntax/build, and current branch integration.
+- **NOT TESTED:** manual browser, screen-reader, keyboard-only end-to-end, responsive device matrix, contrast, offline, live-site network/privacy and console checks.
+- A package lockfile could not be generated in the current execution environment; CI currently installs dependencies without a committed lockfile.
+- Translation text requires fluent-speaker review.
 
-## Known product gaps
-Official corporate logo is not integrated; HB monogram is a placeholder. Engineering memory, richer demographics category labels, source/methodology views and some detailed master-prompt UX remain incomplete. World-statistics metrics remain hidden until credible dated baselines are sourced. This is published and CI-tested, but not a fully production-certified release.
+## Remaining release limitations
+- Official corporate logo artwork not integrated; only an HB placeholder remains. No reuse permission has been established for copying the binary asset.
+- Project-wide licence has not been authorised; no root LICENSE file added.
+- Tokenizer byte-piece adapter relies on the pinned js-tiktoken 1.0.21 internal byte map because the package does not expose a public per-token byte method.
+- World population estimate needs exact values rechecked against the official UN downloadable dataset before release; no births/deaths/CO₂ counters.
+- This milestone is not production-certified until automated and manual release gates are completed.
