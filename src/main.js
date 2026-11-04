@@ -71,7 +71,7 @@ function renderNav(){
  chips.replaceChildren();categories.forEach((name,i)=>{const b=el("button","category-chip",name);b.type="button";b.setAttribute("aria-pressed",values[i]===activeCategory?"true":"false");b.addEventListener("click",()=>{activeCategory=values[i]||"All";renderNav();});chips.append(b);});
  const icons={"Token & AI":"🔤","Math":"∑","Text & Language":"文","Conversion":"⇄","Health":"♥","Finance":"¤","Time & Date":"◷","World & Culture":"◎","Developer":"{}","Security & Privacy":"⌑"};
  keys.forEach((key,i)=>{const category=tr().toolCategoryByKey[key]||tr().groups[i];if(activeCategory!=="All"&&category!==activeCategory)return;if(q&&!tr().names[i].toLocaleLowerCase().includes(q)&&!tr().descriptions[i].toLocaleLowerCase().includes(q))return;
-  const card=el("button","tool-card");card.type="button";card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",tr().toolCategoryLabels?.[category]||category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{active=i;location.hash="#/"+key;renderTool();});nav.append(card);
+  const card=el("button","tool-card");card.type="button";card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",tr().toolCategoryLabels?.[category]||category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{location.hash="#/"+key;});nav.append(card);
  });
  if(!nav.children.length)nav.append(el("p","muted",tr().noResults||"No matching tools."));
 }
@@ -131,7 +131,7 @@ function renderTool(){
  if(active<0||!keys[active]){aside.hidden=false;panel.hidden=true;return;}
  aside.hidden=true;panel.hidden=false;
  const i=active,k=keys[i];panel.replaceChildren();
- const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{active=-1;location.hash="#/";renderNav();renderTool();});panel.append(back);
+ const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});panel.append(back);
  const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
