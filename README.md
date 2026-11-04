@@ -4,7 +4,7 @@
 
 Live application: https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
-A static, browser-side suite of 18 token and everyday calculators. The interface is available in English, German, Yoruba and Nigerian Pidgin. The visual system uses approved corporate colours with a system-font fallback pending official typography.
+A static, browser-side suite of 38 token, everyday, health-estimate and developer calculators. The interface is available in English, German, Yoruba and Nigerian Pidgin. The visual system uses the approved corporate logo, corporate colours and a system-font fallback pending official typography.
 
 ## Tool catalogue
 
@@ -29,6 +29,27 @@ A static, browser-side suite of 18 token and everyday calculators. The interface
 | Fuel cost / trip | Metric L/100 km or miles per US/Imperial gallon with matching fuel-price units. |
 | Sleep cycle planner | Configurable cycle and fall-asleep buffer; not medical advice. |
 
+| Time zone converter | Convert local date/time between IANA zones; flags ambiguous fall-back times and rejects nonexistent spring-forward times. |
+| Offline currency converter | Editable ECB reference-rate snapshot dated 4 November 2026; not a live or transaction rate. |
+| Inflation / purchasing power | Compound-rate estimate using the annual rate entered by the user; not an official CPI series. |
+| Tip & bill splitter | Calculate tax, tip, total and per-person amount with explicit rounding. |
+| Calorie & macro estimate | Adult Mifflin–St Jeor BMR/TDEE and macro estimate; not a diet prescription. |
+| Pregnancy due date estimate | LMP/conception-based date estimate; not prenatal care. |
+| Water intake range | Adjustable 30–35 mL/kg planning heuristic plus user adjustment; not medical guidance. |
+| Blood alcohol estimate | Simplified educational Widmark-style estimate with prominent no-driving warning; never a fitness-to-drive test. |
+| Roman numeral converter | Canonical conversion for integers 1–3999. |
+| Number base converter | Signed integer conversion between bases 2–36 using BigInt. |
+| Password generator | Local cryptographic random generation; nothing is uploaded or stored. |
+| QR code generator | Locally generated downloadable QR image; scanned content is visible to others. |
+| Hash / checksum | Local SHA-256, SHA-1 and MD5 for text or selected files; MD5/SHA-1 are not security choices. |
+| JSON formatter / validator | Local pretty-print, minify and syntax validation with line/column errors. |
+| Color & contrast checker | HEX/RGB/HSL conversion and WCAG contrast ratio. |
+| Discount & tax calculator | Discount, tax and reverse original-price estimate. |
+| Recipe scaler | Scale ingredient quantities while preserving entered units and names. |
+| Holiday dates | Rule-based dates for selected regions; not legal entitlement advice. |
+| Morse code translator | Bidirectional supported International Morse mapping. |
+| Statistics calculator | Mean, median, mode, range, population and sample standard deviation. |
+
 ## Privacy and architecture
 
 Calculations run in the browser. There is no application backend, database, analytics, telemetry, remote logging or runtime calculation API/CDN. Inputs are not intentionally persisted. Geolocation is requested only after a user action; token copying is also user initiated. See [PRIVACY.md](PRIVACY.md).
@@ -36,6 +57,7 @@ Calculations run in the browser. There is no application backend, database, anal
 Architecture and assumptions:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Data sources and methodology](docs/DATA_SOURCES.md)
+- [Sources and calculation methodology](SOURCES.md)
 - [Test plan and manual checklist](docs/TEST_PLAN.md)
 - [Design decisions](DESIGN_DECISIONS.md)
 - [Licensing status](docs/LICENSING.md)
