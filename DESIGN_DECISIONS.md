@@ -4,7 +4,7 @@
 
 ## Confirmed
 1. Division: HB Artificial Intelligence; violet `#A78BFA`.
-2. Full interface language support: English, German, Yoruba and Nigerian Pidgin for all 18 tools.
+2. Full interface language support: English, German, Yoruba and Nigerian Pidgin for all 38 tools.
 3. System-font fallback until official typography is supplied.
 
 ## Verified design identity
