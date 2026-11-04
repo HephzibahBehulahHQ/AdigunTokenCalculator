@@ -43,3 +43,10 @@ yo:{"Token IDs":"Token IDs","Unicode code points":"Àwọn àmì Unicode","Words
 pcm:{"Token IDs":"Token IDs","Unicode code points":"Unicode characters","Words":"Words","Characters (Unicode code points)":"Characters","Characters excluding whitespace":"Characters without spaces","Sentences (estimate)":"Sentences (estimate)","Paragraphs":"Paragraphs","Reading time at 200 wpm":"Reading time","Result":"Result","BMI":"BMI","Entered percentage total":"Total percentage wey you enter","Weekly minutes":"Minutes per week","Annual hours":"Hours per year","Lifetime hours":"Total hours","Entered assets":"Assets wey you enter","Calculated amount":"Calculated amount","Initial bearing":"Direction bearing","Converted value":"Converted value","Monthly payment":"Monthly payment","Total repayment":"Total repayment","Total interest":"Total interest","Calendar days":"Calendar days","Weighted GPA (4.0 scale)":"Weighted GPA","Fuel required":"Fuel needed","Estimated cost":"Estimated cost"}
 };
 for(const [k,v] of Object.entries(outputs))I[k].outputs=v;
+
+I.en.noResults="No matching tools.";I.de.noResults="Keine passenden Werkzeuge.";I.yo.noResults="Kò sí irinṣẹ tó bá ìwá rẹ mu.";I.pcm.noResults="No tool match your search.";
+I.en.fields.encoding="Tokenizer encoding";I.en.fields.op="Operation";
+I.de.fields.encoding="Tokenizer-Kodierung";I.de.fields.op="Operation";
+I.yo.fields.encoding="Tokenizer encoding";I.yo.fields.op="Iṣẹ́";
+I.pcm.fields.encoding="Tokenizer encoding";I.pcm.fields.op="Operation";
+for(const k of Object.keys(I)){I[k].outputs.Tokens=k==="de"?"Tokens":k==="yo"?"Tokens":k==="pcm"?"Tokens":"Tokens";}
