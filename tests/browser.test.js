@@ -68,6 +68,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.equal(new Set(cardData.map(card=>card.key)).size,38,"tool keys must be unique");
     for(const card of cardData){
       await page.locator('.tool-card[data-tool-key="'+card.key+'"]').click();
+      await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,card.key);
       await page.waitForFunction(name=>document.querySelector("#panel h2")?.textContent===name,card.name);
       if(card.key==="world")assert.equal(await page.locator("#panel .result").count(),1);
       else assert.equal(await page.locator("#panel form").count(),1,card.key+" should render a form");
