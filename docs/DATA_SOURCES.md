@@ -47,3 +47,6 @@ The water range is explicitly a project-selected editable heuristic (30–35 mL/
 
 
 The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.md). Exact 2025/2026 numeric rows still require a direct downloadable WPP file comparison and recorded checksum; the values have not been certified against an archived source file.
+
+
+The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.
