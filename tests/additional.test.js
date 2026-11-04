@@ -110,3 +110,10 @@ test("ECB snapshot contains major currency cross-rate inputs",()=>{
  assert.equal(a.ECB_EUR_RATES.CHF,.9188);assert.equal(a.ECB_EUR_RATES.CAD,1.5701);
  assert.equal(a.ECB_EUR_RATES.ZAR,18.5404);
 });
+
+test("regional holiday calendars include common fixed and weekday rules",()=>{
+ const us=a.holidayDates(2026,"US"),gb=a.holidayDates(2026,"GB"),ca=a.holidayDates(2026,"CA");
+ assert.ok(us.some(x=>x[0]==="Labor Day"&&x[1]==="2026-09-07"));
+ assert.ok(gb.some(x=>x[0]==="Summer bank holiday"&&x[1]==="2026-08-31"));
+ assert.ok(ca.some(x=>x[0]==="Thanksgiving"&&x[1]==="2026-10-12"));
+});
