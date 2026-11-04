@@ -47,3 +47,11 @@ export function dateDifference(start,end,today=new Date()){
 const a=parts(start),b=parts(end),x=Date.UTC(a.y,a.m-1,a.d),y=Date.UTC(b.y,b.m-1,b.d);
 const fromToday=Math.round((y-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000);return{days:Math.round((y-x)/86400000),direction:fromToday>0?"upcoming":fromToday<0?"elapsed":"today",fromToday};
 }
+
+export function populationEstimate(now=new Date()){
+const baseline=8300678395,annualNet=8300678395-8231613070,daysPerYear=365.2425;
+const elapsed=(now.getTime()-Date.UTC(2026,6,1))/86400000;
+const perDay=annualNet/daysPerYear;
+const estimate=baseline+elapsed*perDay;
+return{estimate,rounded:Math.round(estimate/1000)*1000,perDay,baselineDate:"2026-07-01",annualNet};
+}
