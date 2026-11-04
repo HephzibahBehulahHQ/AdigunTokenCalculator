@@ -63,8 +63,9 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
     const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
+    assert.equal(new Set(cardData.map(card=>card.key)).size,38,"tool keys must be unique");
     for(const card of cardData){
-      await page.getByRole("button",{name:card.name}).click();
+      await page.locator('.tool-card[data-tool-key="'+card.key+'"]').click();
       await page.waitForFunction(name=>document.querySelector("#panel h2")?.textContent===name,card.name);
       if(card.key==="world")assert.equal(await page.locator("#panel .result").count(),1);
       else assert.equal(await page.locator("#panel form").count(),1,card.key+" should render a form");
