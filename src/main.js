@@ -128,9 +128,9 @@ async function execute(k,d){
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
 function renderTool(){
  const aside=$("aside");
- if(active<0||!keys[active]){aside.hidden=false;panel.hidden=true;return;}
+ if(active<0||!keys[active]){delete panel.dataset.toolKey;aside.hidden=false;panel.hidden=true;return;}
  aside.hidden=true;panel.hidden=false;
- const i=active,k=keys[i];panel.replaceChildren();
+ const i=active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
  const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});panel.append(back);
  const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
