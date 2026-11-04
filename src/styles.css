@@ -26,3 +26,5 @@
 
 .corporate-logo{display:block;width:auto;max-width:min(30vw,168px);height:46px;object-fit:contain;background:#fff;border-radius:5px;padding:2px}
 @media(max-width:480px){.corporate-logo{max-width:108px;height:38px}}
+
+.field.dragover{outline:2px dashed var(--violet);outline-offset:3px;background:#F5F1FF}
