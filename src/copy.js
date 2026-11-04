@@ -102,3 +102,5 @@ yo:{"Estimated population":"Àfojúsùn iye ènìyàn","Estimated net change per
 pcm:{"Estimated population":"Estimated population","Estimated net change per day":"Estimated net change per day","Reference baseline":"Reference baseline","Daily average minutes":"Average minutes per day","Countdown status":"Countdown status","Calendar days (exclusive)":"Calendar days (not counting start day)","Next occurrence":"Next occurrence","Days until event":"Days until event","Weighted percentage average":"Weighted percentage average","Fuel units":"Fuel quantity","Applied rate":"Rate wey apply","Compass direction":"Compass direction"}
 };
 for(const [locale,data] of Object.entries(completionOutputs))Object.assign(I[locale].outputs,data);
+
+for(const [locale,value] of Object.entries({en:"Estimate timestamp (UTC)",de:"Zeitpunkt der Schätzung (UTC)",yo:"Àkókò àfojúsùn (UTC)",pcm:"Estimate time (UTC)"}))I[locale].outputs["Estimate timestamp UTC"]=value;
