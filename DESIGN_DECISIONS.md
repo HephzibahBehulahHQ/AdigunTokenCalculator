@@ -24,3 +24,12 @@ No product licence has been authorized. Include third-party notices for the MIT 
 
 ## Release gates
 Generate and inspect lockfile; verify tokenizer mappings and Unicode pieces; obtain fluent translation review; obtain approved logo and asset permissions; complete accessibility, responsive, browser and offline verification; source any world-statistics baselines; obtain explicit deployment authorization.
+
+
+## Completion milestone decisions
+- The world dashboard now shows only a rounded, linear population estimate derived from UN WPP 2024 medium-variant 1 July 2025 and 1 July 2026 values. It is labelled an estimate, not live data; births, deaths and CO₂ remain omitted until independently sourced baselines are established.
+- Religion demographics starts with Pew Research Center's 2020 estimates (published 9 June 2025). The Pew "other religions" category includes folk/traditional and smaller traditions; the app does not fabricate a separate folk-religion share. Users can edit category labels and percentages.
+- Qibla geolocation is requested only after a deliberate button click; coordinates remain in-page.
+- Imperial fuel calculations distinguish US mpg/US gallons from Imperial mpg/Imperial gallons. GPA percentage mode reports a weighted percentage and does not convert it into GPA.
+- The tokenizer's UTF-8 piece reconstruction adapter remains pinned to js-tiktoken 1.0.21 internal byte-map behaviour because this version does not expose a public per-token-byte method. It fails closed if the map is unavailable.
+- The project-wide licence and logo asset reuse remain unresolved; no root LICENSE or copied corporate artwork is added. The exact official artwork must be used if/when reuse is authorised.
