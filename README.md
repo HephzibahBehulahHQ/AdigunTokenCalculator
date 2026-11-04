@@ -28,7 +28,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | GPA / grade calculator | Finance | Weighted illustrative 4.0 mapping or percentage average. | Explicit product mapping; percentage mode stays separate. |
 | Fuel cost / trip | Finance | Metric, US mpg and Imperial mpg fuel/cost estimate. | NIST unit conversions; user-supplied fuel price. |
 | Sleep cycle planner | Health & Body | Configurable cycle and fall-asleep buffer. | User-adjustable 90-minute heuristic; not medical advice. |
-| Time zone converter | Time & Date | IANA-zone conversion with daylight-saving checks. | Browser Intl / IANA time-zone database. |
+| Time zone converter | Time & Date | IANA-zone conversion with daylight-saving checks. | Temporal polyfill plus native Intl.DateTimeFormat / browser IANA time-zone database. |
 | Offline currency converter | Finance | Editable dated reference-rate snapshot. | ECB euro reference rates, 4 Nov 2026; not transaction pricing. |
 | Inflation / purchasing power | Finance | Compound estimate using user-entered annual rate. | User-supplied rate; not official CPI. |
 | Tip & bill splitter | Finance | Tax, tip, total and per-person rounding. | Standard arithmetic. |
