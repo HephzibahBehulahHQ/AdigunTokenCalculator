@@ -40,6 +40,14 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/112\.67\s+USD/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
+    await page.getByRole("button",{name:"QR code generator"}).click();
+    await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="QR code generator");
+    await page.locator('textarea[name="text"]').fill("https://example.com");
+    await page.locator("#panel form").evaluate(form=>form.requestSubmit());
+    await page.locator(".qr-preview").waitFor({timeout:5000});
+    assert.match(await page.locator(".result").innerText(),/https:\/\/example\.com/);
+    await page.locator(".back-directory").click();
+    await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
     await page.goto("http://127.0.0.1:4173/#/timezone");
     assert.match(await page.locator("#panel h2").innerText(),/Time zone converter/);
