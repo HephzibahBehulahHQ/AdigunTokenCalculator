@@ -114,7 +114,7 @@ export function generatePassword(length,charset="all") {
 }
 export function jsonTransform(source,mode="pretty") {
   if(typeof source!=="string"||!source.trim())throw Error("empty");
-  let value;try{value=JSON.parse(source);}catch(e){const m=String(e.message).match(/position\s+(\d+)/i);if(m){const pos=Number(m[1]),before=source.slice(0,pos),line=before.split("\n").length,column=pos-(before.lastIndexOf("\n")+1)+1;throw Error("JSON syntax error at line "+line+", column "+column);}throw Error("JSON syntax error");}
+  let value;try{value=JSON.parse(source);}catch(e){const message=String(e.message),lc=message.match(/line\s+(\d+)\s+column\s+(\d+)/i),m=message.match(/position\s+(\d+)/i);if(lc)throw Error("JSON syntax error at line "+lc[1]+", column "+lc[2]);if(m){const pos=Number(m[1]),before=source.slice(0,pos),line=before.split("\n").length,column=pos-(before.lastIndexOf("\n")+1)+1;throw Error("JSON syntax error at line "+line+", column "+column);}throw Error("JSON syntax error");}
   return mode==="minify"?JSON.stringify(value):JSON.stringify(value,null,2);
 }
 export function parseHexColor(hex) {
