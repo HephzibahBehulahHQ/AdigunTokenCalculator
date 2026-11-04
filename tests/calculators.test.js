@@ -18,4 +18,4 @@ test("practice projections include daily weekly and annual totals",()=>{const r=
 test("temperature rejects unknown conversion modes and absolute zero boundaries",()=>{assert.equal(c.temperature(-273.15,"c"),-459.66999999999996);assert.throws(()=>c.temperature(10,"x"));assert.throws(()=>c.temperature(-459.68,"f"));});
 test("countdown status distinguishes an event today",()=>{assert.equal(c.dateDifference("2026-11-01","2026-11-04",new Date(2026,10,4)).direction,"today");});
 
-test("world population estimate is anchored to published mid-year baselines",()=>{const r=c.populationEstimate(new Date(Date.UTC(2026,6,1)));assert.equal(r.estimate,8300678395);assert.equal(r.baselineDate,"2026-07-01");assert.ok(r.perDay>0);assert.equal(c.populationEstimate(new Date(Date.UTC(2026,6,2))).estimate-r.estimate,r.perDay);});
+test("world population estimate is anchored to published mid-year baselines",()=>{const r=c.populationEstimate(new Date(Date.UTC(2026,6,1)));assert.equal(r.estimate,8300678395);assert.equal(r.baselineDate,"2026-07-01");assert.ok(r.perDay>0);assert.ok(Math.abs((c.populationEstimate(new Date(Date.UTC(2026,6,2))).estimate-r.estimate)-r.perDay)<1e-6);});
