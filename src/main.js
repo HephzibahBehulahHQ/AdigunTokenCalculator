@@ -70,7 +70,7 @@ async function execute(k,d){
  case"fuel":{const r=c.fuelTrip(d.distance,d.efficiency,d.price,d.mode,d.mpgType);rows=[["Fuel required",fmt(r.litres)+" L"],["Fuel units",fmt(r.fuelUnits,3)+" "+r.unit],["Estimated cost",fmt(r.cost)]];note=(N.fuel||"")+" "+(d.mode==="imperial"?(d.mpgType==="us"?"Uses US gallons and miles per US gallon.":"Uses Imperial gallons and miles per Imperial gallon."):"Uses L/100 km and price per litre.");break;}
  case"sleep":rows=c.sleep(d.time,d.mode,d.cycle,d.buffer).map((v,i)=>["After "+(i+1)+" cycles",v]);note=N.sleep;break;
  }
- result(rows,note);
+ const box=result(rows,note);if(k==="demographics"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const a=el("a","", "Pew Research Center (2025; estimates for 2020)");a.href="https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);}
 }
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
 function renderTool(){
