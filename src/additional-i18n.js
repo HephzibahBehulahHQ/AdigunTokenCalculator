@@ -88,3 +88,8 @@ I.en.bacConsent="I understand this is educational only and will never use it to 
 I.de.bacConsent="Ich verstehe, dass dies nur zu Lehrzwecken dient und niemals zur Entscheidung über das Fahren verwendet werden darf.";
 I.yo.bacConsent="Mo lóye pé fún ẹ̀kọ́ nìkan ni, mi ò sì ní lò ó láti pinnu bóyá mo lè wakọ̀.";
 I.pcm.bacConsent="I understand say na education only and I no go use am to decide whether to drive.";
+
+I.en.descriptions[24]="Estimate total daily water using a broad DGE adult reference band of 30–35 mL/kg, including water from food; adjust for activity and climate.";
+I.de.descriptions[24]="Gesamte tägliche Wasserzufuhr anhand eines groben DGE-Referenzbereichs für Erwachsene von 30–35 mL/kg schätzen; Wasser aus Lebensmitteln eingeschlossen.";
+I.yo.descriptions[24]="Ṣírò àpapọ̀ omi ojoojúmọ́ pẹ̀lú ìwọ̀n DGE 30–35 mL/kg fún àgbà; omi inú oúnjẹ tún wà nínú rẹ̀.";
+I.pcm.descriptions[24]="Estimate total daily water with DGE adult reference band 30–35 mL/kg, including food water; adjust for activity and climate.";
