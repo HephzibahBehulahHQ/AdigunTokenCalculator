@@ -168,5 +168,5 @@ function renderTool(){
 }
 function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;renderNav();renderTool();}
 search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
-window.addEventListener("hashchange",()=>{const key=decodeURIComponent(location.hash.replace(/^#\\/?/,""));active=keys.indexOf(key);renderNav();renderTool();});
-const initialKey=decodeURIComponent(location.hash.replace(/^#\\/?/,""));if(keys.includes(initialKey))active=keys.indexOf(initialKey);setLang("en");
+window.addEventListener("hashchange",()=>{const key=decodeURIComponent(location.hash.replace(/^#\/?/,""));active=keys.indexOf(key);renderNav();renderTool();});
+const initialKey=decodeURIComponent(location.hash.replace(/^#\/?/,""));if(keys.includes(initialKey))active=keys.indexOf(initialKey);setLang("en");
