@@ -24,7 +24,7 @@ Production output is `dist/`; GitHub Actions deploys only that directory after t
 
 
 ## Expanded local utilities
-- Time-zone conversion uses `Intl.DateTimeFormat` and the browser's IANA data; ambiguous fall-back times choose the earlier instant and are flagged, while nonexistent spring-forward times are rejected.
+- Time-zone conversion uses the bundled `@js-temporal/polyfill@0.5.1` for explicit DST disambiguation plus native `Intl.DateTimeFormat` and the browser's IANA data; ambiguous fall-back times choose the earlier instant and are flagged, while nonexistent spring-forward times are rejected.
 - Currency conversion uses a static, editable ECB EUR-base snapshot dated 4 November 2026. No request is made when calculating.
 - Password generation uses `crypto.getRandomValues`; hashes use `crypto.subtle.digest` for SHA-1/SHA-256 and a local MD5 compatibility implementation.
 - QR code generation is bundled with `qrcode-generator` and creates a local data URL for preview/download.
