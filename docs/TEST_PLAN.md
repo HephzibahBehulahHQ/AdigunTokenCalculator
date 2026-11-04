@@ -19,3 +19,28 @@ Unit coverage includes Unicode text statistics; age/date-only calendar arithmeti
 - [ ] Verify language switching on every calculator.
 
 Manual checks require a human on target browsers before claiming full accessibility or production certification.
+
+
+## Expanded calculator unit coverage
+- [ ] Time-zone normal conversion, DST gap rejection and repeated-time ambiguity.
+- [ ] Currency conversion, custom-rate parsing and dated snapshot values.
+- [ ] Inflation forward/reverse compounding and negative-rate boundaries.
+- [ ] Tip/tax basis, people count and rounding modes.
+- [ ] Mifflin–St Jeor, activity multipliers and macro percentage validation.
+- [ ] LMP/conception due dates, gestational age and future-date rejection.
+- [ ] Water heuristic lower/upper bounds and adjustment.
+- [ ] BAC formula zero case, range validation and disclaimer visibility.
+- [ ] Roman canonicality, base conversion BigInt boundaries and password character sets.
+- [ ] QR generation, hash known vectors / file limit, JSON line-column errors.
+- [ ] HEX/RGB/HSL and WCAG ratio, discount reverse calculation, recipe fractions.
+- [ ] Easter computus and regional holiday rules, Morse round-trip and statistics edge cases.
+
+## Expanded manual browser checklist
+- [ ] Verify all 38 cards, category filters, search, deep links and back navigation.
+- [ ] Verify every new tool in all four locales; fluent German, Yoruba and Nigerian Pidgin review is still required.
+- [ ] Confirm currency and other calculations work with network disabled after the static site loads.
+- [ ] Confirm password and hash data are never sent in network requests; file hashing is local and rejects files above 25 MB.
+- [ ] Confirm QR content is visibly disclosed as readable by scanners and downloaded QR image scans correctly.
+- [ ] Confirm health and BAC warnings remain visible beside results; BAC must never be represented as driving clearance.
+- [ ] Verify DST gap and ambiguity behavior in browser versions with IANA time-zone data.
+- [ ] Check responsive card grid, keyboard focus, screen-reader announcements and 200% zoom.
