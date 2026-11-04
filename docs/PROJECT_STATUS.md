@@ -22,10 +22,10 @@
 
 ## Automated verification
 
-Latest successful CI run: [#141](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41927252229), commit `4ab402b73c69648ab6972610fcf2aead5f70466f`.
+Latest successful CI run: [#186](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930108283), commit `b3c152126c1bc55b97193b43e23dbf66613adeee`.
 - `npm ci`: PASS.
 - Chromium installation on Ubuntu 24.04: PASS.
-- `npm test`: **57 passed, 0 failed**, including Playwright Chromium browser smoke test.
+- `npm test`: **58 passed, 0 failed**, including Playwright Chromium browser smoke test.
 - `npm run build`: PASS.
 - Lockfile inventory: 70 dependency packages; all have declared licence metadata (MIT, ISC, BSD-2-Clause, BSD-3-Clause, Apache-2.0).
 
@@ -45,7 +45,7 @@ Earlier deployment run #6 succeeded for commit `862ca832609d8e6dd80e616c37ad75b9
 - Population output is an interpolation/extrapolation from mid-year UN medium-variant projections, not a live count. Births, deaths and CO₂ remain withheld.
 - ECB rates are a dated reference snapshot, not live transaction rates.
 - Inflation uses a user-supplied annual rate, not an official CPI series.
-- The water range is an editable planning heuristic, not a medical recommendation.
+- The water range is a broad DGE-derived total-water estimate (including food water), with an editable activity/climate adjustment; it is not a medical recommendation.
 - BAC is a simplified Widmark-style educational estimate, never a fitness-to-drive assessment.
 - MD5 and SHA-1 are supported for legacy checksums only, not security-sensitive use.
 - Holiday dates are rule-based calendar references, not legal confirmation of statutory-holiday entitlement.
