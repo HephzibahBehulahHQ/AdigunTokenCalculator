@@ -22,7 +22,7 @@
 
 ## Automated verification
 
-Latest successful CI run: [#188](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930336508), commit `69f9fb9a13a799b4718401be580c1629d8824393`.
+Latest successful CI run: [#190](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930582052), commit `e43c0d309be7640be37bb27a07631eaf6f7b73cb`.
 - `npm ci`: PASS.
 - Chromium installation on Ubuntu 24.04: PASS.
 - `npm test`: **58 passed, 0 failed**, including Playwright Chromium browser smoke test.
