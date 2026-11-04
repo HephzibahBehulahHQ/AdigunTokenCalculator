@@ -19,7 +19,7 @@
 
 ## Verification and deployment evidence
 - Pre-merge GitHub Actions Build and test run #68 (41913773155): **12 tests passed, 0 failed; production build passed**.
-- Post-merge Pages workflow run #70 (41913949546), commit 4b338de154350437697425a162e342d45702d9b4: dependency install PASS, tests PASS, production build PASS, Pages artifact upload PASS, deployment PASS.
+- Post-merge Pages workflow run #1 (41913949546), commit 4b338de154350437697425a162e342d45702d9b4: dependency install PASS, tests PASS, production build PASS, Pages artifact upload PASS, deployment PASS.
 - GitHub Actions reported the deployment URL as https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/.
 - Main app bundle: 46.01 kB (gzip 16.49 kB).
 - Tokenizer rank data is lazy-loaded: cl100k_base 1.09 MB and o200k_base 2.33 MB minified (gzip 502 kB and 1.14 MB respectively), fetched only when the selected encoding is first used.
