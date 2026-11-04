@@ -8,47 +8,46 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 
 ## Tool catalogue
 
-| Tool | Purpose and assumptions |
-|---|---|
-| OpenAI-compatible token calculator | Counts plain text using locally bundled cl100k_base or o200k_base; token pieces reconstruct the original UTF-8 text. Not an API billing estimate. |
-| Engineering calculator | Arithmetic, powers, square root, modulo, trigonometry in degrees, logarithms, factorial and memory controls. |
-| Wordpedometer / text statistics | Word, Unicode character, non-whitespace character, sentence and paragraph counts; reading time assumes 200 wpm. |
-| Celsius / Fahrenheit converter | Bidirectional conversion with absolute-zero validation. |
-| Age calculator | Completed calendar years, months and days from date of birth to the browser's local current date. |
-| BMI calculator | Metric and imperial input; general adult screening only, not a diagnosis. |
-| Percentage calculator | Percent of, ratio as a percentage, and signed percentage change. |
-| Worldometer-style estimates | One rounded population estimate interpolated from UN WPP 2024 mid-year projections. Not live data; births, deaths and CO₂ are omitted pending separately verified baselines. |
-| Religion demographics | Editable categories seeded with Pew Research Center 2020 global estimates, published 2025. Other religions includes folk/traditional and smaller groups. |
-| Contemplative practice time | Daily average, weekly, annual and optional lifetime projections; annual projection assumes 52 weeks. |
-| Zakat / charity | User-entered assets and adjustable rate; mathematical aid only, not a religious ruling. |
-| Qibla direction | Great-circle bearing to the Kaaba; optional geolocation only after an explicit button click. |
-| Extended unit converter | Length, mass, US customary volume, area, speed and decimal/binary digital units. |
-| Loan / mortgage | Fixed-rate monthly payment, total repayment and interest; estimate, not a lender quote. |
-| Date difference / countdown | Exclusive calendar-day difference and annual event countdown. |
-| GPA / grade calculator | Weighted illustrative 4.0 mapping or credit-weighted percentage average. |
-| Fuel cost / trip | Metric L/100 km or miles per US/Imperial gallon with matching fuel-price units. |
-| Sleep cycle planner | Configurable cycle and fall-asleep buffer; not medical advice. |
-
-| Time zone converter | Convert local date/time between IANA zones; flags ambiguous fall-back times and rejects nonexistent spring-forward times. |
-| Offline currency converter | Editable ECB reference-rate snapshot dated 4 November 2026; not a live or transaction rate. |
-| Inflation / purchasing power | Compound-rate estimate using the annual rate entered by the user; not an official CPI series. |
-| Tip & bill splitter | Calculate tax, tip, total and per-person amount with explicit rounding. |
-| Calorie & macro estimate | Adult Mifflin–St Jeor BMR/TDEE and macro estimate; not a diet prescription. |
-| Pregnancy due date estimate | LMP/conception-based date estimate; not prenatal care. |
-| Water intake range | Adjustable 30–35 mL/kg planning heuristic plus user adjustment; not medical guidance. |
-| Blood alcohol estimate | Simplified educational Widmark-style estimate with mandatory educational-use acknowledgement and prominent no-driving warning; never a fitness-to-drive test. |
-| Roman numeral converter | Canonical conversion for integers 1–3999. |
-| Number base converter | Signed integer conversion between bases 2–36 using BigInt. |
-| Password generator | Local cryptographic random generation; nothing is uploaded or stored. |
-| QR code generator | Locally generated downloadable QR image; scanned content is visible to others. |
-| Hash / checksum | Local SHA-256, SHA-1 and MD5 for text, selected files or dropped files (25 MB limit); MD5/SHA-1 are not security choices. |
-| JSON formatter / validator | Local pretty-print, minify and syntax validation with line/column errors. |
-| Color & contrast checker | HEX/RGB/HSL conversion and WCAG contrast ratio. |
-| Discount & tax calculator | Discount, tax and reverse original-price estimate. |
-| Recipe scaler | Scale ingredient quantities while preserving entered units and names. |
-| Holiday dates | Countdown to common rule-based holidays for selected regions; not legal entitlement advice. |
-| Morse code translator | Bidirectional supported International Morse mapping. |
-| Statistics calculator | Mean, median, mode, range, population and sample standard deviation. |
+| Tool | Category | Purpose and assumptions | Data source / formula |
+|---|---|---|---|
+| OpenAI-compatible token calculator | AI & Text | Plain-text token count, token IDs and reversible visual pieces; not API billing. | OpenAI tiktoken mappings; bundled js-tiktoken. |
+| Engineering calculator | Math & Engineering | Arithmetic, powers, trig, logs, factorial and memory. | Standard arithmetic; degree-based trig. |
+| Wordpedometer / text statistics | AI & Text | Unicode-aware word/character/sentence/paragraph counts and reading-time estimate. | Unicode text handling; 200 wpm product heuristic. |
+| Celsius / Fahrenheit | Conversion | Bidirectional temperature conversion with absolute-zero checks. | Standard Celsius/Fahrenheit formulas. |
+| Age calculator | Time & Date | Calendar age from birth date to local today. | Calendar arithmetic in browser. |
+| BMI calculator | Health & Body | Metric/imperial adult screening estimate. | CDC BMI formula and adult categories. |
+| Percentage calculator | Math & Engineering | Percent of, ratio and percentage change. | Standard arithmetic. |
+| World population estimate | World & Culture | Interpolated mid-year population estimate; not live. | UN WPP 2024 Medium; direct file checksum audit pending. |
+| Religion demographics | World & Culture | Editable global shares and counts. | Pew Research Center 2020 estimates, published 2025. |
+| Contemplative practice time | World & Culture | Daily/weekly/annual/lifetime projections. | User inputs; 52 weeks/year assumption. |
+| Zakat / charity | Finance | User-entered assets and editable rate; not a ruling. | Islamic Relief 2.5% reference; no nisab ruling. |
+| Qibla direction | World & Culture | Great-circle bearing to the Kaaba; location only by explicit action. | Kaaba coordinate from DAI gazetteer; great-circle formula. |
+| Extended unit converter | Conversion | Length, mass, volume, area, speed and digital units. | BIPM SI and NIST SP 811 conversion factors. |
+| Loan / mortgage | Finance | Fixed-rate monthly payment, repayment and interest estimate. | Standard amortization formula; user-supplied rate. |
+| Date difference / countdown | Time & Date | Calendar-day difference and recurring event countdown. | Browser calendar arithmetic. |
+| GPA / grade calculator | Finance | Weighted illustrative 4.0 mapping or percentage average. | Explicit product mapping; percentage mode stays separate. |
+| Fuel cost / trip | Finance | Metric, US mpg and Imperial mpg fuel/cost estimate. | NIST unit conversions; user-supplied fuel price. |
+| Sleep cycle planner | Health & Body | Configurable cycle and fall-asleep buffer. | User-adjustable 90-minute heuristic; not medical advice. |
+| Time zone converter | Time & Date | IANA-zone conversion with daylight-saving checks. | Browser Intl / IANA time-zone database. |
+| Offline currency converter | Finance | Editable dated reference-rate snapshot. | ECB euro reference rates, 4 Nov 2026; not transaction pricing. |
+| Inflation / purchasing power | Finance | Compound estimate using user-entered annual rate. | User-supplied rate; not official CPI. |
+| Tip & bill splitter | Finance | Tax, tip, total and per-person rounding. | Standard arithmetic. |
+| Calorie & macro estimate | Health & Body | Adult BMR/TDEE and macro grams. | Mifflin–St Jeor; activity multipliers are estimates. |
+| Pregnancy due date estimate | Health & Body | LMP/conception date, gestational age and trimester. | Conventional 280/266-day dating; ACOG guidance. |
+| Water intake range | Health & Body | Adjustable estimated total-water range, including food water. | DGE adult reference band 30–35 mL/kg; not a drink-only target. |
+| Blood alcohol estimate | Health & Body | Educational estimate with required acknowledgement and no-driving warning. | Simplified Widmark-style estimate; NIST forensic guidance. |
+| Roman numeral converter | Text & Language | Canonical Arabic/Roman conversion 1–3999. | Canonical Roman numeral rules. |
+| Number base converter | Conversion | Signed BigInt conversion between bases 2–36. | JavaScript BigInt. |
+| Password generator | Security & Privacy | Local cryptographic random password generation. | Browser crypto.getRandomValues. |
+| QR code generator | Developer | Local QR image preview/download. | Bundled qrcode-generator. |
+| Hash / checksum | Security & Privacy | Local SHA-256, SHA-1 and MD5 for text/files. | Web Crypto and local MD5; MD5/SHA-1 not security choices. |
+| JSON formatter / validator | Developer | Local pretty-print, minify and line/column validation. | Native JSON.parse / JSON.stringify. |
+| Color & contrast checker | Developer | HEX/RGB/HSL and WCAG contrast. | WCAG relative luminance and contrast ratio. |
+| Discount & tax calculator | Finance | Discount, tax and reverse original-price estimate. | Standard arithmetic; currency-neutral. |
+| Recipe scaler | Conversion | Scale quantities and preserve entered units/fractions. | Direct ratio scaling; no inferred unit conversion. |
+| Holiday countdown | Time & Date | Common rule-based dates by region; incomplete calendar coverage. | Gregorian computus and selected official holiday references. |
+| Morse code translator | Text & Language | Bidirectional International Morse mapping. | ITU-R M.1677-1. |
+| Statistics calculator | Math & Engineering | Mean, median, mode, range, variance and standard deviation. | Standard descriptive statistics. |
 
 ## Privacy and architecture
 
@@ -69,7 +68,7 @@ Architecture and assumptions:
 Requirements: Node.js 20+.
 
 ```sh
-npm install
+npm ci
 npm run dev
 npm test
 npm run build
@@ -84,10 +83,17 @@ Vite writes the static production site to dist/. GitHub Actions tests and builds
 
 The selected encoding counts only supplied plain text. API usage may additionally include message framing, role/tool metadata, images, audio and other model-specific processing. Tokenizer ranks are bundled locally and loaded on demand. Current dependency is js-tiktoken@1.0.21 (MIT); see third-party notices.
 
+## Deliberate exclusions
+
+- AI prediction, fortune-telling, personality and relationship-scoring tools are excluded because they imply unsupported certainty.
+- Medical diagnosis/treatment tools beyond labelled screening or formula estimates are excluded.
+- Live stock/crypto tickers and live exchange APIs are excluded to preserve the static local-only architecture.
+- User accounts, cloud profiles and persistent sensitive data are excluded.
+
 ## Data restraint and known limitations
 
 - World population output is a linear estimate from UN WPP 2024 mid-year projections, rounded to the nearest thousand. It is not a live headcount. Births, deaths and CO₂ are not shown without verified matching baselines.
 - Religion shares are historical 2020 estimates, not a statement about individual beliefs; categories and surveys have limitations.
-- Official corporate logo is not yet embedded; current HB monogram is a placeholder pending confirmed asset reuse permission.
+- The approved corporate logo is embedded byte-for-byte from the canonical design-system asset; provenance is documented in docs/LICENSING.md.
 - Fluent-speaker translation review and manual browser/accessibility testing remain release tasks.
 - No project-wide licence has been authorised. Do not assume the complete application is open source.
