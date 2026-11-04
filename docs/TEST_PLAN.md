@@ -35,6 +35,9 @@ Manual checks require a human on target browsers before claiming full accessibil
 - [ ] HEX/RGB/HSL and WCAG ratio, discount reverse calculation, recipe fractions.
 - [ ] Easter computus and regional holiday rules, Morse round-trip and statistics edge cases.
 
+## Automated browser integration
+- `tests/browser.test.js` runs Chromium against the Vite development server in CI. It checks the 38-card directory, category filters, search, currency conversion, back navigation and a direct time-zone deep link. It is skipped locally when the Playwright browser binary is not installed.
+
 ## Expanded manual browser checklist
 - [ ] Verify all 38 cards, category filters, search, deep links and back navigation.
 - [ ] Verify every new tool in all four locales; fluent German, Yoruba and Nigerian Pidgin review is still required.
