@@ -728,6 +728,138 @@ STATUS
 - Next: [single next milestone/task]
 ```
 
+
+. Further Calculator Additions (Milestone 4.6 — Insert Before Milestone 5)
+7.1 Guiding Filter
+Before adding any tool, it must pass three checks derived from your organizational templates:
+
+Real user need — solves a common, recurring problem (not a novelty).
+
+Attributable source — any non-trivial constant or rate has a documented public source in the README.
+
+Policy fit — respects hb-AI-policy (client-side only, no sensitive data transmission, clear disclaimers).
+
+The tools below pass all three. I have deliberately excluded tools that fail (e.g., “celebrity age predictor,” “personality calculators,” “relationship compatibility scores”) because they misrepresent what AI/statistics can honestly deliver.
+
+7.2 Additional Tools to Build
+Tool	Module File	Functionality	Edge Cases / Policy Notes
+Time Zone Converter	js/timezone.js	Convert a date-time from one IANA time zone to another. Use the browser’s native Intl.DateTimeFormat and Temporal polyfill (or 
+date-fns-tz
+) — no API calls.	Handle DST transitions. Show offset. No location transmission.
+Currency Converter (Offline Rates)	js/currency.js	Convert between major currencies using user-editable rates (pre-populated with a snapshot of published rates, dated in the UI). Optional: user pastes current rates from their own source.	Do not call live exchange APIs. Display “Rates last updated: [date]” and “Edit rates for accuracy.” Financial disclaimer.
+Inflation / Purchasing Power Calculator	
+js/inflation.js
+Convert an amount from one year to another using a user-adjustable annual inflation rate, or a bundled historical table for a user-selectable country (documented source).	Clearly label the data year range. Disclaimer: “Estimates; not financial advice.”
+Tip & Bill Splitter	js/tip.js	Calculate tip amount, total, and per-person share with adjustable tip %, party size, and optional tax handling.	Rounding rules (round up/down/nearest). Handle zero party size.
+Calorie / Macro Calculator	js/calories.js	Estimate BMR (Mifflin-St Jeor) and TDEE from age, sex, height, weight, activity level. Optionally split into protein/carb/fat targets.	Health disclaimer required: “Not medical advice. Consult a professional.” No data leaves the browser.
+Pregnancy Due Date Calculator	js/pregnancy.js	Estimate due date from last menstrual period (Naegele’s rule) or conception date. Show gestational age and trimester.	Health disclaimer. Handle invalid/future dates. Offer “consult your clinician.”
+Water Intake Calculator	js/water.js	Estimate daily water needs from body weight, activity level, and climate (with adjustable factor).	Health disclaimer. Show range, not a single “correct” number.
+Blood Alcohol Estimator (Educational)	js/bac.js	Estimate BAC using the Widmark formula from weight, sex, drinks, and time.	Strict warning: “Educational estimate only. Do NOT use to decide whether to drive. Impairment varies. Never drive after drinking.” Consider making this opt-in behind a warning modal, or omitting it if hb-AI-policy disallows. Recommended: include only with an explicit policy check.
+Roman Numeral Converter	js/roman.js	Bidirectional Arabic ↔ Roman numeral conversion (1–3999).	Reject out-of-range values with clear error.
+Base / Number System Converter	js/bases.js	Convert between binary, octal, decimal, hexadecimal, and arbitrary base 2–36.	Validate digits against base; support large numbers via BigInt.
+Password Strength & Generator	js/password.js	Generate passwords with configurable length/charset; score strength with zxcvbn-style heuristics.	Never transmit or store the password. Generate entirely client-side using crypto.getRandomValues. Show note: “Generated locally; we never see it.”
+QR Code Generator	js/qr.js	Encode text/URL into a downloadable QR code (client-side library, e.g., qrcode).	Warn users that QR content is visible to anyone who scans it. No upload.
+Hash / Checksum Tool	js/hash.js	Compute SHA-256, SHA-1, MD5 (via Web Crypto or library) of pasted text or a dropped file.	All hashing local. State: “Nothing is uploaded.”
+JSON Formatter / Validator	js/json.js	Pretty-print, minify, and validate JSON; show line/column of errors.	Handle large inputs gracefully; no server round-trip.
+Color Converter & Contrast Checker	js/color.js	HEX ↔ RGB ↔ HSL conversion; WCAG contrast ratio between two colors.	Useful for design-system work. Align palette defaults with hb-design-system tokens.
+Percentage Change & Discount Calculator	js/discount.js	Original price, discount %, tax → final price; reverse-calculate original from sale price.	Rounding clarity; currency-neutral (unitless).
+Recipe Scaler	js/recipe.js	Scale ingredient quantities from one serving count to another; convert units where possible.	Handle fractions; preserve unit type.
+Timezone-aware “Days Until” for Holidays	js/holidays.js	Countdown to common holidays (user-selectable region), computed from published rules (e.g., Easter via Computus algorithm).	Provide sources; label region coverage. No external calendar APIs.
+Morse Code Translator	js/morse.js	Bidirectional text ↔ Morse code (international standard).	Handle unsupported characters with clear feedback.
+Simple Statistics Calculator	js/stats.js	Mean, median, mode, min, max, range, variance, standard deviation from a list of numbers.	Handle empty input, non-numeric entries, single-value sets.
+7.3 Deliberate Exclusions (and Why)
+To keep the product honest, do not add:
+
+“AI Prediction” or “Fortune” tools — violate hb-AI-policy spirit; misrepresent capability.
+
+Medical diagnostic tools beyond BMI/BMR estimates — liability and policy risk.
+
+Live stock/crypto tickers — require external APIs; no static hosting path.
+
+Tools requiring user accounts or stored data — breaks the “static, client-side only” architecture.
+
+If any of these are desired later, they should be treated as a separate milestone with explicit policy review, not slipped into this build.
+
+7.4 Updated File Structure (final)
+text
+js/
+├── (existing modules)
+├── timezone.js
+├── currency.js
+├── inflation.js
+├── tip.js
+├── calories.js
+├── pregnancy.js
+├── water.js
+├── bac.js            # only if policy-cleared
+├── roman.js
+├── bases.js
+├── password.js
+├── qr.js
+├── hash.js
+├── json.js
+├── color.js
+├── discount.js
+├── recipe.js
+├── holidays.js
+├── morse.js
+└── stats.js
+7.5 Navigation Update (Supersedes 6.3)
+With ~30 tools total, grouped tabs alone will not scale. Final navigation design:
+
+Landing panel with a searchable, filterable card grid of all tools.
+
+Category chips: All · Token & AI · Math · Text & Language · Conversion · Health · Finance · Time & Date · World & Culture · Developer · Security & Privacy.
+
+Each card shows: icon, tool name, one-line description, and a category tag.
+
+Selecting a card opens the tool panel; a “Back to all tools” button returns to the grid.
+
+Deep links via URL hash (e.g., #/token, #/bmi) so tools are shareable — implement a tiny hash router in main.js.
+
+This design preserves discoverability, respects the design system, and keeps every tool reachable without a crowded tab bar.
+
+7.6 Policy Additions
+Add these clauses to PRIVACY.md / README:
+
+Local-only processing reaffirmed for every tool added in Sections 6 and 7.
+
+No telemetry — no analytics, no beacons, no third-party scripts beyond static library CDNs (list them explicitly).
+
+Sensitive categories (health, religion, location, finance, security) each carry a contextual disclaimer visible in the UI.
+
+Source attribution — a SOURCES.md file lists every non-trivial constant (population rates, religious percentages, inflation tables, conversion factors, formula citations like Mifflin-St Jeor and Widmark).
+
+BAC tool: gated behind a warning modal; excluded from default build if 
+hb-AI-policy
+ forbids it. Default decision: include with warning + prominent “do not drive” clause unless the policy says otherwise.
+
+7.7 Updated Acceptance Criteria for Milestone 4.6
+The milestone is complete when:
+
+All tools from Sections 1.2, 6.2, and 7.2 are implemented and reachable via the card grid.
+
+The hash router works (direct links open the correct tool).
+
+SOURCES.md exists and covers every constant/rate/formula.
+
+Every policy-sensitive tool shows its contextual disclaimer.
+
+bac.js is either policy-cleared or excluded — the decision is documented in DESIGN_DECISIONS.md.
+
+No tool makes external network calls (verified by inspecting Network tab in DevTools).
+
+The card grid renders correctly on mobile (responsive, per hb-design-system breakpoints).
+
+7.8 Milestone 6 Addendum (Documentation)
+Update README.md and SOURCES.md to reflect:
+
+Full tool catalog table (name · category · purpose · data source).
+
+Explicit exclusion list with rationale (Section 7.3) so future contributors understand the boundaries.
+
+A note that the architecture is static, offline-capable after first load, and privacy-preserving by design.
+
 For ongoing work, provide a short checkpoint only when there is meaningful new, verified progress. Do not send repetitive status messages that contain no new information.
 
 The final report must include the live URL (only if verified), final commit SHA, test/build results, known limitations, and any remaining owner decisions.
