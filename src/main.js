@@ -16,7 +16,7 @@ const schema={
  bmi:[["unit","select",[["metric","Metric (kg, m)"],["imperial","Imperial (lb, in)"]]],["weight","number"],["height","number"]],
  percent:[["mode","select",[["of","X percent of Y"],["as","X as percent of Y"],["change","Percentage change"]]],["a","number"],["b","number"]],
  world:[],
- demographics:[["total","number"],["shares","textarea"]],
+ demographics:[["total","number"],["shares","textarea",null,"Christianity, 28.8\\nIslam, 25.6\\nHinduism, 14.9\\nBuddhism, 4.1\\nJudaism, 0.2\\nOther religions (including folk/traditional), 2.2\\nReligiously unaffiliated, 24.2"]],
  practice:[["minutes","number"],["sessions","number"],["years","number"]],
  zakat:[["cash","number"],["gold","number"],["silver","number"],["investments","number"],["rate","number",null,"2.5"]],
  qibla:[["lat","number"],["lon","number"]],
@@ -52,8 +52,8 @@ async function execute(k,d){
  case"age":{const r=c.age(d.birth);rows=[["Years",r.years],["Months",r.months],["Days",r.days]];break;}
  case"bmi":rows=[["BMI",fmt(c.bmi(d.weight,d.height,d.unit))]];note=N.bmi;break;
  case"percent":rows=[["Result",fmt(c.percent(d.mode,d.a,d.b))+"%"]];note=T.percentageAssumption||"Percentage change is signed: increases are positive and decreases are negative.";break;
- case"world":throw Error("notAvailable");
- case"demographics":{const r=c.demographics(d.total,d.shares);rows=r.rows.map(x=>[x.name,fmt(x.count,0)+" ("+fmt(x.share,2)+"%)"]);rows.push(["Entered percentage total",fmt(r.totalShare,2)+"%"]);note=N.demographics+" "+(r.totalShare<100?"Entered shares are below 100%.":r.totalShare>100?"Entered shares exceed 100%.":"Entered shares total 100%.");break;}
+ case"world":{const r=c.populationEstimate(new Date());rows=[["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]];note=T.worldEstimateNotice||"Estimate, not live data. Linear interpolation from UN medium-variant mid-year projections.";break;}
+ case"demographics":{const r=c.demographics(d.total,d.shares);rows=r.rows.map(x=>[x.name,fmt(x.count,0)+" ("+fmt(x.share,2)+"%)"]);rows.push(["Entered percentage total",fmt(r.totalShare,2)+"%"]);note=(T.demographicsSourceNote||"Starting shares are Pew Research Center global estimates for 2020; editable and not individual beliefs. ") + N.demographics+" "+(r.totalShare<100?"Entered shares are below 100%.":r.totalShare>100?"Entered shares exceed 100%.":"Entered shares total 100%.");break;}
  case"practice":{const r=c.practice(d.minutes,d.sessions,d.years);rows=[["Daily average minutes",fmt(r.day)],["Weekly minutes",fmt(r.week)],["Annual hours",fmt(r.year/60)],["Lifetime hours",fmt(r.lifetime/60)]];note=T.practiceAssumption||"Annual projection assumes 52 weeks per year; daily value is a weekly average.";break;}
  case"zakat":{const r=c.zakat(d,d.rate);rows=[["Entered assets",fmt(r.assets)],["Applied rate",fmt(d.rate)+"%"],["Calculated amount",fmt(r.due)]];note=N.zakat;break;}
  case"qibla":{const b=c.bearing(d.lat,d.lon);rows=[["Initial bearing",fmt(b,1)+"°"],["Compass direction",c.compass(b)]];note=N.qibla;break;}
@@ -69,7 +69,7 @@ async function execute(k,d){
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
 function renderTool(){
  const i=active,k=keys[i];panel.replaceChildren();const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);
- if(k==="world"){panel.append(el("p","notice",tr().notices.world));panel.append(el("p","muted",tr().worldWithheld||"No estimates are shown until a dated, credible baseline and method can be verified."));return;}
+ if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
  if(k==="token"){
   const live=el("p","muted","");live.setAttribute("role","status");live.setAttribute("aria-live","polite");form.append(live);
