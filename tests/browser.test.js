@@ -49,6 +49,21 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
+    const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
+    for(const card of cardData){
+      await page.getByRole("button",{name:card.name}).click();
+      await page.waitForFunction(name=>document.querySelector("#panel h2")?.textContent===name,card.name);
+      if(card.key==="world")assert.equal(await page.locator("#panel .result").count(),1);
+      else assert.equal(await page.locator("#panel form").count(),1,card.key+" should render a form");
+      await page.locator(".back-directory").click();
+      await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
+    }
+    await page.setViewportSize({width:375,height:812});
+    const mobile=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+    assert.ok(mobile.scroll<=mobile.width,"mobile directory should not overflow horizontally");
+    await page.locator(".tool-card").first().focus();
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(()=>!document.querySelector("#panel")?.hidden);
     await page.goto("http://127.0.0.1:4173/#/timezone");
     assert.match(await page.locator("#panel h2").innerText(),/Time zone converter/);
     assert.equal(await page.locator("#panel form").count(),1);
