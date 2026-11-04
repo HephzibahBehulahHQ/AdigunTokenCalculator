@@ -12,3 +12,5 @@ test("completion milestone controls are labelled in every locale",()=>{for(const
 test("new result labels are translated in every locale",()=>{for(const locale of ["en","de","yo","pcm"])for(const key of ["Estimated population","Estimated net change per day","Reference baseline","Daily average minutes","Countdown status","Next occurrence","Days until event","Weighted percentage average","Fuel units","Applied rate","Compass direction"])assert.ok(I[locale].outputs[key],locale+":"+key);});
 
 test("UTC population timestamp label is translated",()=>{for(const locale of ["en","de","yo","pcm"])assert.ok(I[locale].outputs["Estimate timestamp UTC"],locale);});
+
+test("percentage result explanation is localized in all four languages",()=>{for(const locale of ["en","de","yo","pcm"])assert.ok(I[locale].notices.percentage,locale);});
