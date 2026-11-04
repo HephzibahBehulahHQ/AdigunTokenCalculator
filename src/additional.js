@@ -1,3 +1,5 @@
+import { Temporal } from "@js-temporal/polyfill";
+
 const finite = n => Number.isFinite(Number(n));
 const positive = n => finite(n) && Number(n) > 0;
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
@@ -26,20 +28,23 @@ function formatOffset(minutes) {
   return sign+String(Math.floor(v/60)).padStart(2,"0")+":"+String(v%60).padStart(2,"0");
 }
 export function convertTimeZone(localDateTime, fromZone, toZone) {
-  const m=/^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):([0-5]\d)$/.exec(String(localDateTime));
-  if(!m) throw Error("date");
-  const p=dateParts(m[1]),hh=+m[2],mm=+m[3],wall=Date.UTC(p.y,p.m-1,p.d,hh,mm);
-  const zones=[fromZone,toZone];
-  for(const z of zones) new Intl.DateTimeFormat("en",{timeZone:z}).format(new Date(wall));
-  const offsets=new Set();
-  for(let delta=-36;delta<=36;delta+=6) offsets.add(offsetAt(wall+delta*3600000,fromZone));
-  const matches=[...offsets].map(off=>wall-off*60000).filter(ms=>{
-    const q=wallParts(ms,fromZone);
-    return q.y===p.y&&q.m===p.m&&q.d===p.d&&q.h===hh&&q.min===mm;
-  }).sort((a,b)=>a-b);
-  if(!matches.length) throw Error("dst-gap");
-  const instant=matches[0],to=wallParts(instant,toZone),fromOffset=offsetAt(instant,fromZone),toOffset=offsetAt(instant,toZone);
-  return {instant:new Date(instant).toISOString(),local:isoDate(to.y,to.m,to.d)+"T"+String(to.h).padStart(2,"0")+":"+String(to.min).padStart(2,"0"),fromOffset:formatOffset(fromOffset),toOffset:formatOffset(toOffset),ambiguous:matches.length>1};
+  const match=/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(localDateTime));
+  if(!match) throw Error("date");
+  let plain;
+  try{plain=Temporal.PlainDateTime.from(String(localDateTime)+":00",{overflow:"reject"});}catch{throw Error("date");}
+  let earlier,later;
+  try{
+    earlier=plain.toZonedDateTime(fromZone,{disambiguation:"earlier"});
+    later=plain.toZonedDateTime(fromZone,{disambiguation:"later"});
+    new Intl.DateTimeFormat("en",{timeZone:toZone}).format(new Date(Number(earlier.epochMilliseconds)));
+  }catch{throw Error("zone");}
+  const earlierMatches=earlier.toPlainDateTime().equals(plain),laterMatches=later.toPlainDateTime().equals(plain);
+  if(!earlierMatches||!laterMatches)throw Error("dst-gap");
+  const ambiguous=!earlier.toInstant().equals(later.toInstant());
+  const target=earlier.toInstant().toZonedDateTimeISO(toZone);
+  const local=target.toPlainDateTime().toString({smallestUnit:"minute"});
+  const localFormatted=new Intl.DateTimeFormat(undefined,{timeZone:toZone,dateStyle:"medium",timeStyle:"short",hourCycle:"h23"}).format(new Date(Number(target.epochMilliseconds)));
+  return {instant:earlier.toInstant().toString(),local,localFormatted,fromOffset:earlier.offset,toOffset:target.offset,ambiguous};
 }
 
 export const ECB_RATES_DATE="2026-11-04";
