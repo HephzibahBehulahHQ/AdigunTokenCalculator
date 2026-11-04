@@ -389,3 +389,9 @@ The Qibla bearing uses the Kaaba coordinates from Deutsches Archäologisches Ins
 ## Data attribution — ECB reference rates
 
 Currency table attribution: European Central Bank (ECB), euro foreign exchange reference rates, 4 November 2026. The rates are informational reference data, not transaction rates; see the ECB source and its use guidance in SOURCES.md.
+
+
+## Temporal time-zone dependencies
+
+- `@js-temporal/polyfill@0.5.1` — ISC. Used locally for Temporal.PlainDateTime / ZonedDateTime DST gap and ambiguity handling. The standard ISC licence text is included above.
+- `jsbi@4.3.2` — Apache-2.0, dependency of the Temporal polyfill. The full Apache 2.0 licence text above applies.
