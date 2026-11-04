@@ -32,5 +32,5 @@ if(!Number.isFinite(v))throw Error("number");return v;
 }
 export function dateDifference(start,end,today=new Date()){
 const a=parts(start),b=parts(end),x=Date.UTC(a.y,a.m-1,a.d),y=Date.UTC(b.y,b.m-1,b.d);
-return{days:Math.round((y-x)/86400000),direction:y>=x?"forward":"past",fromToday:Math.round((y-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000)};
+return{days:Math.round((y-x)/86400000),direction:y>=Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())?"upcoming":"elapsed",fromToday:Math.round((y-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000)};
 }
