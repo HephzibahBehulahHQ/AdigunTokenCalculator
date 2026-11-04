@@ -43,7 +43,7 @@ export function convertTimeZone(localDateTime, fromZone, toZone) {
 }
 
 export const ECB_RATES_DATE="2026-11-04";
-export const ECB_EUR_RATES=Object.freeze({EUR:1,USD:1.1267,GBP:0.83460,JPY:178.30});
+export const ECB_EUR_RATES=Object.freeze({EUR:1,USD:1.1267,JPY:178.30,CZK:24.309,DKK:7.4738,GBP:0.83460,HUF:363.03,PLN:4.3990,RON:5.3440,SEK:10.9718,CHF:0.9188,ISK:136.80,NOK:10.3970,TRY:56.3598,AUD:1.6061,BRL:6.1579,CAD:1.5701,CNY:7.5177,HKD:8.8399,IDR:20425.83,ILS:3.5641,INR:106.6318,KRW:1508.18,MXN:21.0086,MYR:4.5789,NZD:1.9988,PHP:71.578,SGD:1.4398,THB:37.902,ZAR:18.5404});
 export function convertCurrency(amount,from,to,rates=ECB_EUR_RATES) {
   amount=Number(amount);
   if(!finite(amount)||!rates||!positive(rates[from])||!positive(rates[to])) throw Error("number");
