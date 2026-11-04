@@ -44,3 +44,27 @@ Recheck date-sensitive snapshots before release. Never label a stored snapshot �
 ### Population baseline verification state
 
 The official [UNData WPP 2024 record](https://data.un.org/Data.aspx?d=PopDiv&f=variableID%3A12%3BcrID%3A900%3BvarID%3A2) identifies the series as “Total population, both sexes combined (thousands)” for World / Medium and cites the 2024 Revision. The application currently seeds 1 July 2025 and 1 July 2026 values from that WPP 2024 medium-variant series. Those numbers have been cross-checked against independent public reproductions, but the direct downloadable UN dataset file and its checksum have not yet been archived in this repository. Therefore, exact baseline-to-file verification remains an open release check; do not describe this dataset audit as fully closed.
+
+
+## Remaining original-tool constants and formula references
+
+- **BMI:** CDC's adult BMI calculation is weight in kg divided by height in metres squared; the imperial factor is 703. BMI is a screening measure, not a diagnosis. [CDC calculation](https://www.cdc.gov/growth-chart-training/hcp/using-bmi/calculating-bmi.html) and [adult categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html).
+- **Qibla:** bearing uses the great-circle initial-bearing formula. The Kaaba reference coordinate is approximately 21.4225° N, 39.8262° E, matching the [German Archaeological Institute gazetteer](https://gazetteer.dainst.org/doc/1008211.html); Google's [Qibla Finder explanation](https://support.google.com/faqs/answer/7364753?hl=en) describes the same great-circle approach. Geolocation remains an explicit user action.
+- **Unit and fuel conversions:** length, mass, volume and area constants are based on SI definitions and [NIST SP 811 conversion factors](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9). Exact gallon distinctions are retained: US gallon = 3.785411784 L; Imperial gallon = 4.54609 L. Decimal and binary digital units are explicitly distinct (1000 vs 1024 prefixes); see the [BIPM SI Brochure](https://www.bipm.org/en/publications/si-brochure/).
+- **Zakat:** the default editable rate is 2.5%, consistent with [Islamic Relief's zakat rules](https://www.islamic-relief.org.uk/giving/islamic-giving/zakat/zakat-rules/). Eligibility, nisab, lunar-year ownership, debt treatment and school-specific rulings are not calculated; this is arithmetic only, not a religious ruling.
+- **Water:** the broad 30–35 mL/kg adult band is adapted from [German Nutrition Society (DGE) reference values](https://www.dge.de/wissenschaft/referenzwerte/wasser/), which vary by age and describe total water from drinks and food. The app does not ask age and therefore labels this a rough adjustable total-water estimate, not a drinking-water prescription.
+- **Holidays:** Easter dates use Gregorian computus. US federal holiday examples are checked against [US OPM](https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/); England and Wales bank-holiday rules against [GOV.UK](https://www.gov.uk/bank-holidays); Canada examples against [Canada.ca](https://www.canada.ca/en/revenue-agency/services/tax/public-holidays.html). Region lists are intentionally incomplete: Germany and Nigeria include a common fixed/Christian subset, and variable lunar holidays, substitute days and province/state exceptions are not comprehensive. Never treat this as a legal calendar.
+- **Word reading time:** 200 words per minute is a product heuristic, not a universal reading speed.
+- **Contemplative practice:** annual and lifetime projections use 52 weeks per year; this is an explicit arithmetic assumption.
+- **Sleep cycle:** 90 minutes is a user-adjustable heuristic, not a physiological guarantee.
+- **Loan, tip, discount, percentage, recipe and statistics:** standard arithmetic formulas; no external rates or prices are supplied.
+- **Age and date difference:** calendar arithmetic uses the browser's local date/time context; the app documents its exclusive/inclusive convention in the UI.
+- **GPA:** the 4.0 mapping is illustrative; percentage mode remains separate and is not silently converted to GPA.
+
+
+## Deliberate exclusions (scope boundary)
+
+- **AI prediction, fortune-telling and personality/relationship scoring:** excluded because they imply unsupported predictive certainty or misrepresent statistical/AI capability.
+- **Medical diagnosis and treatment recommendations:** excluded; the health tools remain limited to explicitly labelled estimates/screening calculations.
+- **Live stock/crypto tickers or live currency APIs:** excluded because they require runtime external services and would violate the static local-only architecture. Currency conversion uses a dated offline snapshot.
+- **User accounts, cloud profiles and persistent sensitive data:** excluded because they break the static, client-side privacy model.
