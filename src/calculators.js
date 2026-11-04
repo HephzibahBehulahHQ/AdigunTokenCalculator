@@ -18,7 +18,7 @@ export function sleep(time,mode,cycle,buffer){if(!/^([01]\d|2[0-3]):[0-5]\d$/.te
 
 export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;
 switch(op){
-case"add":case"subtract":case"multiply":case"divide":case"power":case"modulo":v=arithmetic(a,b,op==="modulo"?"remainder":op);if(op==="modulo"){if(!ok(b)||b===0)throw Error("zero");v=a%b;}break;
+case"add":case"subtract":case"multiply":case"divide":case"power":case"modulo":if(op==="modulo"){if(!ok(b)||b===0)throw Error("zero");v=a%b;}else v=arithmetic(a,b,op);break;
 case"sqrt":if(a<0)throw Error("number");v=Math.sqrt(a);break;
 case"sin":v=Math.sin(a*Math.PI/180);break;
 case"cos":v=Math.cos(a*Math.PI/180);break;
