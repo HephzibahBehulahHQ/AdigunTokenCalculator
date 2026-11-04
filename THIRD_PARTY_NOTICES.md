@@ -267,3 +267,116 @@ Apache License
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+## Lockfile dependency inventory
+
+The following inventory is generated from the committed lockfile. Package-specific copyright holders and licence terms remain those supplied by each package; this table records the declared SPDX licence identifier.
+
+| Package | Version | Declared licence |
+|---|---:|---|
+| `@esbuild/aix-ppc64` | `0.25.12` | `MIT` |
+| `@esbuild/android-arm` | `0.25.12` | `MIT` |
+| `@esbuild/android-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/android-x64` | `0.25.12` | `MIT` |
+| `@esbuild/darwin-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/darwin-x64` | `0.25.12` | `MIT` |
+| `@esbuild/freebsd-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/freebsd-x64` | `0.25.12` | `MIT` |
+| `@esbuild/linux-arm` | `0.25.12` | `MIT` |
+| `@esbuild/linux-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/linux-ia32` | `0.25.12` | `MIT` |
+| `@esbuild/linux-loong64` | `0.25.12` | `MIT` |
+| `@esbuild/linux-mips64el` | `0.25.12` | `MIT` |
+| `@esbuild/linux-ppc64` | `0.25.12` | `MIT` |
+| `@esbuild/linux-riscv64` | `0.25.12` | `MIT` |
+| `@esbuild/linux-s390x` | `0.25.12` | `MIT` |
+| `@esbuild/linux-x64` | `0.25.12` | `MIT` |
+| `@esbuild/netbsd-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/netbsd-x64` | `0.25.12` | `MIT` |
+| `@esbuild/openbsd-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/openbsd-x64` | `0.25.12` | `MIT` |
+| `@esbuild/openharmony-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/sunos-x64` | `0.25.12` | `MIT` |
+| `@esbuild/win32-arm64` | `0.25.12` | `MIT` |
+| `@esbuild/win32-ia32` | `0.25.12` | `MIT` |
+| `@esbuild/win32-x64` | `0.25.12` | `MIT` |
+| `@rollup/rollup-android-arm-eabi` | `4.67.5` | `MIT` |
+| `@rollup/rollup-android-arm64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-android-x64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-darwin-arm64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-darwin-x64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-freebsd-arm64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-freebsd-x64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-arm-gnueabihf` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-arm-musleabihf` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-arm64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-arm64-musl` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-loong64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-loong64-musl` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-ppc64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-ppc64-musl` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-riscv64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-riscv64-musl` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-s390x-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-x64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-linux-x64-musl` | `4.67.5` | `MIT` |
+| `@rollup/rollup-openbsd-x64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-openharmony-arm64` | `4.67.5` | `MIT` |
+| `@rollup/rollup-win32-arm64-msvc` | `4.67.5` | `MIT` |
+| `@rollup/rollup-win32-ia32-msvc` | `4.67.5` | `MIT` |
+| `@rollup/rollup-win32-x64-gnu` | `4.67.5` | `MIT` |
+| `@rollup/rollup-win32-x64-msvc` | `4.67.5` | `MIT` |
+| `@types/estree` | `1.0.10` | `MIT` |
+| `base64-js` | `1.5.1` | `MIT` |
+| `esbuild` | `0.25.12` | `MIT` |
+| `fdir` | `6.5.0` | `MIT` |
+| `fsevents` | `2.3.3` | `MIT` |
+| `js-tiktoken` | `1.0.21` | `MIT` |
+| `nanoid` | `3.3.20` | `MIT` |
+| `picocolors` | `1.1.1` | `ISC` |
+| `picomatch` | `4.0.7` | `MIT` |
+| `playwright-core` | `1.57.0` | `Apache-2.0` |
+| `postcss` | `8.5.32` | `MIT` |
+| `qrcode-generator` | `2.0.4` | `MIT` |
+| `rollup` | `4.67.5` | `MIT` |
+| `source-map-js` | `1.2.2` | `BSD-3-Clause` |
+| `tinyglobby` | `0.2.17` | `MIT` |
+| `vite` | `6.4.5` | `MIT` |
+
+
+## ISC License — standard text
+
+ISC License
+
+Copyright <year> <owner> 
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+## BSD 2-Clause License — standard text
+
+Copyright (c) <year> <owner> 
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## BSD 3-Clause License — standard text
+
+Copyright (c) <year> <owner>. 
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
