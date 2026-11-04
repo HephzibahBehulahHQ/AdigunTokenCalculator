@@ -93,3 +93,8 @@ I.en.descriptions[24]="Estimate total daily water using a broad DGE adult refere
 I.de.descriptions[24]="Gesamte tägliche Wasserzufuhr anhand eines groben DGE-Referenzbereichs für Erwachsene von 30–35 mL/kg schätzen; Wasser aus Lebensmitteln eingeschlossen.";
 I.yo.descriptions[24]="Ṣírò àpapọ̀ omi ojoojúmọ́ pẹ̀lú ìwọ̀n DGE 30–35 mL/kg fún àgbà; omi inú oúnjẹ tún wà nínú rẹ̀.";
 I.pcm.descriptions[24]="Estimate total daily water with DGE adult reference band 30–35 mL/kg, including food water; adjust for activity and climate.";
+
+Object.assign(I.en.additionalOutputs,{LocalISO:"Converted local date/time (ISO)"});
+Object.assign(I.de.additionalOutputs,{LocalISO:"Umgerechnete Ortszeit (ISO)"});
+Object.assign(I.yo.additionalOutputs,{LocalISO:"Àkókò agbègbè tí a yí padà (ISO)"});
+Object.assign(I.pcm.additionalOutputs,{LocalISO:"Converted local date/time (ISO)"});
