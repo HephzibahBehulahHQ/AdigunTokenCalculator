@@ -36,7 +36,7 @@ Manual checks require a human on target browsers before claiming full accessibil
 - [x] Easter computus and regional holiday rules, Morse round-trip and statistics edge cases.
 
 ## Automated browser integration
-- [x] `tests/browser.test.js` runs Chromium against the Vite development server in CI. It checks all 38 tool views, the 38-card directory, category filters, search, currency conversion, QR generation, back navigation, a direct time-zone deep link, mobile overflow and keyboard activation. It is skipped locally when the Playwright browser binary is not installed.
+- [x] `tests/browser.test.js` runs Chromium against the Vite development server in CI. It checks all 38 tool views, the 38-card directory, category filters, search, currency conversion, QR generation, BAC acknowledgement, back navigation, a direct time-zone deep link, mobile overflow, keyboard activation, no third-party requests and no geolocation before explicit user action. It is skipped locally when the Playwright browser binary is not installed.
 
 ## Expanded manual browser checklist
 - [ ] Verify all 38 cards, category filters, search, deep links and back navigation.
