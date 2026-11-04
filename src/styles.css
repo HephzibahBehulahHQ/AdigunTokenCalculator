@@ -23,3 +23,6 @@
 .field input[type=file]{padding:.55rem}
 [hidden]{display:none!important}
 @media(max-width:720px){.tool-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr))}.tool-card{min-height:125px}.category-chips{gap:.35rem}}
+
+.corporate-logo{display:block;width:auto;max-width:min(30vw,168px);height:46px;object-fit:contain;background:#fff;border-radius:5px;padding:2px}
+@media(max-width:480px){.corporate-logo{max-width:108px;height:38px}}
