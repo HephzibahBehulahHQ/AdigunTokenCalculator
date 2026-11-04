@@ -104,3 +104,11 @@ pcm:{"Estimated population":"Estimated population","Estimated net change per day
 for(const [locale,data] of Object.entries(completionOutputs))Object.assign(I[locale].outputs,data);
 
 for(const [locale,value] of Object.entries({en:"Estimate timestamp (UTC)",de:"Zeitpunkt der Schätzung (UTC)",yo:"Àkókò àfojúsùn (UTC)",pcm:"Estimate time (UTC)"}))I[locale].outputs["Estimate timestamp UTC"]=value;
+
+const tokenNotes={
+en:"Strings that look like special tokenizer tokens are counted as ordinary text. Only the selected encoding and exact text are counted.",
+de:"Zeichenfolgen, die wie spezielle Token aussehen, werden als normaler Text gezählt. Gezählt werden nur der gewählte Encoder und der genaue Text.",
+yo:"Ọ̀rọ̀ tó dà bí special token ni a ó ka gẹ́gẹ́ bí ọ̀rọ̀ lasan. A ka text gangan àti encoding tí o yàn nìkan.",
+pcm:"Text wey look like special tokenizer token go count as normal text. We count only the exact text and encoding wey you select."
+};
+for(const [locale,note] of Object.entries(tokenNotes))I[locale].notices.token+=" "+note;
