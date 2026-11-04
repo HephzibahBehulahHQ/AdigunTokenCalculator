@@ -14,16 +14,16 @@ Corporate tokens: midnight navy `#0B1220`, metallic gold `#D4AF37`, royal blue `
 Static Vite + semantic HTML + CSS + vanilla JS. All calculations run in-browser. No backend, analytics, telemetry, remote logging, third-party calculation API or runtime CDN. User input is rendered through DOM APIs and textContent.
 
 ## Tokenizer dependency
-Initial candidate: `js-tiktoken@1.0.21`, MIT declared by npm. Lite rank imports keep only `cl100k_base` and `o200k_base` in the product source. Package maintenance cadence and model-to-encoding claims must be re-evaluated before release. Initial supported model labels: GPT-4o / GPT-4o mini → o200k_base; GPT-4 / GPT-3.5 Turbo → cl100k_base. These mappings require upstream verification and reproducible tests before production claims.
+Pinned dependency: `js-tiktoken@1.0.21`, MIT declared by npm. Lite rank imports keep only `cl100k_base` and `o200k_base` in the product source. Model mappings were checked against OpenAI's upstream tiktoken model table and Cookbook: GPT-4o / GPT-4o mini → `o200k_base`; GPT-4 / GPT-3.5 Turbo → `cl100k_base`. Automated tests cover Unicode inputs and UTF-8 piece reconstruction. The byte-piece adapter still relies on the pinned package's internal byte map because no public per-token byte method is exposed; that implementation detail remains a documented maintenance risk.
 
 ## Data restraint
-World-statistics metrics remain withheld until credible dated baselines, units, sources and assumptions are documented. Demographic shares are user-entered; no unsupported global estimates are supplied.
+The world population tool uses two dated 1 July UN WPP 2024 medium-variant baselines and labels its linear interpolation/extrapolation as an estimate, not a live count. The direct downloadable dataset and checksum comparison for the 2025/2026 numeric rows remains a release check. Births, deaths and CO₂ remain withheld until separately sourced daily baselines are verified. Religion shares are seeded from the cited Pew 2020 estimates, are editable, and retain the Pew “other religions” aggregation; no unsupported folk-only share is invented.
 
 ## Licensing
-No product licence has been authorized. Include third-party notices for the MIT tokenizer dependency when packaging. Do not infer a licence for corporate artwork.
+No project-wide product licence has been authorized; no root `LICENSE` file is added until the owner chooses one. Third-party notices are included for `js-tiktoken@1.0.21` (MIT), `qrcode-generator@2.0.4` (MIT) and the development-only `playwright-core@1.57.0` (Apache-2.0). The corporate logo is copied byte-for-byte from the approved canonical design-system asset, with source revision and provenance recorded in `docs/LICENSING.md`.
 
 ## Release gates
-Generate and inspect lockfile; verify tokenizer mappings and Unicode pieces; obtain fluent translation review; obtain approved logo and asset permissions; complete accessibility, responsive, browser and offline verification; source any world-statistics baselines; obtain explicit deployment authorization.
+Automated lockfile installation, 57 unit/browser tests, Chromium smoke test and production build pass on the current feature branch. The approved logo asset is integrated. Remaining gates are fluent translation review, manual keyboard/screen-reader/responsive/contrast/offline checks, direct UN WPP downloadable-file verification with checksum, and an owner decision on the project-wide licence. The owner has explicitly authorized completion, merge and deployment; the expanded feature branch is not yet merged or deployed.
 
 
 ## Completion milestone decisions
