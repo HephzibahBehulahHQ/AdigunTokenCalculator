@@ -1,0 +1,7 @@
+import test from "node:test";import assert from "node:assert/strict";import * as c from "../src/calculators.js";
+test("Unicode text statistics",()=>{const r=c.stats("Hello, world!\n\nYorùbá 😊");assert.equal(r.words,3);assert.equal(r.paragraphs,2);assert.equal(r.chars,[..."Hello, world!\n\nYorùbá 😊"].length);});
+test("calendar age handles month ends",()=>{assert.deepEqual(c.age("2000-01-31",new Date(2024,2,1)),{years:24,months:1,days:1});assert.throws(()=>c.age("2030-01-01",new Date(2024,0,1)));});
+test("math and percentage edge cases",()=>{assert.equal(c.arithmetic(8,2,"divide"),4);assert.throws(()=>c.arithmetic(1,0,"divide"));assert.equal(c.percent("change",100,125),25);assert.throws(()=>c.percent("as",1,0));});
+test("temperature and BMI",()=>{assert.equal(c.temperature(0,"c"),32);assert.equal(c.temperature(32,"f"),0);assert.throws(()=>c.temperature(-300,"c"));assert.equal(c.bmi(80,2),20);});
+test("bearing, loans, dates and GPA",()=>{assert.ok(c.bearing(0,0)>=0);assert.throws(()=>c.bearing(91,0));assert.equal(c.loan(1200,0,1).payment,100);assert.equal(c.days("2024-02-28","2024-03-01"),2);assert.equal(c.gpa("A,3\nB,1"),3.75);});
+test("fuel, units, zakat, practice, shares and sleep",()=>{assert.deepEqual(c.fuel(100,5,2),{litres:5,cost:10});assert.equal(c.unit(1,"km","m","length"),1000);assert.equal(c.zakat({cash:100},2.5).due,2.5);assert.equal(c.practice(30,7,1).year,10920);assert.equal(c.shares(100,"30,20").total,50);assert.equal(c.sleep("22:00","bed",90,15)[0],"23:45");});
