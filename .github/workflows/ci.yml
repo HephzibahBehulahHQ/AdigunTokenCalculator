@@ -9,33 +9,54 @@ on:
       - main
     types: [opened, synchronize, reopened, ready_for_review]
 permissions:
-  contents: write
+  contents: read
 jobs:
   verify:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies and generate lockfile
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run build
+  lockfile:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/codex/milestone-4-completion'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/milestone-4-completion
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Rebase onto latest feature branch
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund
-          else
-            npm install --no-audit --no-fund
-          fi
-      - name: Commit lockfile to the feature branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/milestone-4-completion'
+          git fetch origin codex/milestone-4-completion
+          git rebase FETCH_HEAD
+      - name: Generate reproducible dependency lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit lockfile on feature branch
         run: |
-          if [ -f package-lock.json ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            if ! git diff --cached --quiet; then
-              git commit -m "build: lock npm dependency tree"
-              git push origin "HEAD:${GITHUB_REF_NAME}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build: lock npm dependency tree"
+            if ! git push origin HEAD:codex/milestone-4-completion; then
+              git fetch origin codex/milestone-4-completion
+              if git diff --quiet FETCH_HEAD -- package-lock.json; then
+                git reset FETCH_HEAD
+              else
+                exit 1
+              fi
             fi
           fi
+      - name: Install exactly the locked dependencies
+        run: npm ci --no-audit --no-fund
       - run: npm test
       - run: npm run build
