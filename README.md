@@ -74,7 +74,7 @@ npm test
 npm run build
 ```
 
-Vite writes the static production site to dist/. GitHub Actions tests and builds before deploying. The project-site base path is configured in vite.config.js.
+Vite writes the static production site to dist/. GitHub Actions tests and builds before deploying. The project-site base path is configured in vite.config.js. For the full local Chromium integration test, run `npx playwright-core install chromium` once after `npm ci`; without a browser binary, the browser test is skipped locally. CI installs Chromium automatically.
 
 ## Tokenizer scope
 
