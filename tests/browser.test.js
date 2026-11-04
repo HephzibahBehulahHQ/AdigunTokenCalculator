@@ -48,6 +48,19 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/https:\/\/example\.com/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
+    await page.getByRole("button",{name:"Blood alcohol estimate (educational)"}).click();
+    await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="Blood alcohol estimate (educational)");
+    await page.locator('input[name="weightKg"]').fill("70");
+    await page.locator('input[name="drinks"]').fill("2");
+    const bacForm=page.locator("#panel form");
+    assert.equal(await bacForm.evaluate(f=>f.checkValidity()),false,"BAC consent must be required before calculation");
+    await page.locator('input[name="acknowledge"]').check();
+    assert.equal(await bacForm.evaluate(f=>f.checkValidity()),true);
+    await bacForm.evaluate(f=>f.requestSubmit());
+    await page.locator(".result").waitFor({timeout:5000});
+    assert.match(await page.locator(".result").innerText(),/Never use this to decide whether to drive/);
+    await page.locator(".back-directory").click();
+    await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
     const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
     for(const card of cardData){
