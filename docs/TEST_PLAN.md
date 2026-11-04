@@ -1,7 +1,7 @@
 # Test plan
 
 ## Automated
-Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. Latest successful CI run #141 passed 57 tests, Chromium browser smoke test and production build.
+Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. Latest successful CI run #186 passed 58 tests, full 38-view Chromium smoke test, privacy/geolocation checks and production build.
 
 Unit coverage includes Unicode text statistics; age/date-only calendar arithmetic; arithmetic, percentages, temperature limits, BMI metric/imperial; Qibla bearing and compass validation; zero-rate loans; GPA and percentage averages; metric and imperial fuel; unit conversion; Zakat; practice projections; named demographic shares; sleep rollover; scientific operations; calculator memory; annual countdowns; population estimate baseline; four-locale tool catalogues, fields, options and results; tokenizer whitespace, newlines, emoji, non-Latin text, special-token literals, token IDs and UTF-8 reconstruction.
 
@@ -31,7 +31,7 @@ Manual checks require a human on target browsers before claiming full accessibil
 - [x] Water heuristic lower/upper bounds and adjustment.
 - [x] BAC formula zero case, range validation and disclaimer visibility.
 - [x] Roman canonicality, base conversion BigInt boundaries and password character sets.
-- [x] QR generation, hash known vectors / file limit, JSON line-column errors.
+- [x] QR generation, hash known vectors, JSON line-column errors.
 - [x] HEX/RGB/HSL and WCAG ratio, discount reverse calculation, recipe fractions.
 - [x] Easter computus and regional holiday rules, Morse round-trip and statistics edge cases.
 
