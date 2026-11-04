@@ -79,3 +79,12 @@ Object.assign(I.en.additionalOutputs,{Ambiguous:"Ambiguous local time"});
 Object.assign(I.de.additionalOutputs,{Ambiguous:"Mehrdeutige Ortszeit"});
 Object.assign(I.yo.additionalOutputs,{Ambiguous:"Àkókò agbègbè méjì"});
 Object.assign(I.pcm.additionalOutputs,{Ambiguous:"Ambiguous local time"});
+
+I.en.bacConsentWarning="Educational estimate only. Never use this to decide whether to drive.";
+I.de.bacConsentWarning="Nur eine Lehrschätzung. Niemals verwenden, um zu entscheiden, ob Sie fahren können.";
+I.yo.bacConsentWarning="Àfojúsùn fún ẹ̀kọ́ nìkan. Má ṣe lò ó láti pinnu bóyá o lè wakọ̀.";
+I.pcm.bacConsentWarning="Education estimate only. Never use am to decide whether to drive.";
+I.en.bacConsent="I understand this is educational only and will never use it to decide whether to drive.";
+I.de.bacConsent="Ich verstehe, dass dies nur zu Lehrzwecken dient und niemals zur Entscheidung über das Fahren verwendet werden darf.";
+I.yo.bacConsent="Mo lóye pé fún ẹ̀kọ́ nìkan ni, mi ò sì ní lò ó láti pinnu bóyá mo lè wakọ̀.";
+I.pcm.bacConsent="I understand say na education only and I no go use am to decide whether to drive.";
