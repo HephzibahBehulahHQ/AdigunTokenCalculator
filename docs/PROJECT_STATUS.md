@@ -1,34 +1,42 @@
 # Project status — AdigunTokenCalculator
 
-**Current state:** Published to GitHub Pages.
-**Production commit:** 4b338de154350437697425a162e342d45702d9b4.
-**Live URL:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
-**Owner decisions:** HB Artificial Intelligence; English/German/Yoruba/Nigerian Pidgin; system-font fallback.
+**Milestone:** 4 — Completion implementation automated verification passed; review and deployment pending.
+**Branch:** codex/milestone-4-completion.
+**Base:** main at f154de2d80baef52ed66b838ec548fdd1e1f8302.
+**Live production baseline:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
-## Implemented
-- Static Vite app with grouped directory for all 18 tools.
-- Four-language interface foundation: tool names, descriptions, group names, primary form labels, select options and result labels.
-- Local lazy-loaded tokenizer rank chunks for o200k_base and cl100k_base; byte-preserving token segmentation.
-- Scientific engineering operations: arithmetic, modulo, powers, square root, degree-based trigonometry, logarithms and factorial.
-- BMI metric and imperial input modes.
-- Date difference with upcoming/elapsed countdown status.
-- Initial calculators for text statistics, temperature, age, percentages, user-entered demographics, practice time, Zakat arithmetic, Qibla bearing, unit conversions, loans, GPA, fuel and sleep.
-- Vite project-site base path configured as /AdigunTokenCalculator/.
-- GitHub Actions workflow builds, tests and deploys the site from main.
-- Privacy/architecture documentation. Unsourced world-statistics figures remain withheld.
+## Implemented in this milestone
+- Tokenizer live count, reconstructed text and token-ID copy controls, clear action and special-token text notice.
+- Explicit supported model-to-encoding mappings; byte-preserving token reconstruction check.
+- Engineering memory controls (M+, M−, MR, MC), clear/backspace; degree-based trigonometry, modulo, logs and factorial.
+- Named editable religion categories with Pew Research Center's sourced 2020 shares and source link.
+- World population estimate based on UN WPP 2024 medium-variant mid-year values, rounded to nearest thousand with UTC timestamp. Births, deaths and CO₂ remain withheld.
+- Qibla compass direction and explicit click-to-request geolocation.
+- Daily practice-time average.
+- Annual recurring event countdown and corrected today/upcoming/elapsed status.
+- GPA percentage mode, clearly distinguished from GPA.
+- Metric and imperial fuel calculations (US and Imperial mpg).
+- More translated labels, outputs, assumptions and validation feedback in four locales.
+- Privacy, architecture, data-source, licensing, third-party notice and test-plan documentation.
+- CI workflow runs on the completion feature branch; high-contrast focus indicator.
 
-## Verification and deployment evidence
-- Pre-merge GitHub Actions Build and test run #68 (41913773155): **12 tests passed, 0 failed; production build passed**.
-- Post-merge Pages workflow run #1 (41913949546), commit 4b338de154350437697425a162e342d45702d9b4: dependency install PASS, tests PASS, production build PASS, Pages artifact upload PASS, deployment PASS.
-- GitHub Actions reported the deployment URL as https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/.
-- Main app bundle: 46.01 kB (gzip 16.49 kB).
-- Tokenizer rank data is lazy-loaded: cl100k_base 1.09 MB and o200k_base 2.33 MB minified (gzip 502 kB and 1.14 MB respectively), fetched only when the selected encoding is first used.
+## Verified automated checkpoint
+GitHub Actions **Build and test**, run #103 (41916487375), with a clean npm ci after lockfile generation:
+- Dependency install: PASS.
+- Unit tests: **32 passed, 0 failed**.
+- Production build: PASS.
+- Pages base path remains configured for /AdigunTokenCalculator/.
 
-## Remaining validation
-- Manual browser interaction, assistive technology, keyboard-only end-to-end, responsive device matrix, contrast audit, offline behavior and full network/privacy inspection: **NOT TESTED**.
-- Translation quality needs fluent-speaker review.
-- Tokenizer model mappings need release-time verification against official model documentation.
-- No committed npm lockfile yet.
+## Not yet verified
+- **NOT TESTED:** Manual browser interaction for every tool, assistive technology/screen reader, keyboard-only end-to-end, responsive device matrix, full contrast audit, offline behaviour, live-site network/privacy inspection and browser console.
+- Translation quality requires fluent-speaker review.
+- A reproducible package-lock.json was generated and committed on the feature branch by the scoped CI lockfile job (commit 4d6648b0e5e050e3c7b9d889e7aa0c033b05e71e). Subsequent CI uses npm ci.
+- Official population baseline values should be rechecked against the official downloadable UN dataset before future data refreshes.
 
-## Known product gaps
-Official corporate logo is not integrated; HB monogram is a placeholder. Engineering memory, richer demographics category labels, source/methodology views and some detailed master-prompt UX remain incomplete. World-statistics metrics remain hidden until credible dated baselines are sourced. This is published and CI-tested, but not a fully production-certified release.
+## Remaining release limitations
+- Official corporate logo artwork not integrated; the HB monogram remains a placeholder. The design-system repo provides the exact official artwork, but this product repo has no explicit reuse grant/binary asset copy. Do not generate a substitute.
+- Project-wide licence has not been authorised; no root LICENSE file added.
+- Tokenizer byte-piece adapter relies on the pinned js-tiktoken 1.0.21 internal byte map because the package does not expose a public per-token byte method.
+- World population estimate is a linear interpolation, not live data. Births, deaths and CO₂ remain omitted pending separately verified baselines.
+- Pew 2020 "other religions" aggregates folk/traditional and several smaller traditions; a separate folk percentage is not inferred.
+- This milestone is automated-test/build verified, but not production-certified until manual release gates and deployed-commit verification are completed.

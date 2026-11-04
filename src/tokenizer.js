@@ -16,4 +16,5 @@ export async function tokenize(text,name){
   if(pieces.join("")!==text)throw Error("token reconstruction check failed");
   return{ids:Array.from(ids),pieces,chars:[...text].length};
 }
+export const modelMappings=Object.freeze({"GPT-4o":"o200k_base","GPT-4o mini":"o200k_base","GPT-4":"cl100k_base","GPT-3.5 Turbo":"cl100k_base"});
 export const encodings=[["o200k_base","GPT-4o / GPT-4o mini"],["cl100k_base","GPT-4 / GPT-3.5 Turbo"]];
