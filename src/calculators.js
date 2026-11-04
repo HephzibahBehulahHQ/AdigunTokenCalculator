@@ -1,7 +1,7 @@
 const ok=n=>Number.isFinite(Number(n));const pos=n=>ok(n)&&Number(n)>0;const parts=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");if(!m)throw Error("date");const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));if(d.getUTCFullYear()!=+m[1]||d.getUTCMonth()!=+m[2]-1||d.getUTCDate()!=+m[3])throw Error("date");return{y:+m[1],m:+m[2],d:+m[3]};};const dim=(y,m)=>new Date(Date.UTC(y,m,0)).getUTCDate();
 export function stats(s){return{words:(s.trim().match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)||[]).length,chars:[...s].length,noSpace:[...s].filter(c=>!(/\s/u).test(c)).length,sentences:(s.match(/[.!?。！？]+(?=\s|$)/gu)||[]).length,paragraphs:s.trim()?s.trim().split(/\n\s*\n/).filter(Boolean).length:0};}
 export function age(birth,today=new Date()){const b=parts(birth),t={y:today.getFullYear(),m:today.getMonth()+1,d:today.getDate()};if(Date.UTC(b.y,b.m-1,b.d)>Date.UTC(t.y,t.m-1,t.d))throw Error("future");let months=(t.y-b.y)*12+t.m-b.m;const ann=n=>{const y=b.y+Math.floor((b.m-1+n)/12),m=(b.m-1+n)%12+1;return{y,m,d:Math.min(b.d,dim(y,m))};};let a=ann(months);if(Date.UTC(a.y,a.m-1,a.d)>Date.UTC(t.y,t.m-1,t.d)){a=ann(--months);}return{years:Math.floor(months/12),months:months%12,days:Math.round((Date.UTC(t.y,t.m-1,t.d)-Date.UTC(a.y,a.m-1,a.d))/86400000)};}
-export const bmi=(w,h)=>{if(!pos(w)||!pos(h))throw Error("number");return Number(w)/Number(h)**2;};
+export const bmi=(w,h,unit="metric")=>{w=Number(w);h=Number(h);if(!pos(w)||!pos(h))throw Error("number");if(unit==="imperial")return 703*w/(h*h);if(unit!=="metric")throw Error("number");return w/(h*h);};
 export function arithmetic(a,b,op){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))throw Error("number");if(op==="divide"&&b===0)throw Error("zero");const v={add:a+b,subtract:a-b,multiply:a*b,divide:a/b,power:a**b}[op];if(!Number.isFinite(v))throw Error("number");return v;}
 export function percent(mode,a,b){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))throw Error("number");if(mode==="of")return a*b/100;if(mode==="as"){if(!b)throw Error("zero");return a/b*100;}if(mode==="change"){if(!a)throw Error("zero");return(b-a)/Math.abs(a)*100;}throw Error("number");}
 export function temperature(v,dir){v=Number(v);if(!ok(v)||v<(dir==="c"?-273.15:-459.67))throw Error("absolute");return dir==="c"?v*9/5+32:(v-32)*5/9;}
@@ -15,3 +15,22 @@ export function zakat(v,r){const values=["cash","gold","silver","investments"].m
 export function practice(m,s,y){m=Number(m);s=Number(s);y=Number(y);if(!ok(m)||!ok(s)||!ok(y)||m<0||s<0||y<0)throw Error("number");return{week:m*s,year:m*s*52,lifetime:m*s*52*y};}
 export function shares(total,s){total=Number(total);const a=s.split(",").map(Number);if(!ok(total)||total<0||a.some(x=>!ok(x)||x<0))throw Error("number");return{total:a.reduce((x,y)=>x+y,0),counts:a.map(x=>total*x/100)};}
 export function sleep(time,mode,cycle,buffer){if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)||!pos(cycle)||!ok(buffer)||buffer<0)throw Error("number");const base=time.split(":").reduce((h,x)=>h*60+Number(x),0);return Array.from({length:6},(_,i)=>{const d=(i+1)*Number(cycle)+Number(buffer),n=(base+(mode==="bed"?d:-d)+2880)%1440;return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");});}
+
+export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;
+switch(op){
+case"add":case"subtract":case"multiply":case"divide":case"power":case"modulo":v=arithmetic(a,b,op==="modulo"?"remainder":op);if(op==="modulo"){if(!ok(b)||b===0)throw Error("zero");v=a%b;}break;
+case"sqrt":if(a<0)throw Error("number");v=Math.sqrt(a);break;
+case"sin":v=Math.sin(a*Math.PI/180);break;
+case"cos":v=Math.cos(a*Math.PI/180);break;
+case"tan":v=Math.tan(a*Math.PI/180);break;
+case"log":if(a<=0)throw Error("number");v=Math.log10(a);break;
+case"ln":if(a<=0)throw Error("number");v=Math.log(a);break;
+case"factorial":if(a<0||!Number.isInteger(a)||a>170)throw Error("number");v=1;for(let i=2;i<=a;i++)v*=i;break;
+default:throw Error("number");
+}
+if(!Number.isFinite(v))throw Error("number");return v;
+}
+export function dateDifference(start,end,today=new Date()){
+const a=parts(start),b=parts(end),x=Date.UTC(a.y,a.m-1,a.d),y=Date.UTC(b.y,b.m-1,b.d);
+return{days:Math.round((y-x)/86400000),direction:y>=x?"forward":"past",fromToday:Math.round((y-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000)};
+}
