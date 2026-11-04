@@ -32,7 +32,7 @@ Generate and inspect lockfile; verify tokenizer mappings and Unicode pieces; obt
 - Qibla geolocation is requested only after a deliberate button click; coordinates remain in-page.
 - Imperial fuel calculations distinguish US mpg/US gallons from Imperial mpg/Imperial gallons. GPA percentage mode reports a weighted percentage and does not convert it into GPA.
 - The tokenizer's UTF-8 piece reconstruction adapter remains pinned to js-tiktoken 1.0.21 internal byte-map behaviour because this version does not expose a public per-token-byte method. It fails closed if the map is unavailable.
-- The project-wide licence and logo asset reuse remain unresolved; no root LICENSE or copied corporate artwork is added. The exact official artwork must be used if/when reuse is authorised.
+- The approved corporate logo is now integrated byte-for-byte from the canonical design-system asset and its provenance is recorded. The project-wide licence remains an owner decision; no root LICENSE is added until that decision is explicit.
 
 
 ## Reference audit record
