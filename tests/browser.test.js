@@ -58,7 +58,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.equal(await bacForm.evaluate(f=>f.checkValidity()),true);
     await bacForm.evaluate(f=>f.requestSubmit());
     await page.locator(".result").waitFor({timeout:5000});
-    assert.match(await page.locator(".result").innerText(),/Never use this to decide whether to drive/);
+    assert.match(await page.locator(".result").innerText(),/Do NOT use this to decide whether to drive/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
