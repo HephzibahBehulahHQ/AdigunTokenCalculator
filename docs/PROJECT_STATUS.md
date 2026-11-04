@@ -11,7 +11,7 @@
 - All 18 original tools plus the 20 additional tools required by the latest `MASTER_PROMPT.md`: 38 tools total.
 - Searchable, responsive card directory with 11 category filters, localized descriptions, deep links and back navigation.
 - Four locales: English, German, Yoruba and Nigerian Pidgin. Automated completeness checks cover all 38 tool names, groups, descriptions, form labels, select options, result labels and safety notices; fluent-speaker review remains required.
-- Time-zone conversion across a curated set of IANA zones, with daylight-saving gaps rejected and ambiguous fall-back times flagged.
+- Time-zone conversion across a curated set of IANA zones using Temporal polyfill plus native Intl.DateTimeFormat; daylight-saving gaps are rejected and ambiguous fall-back times flagged.
 - Offline ECB currency conversion with an editable 4 November 2026 reference-rate snapshot for 30 currencies.
 - Inflation, tip/tax splitting, adult calorie/macro estimates, pregnancy date estimates, adjustable water range and educational BAC estimate.
 - Roman numeral, number-base, password, QR, file/text hash, JSON, color/contrast, discount/tax, recipe scaling, regional holiday countdown, Morse and statistics tools.
@@ -27,7 +27,7 @@ Latest successful CI run: [#141](https://github.com/HephzibahBehulahHQ/AdigunTok
 - Chromium installation on Ubuntu 24.04: PASS.
 - `npm test`: **57 passed, 0 failed**, including Playwright Chromium browser smoke test.
 - `npm run build`: PASS.
-- Lockfile inventory: 68 dependency packages; all have declared licence metadata (MIT, ISC, BSD-2-Clause, BSD-3-Clause, Apache-2.0).
+- Lockfile inventory: 70 dependency packages; all have declared licence metadata (MIT, ISC, BSD-2-Clause, BSD-3-Clause, Apache-2.0).
 
 Earlier deployment run #6 succeeded for commit `862ca832609d8e6dd80e616c37ad75b9c237ff06` after the owner changed GitHub Pages source to **GitHub Actions**. That deployment contains the earlier 18-tool release, not this 38-tool feature branch. PR #6 must merge and its own Pages workflow must pass before the live site contains the expanded catalogue.
 
