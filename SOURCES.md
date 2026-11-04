@@ -40,3 +40,7 @@ This file records the external references and explicit assumptions used by the b
 ## Source refresh policy
 
 Recheck date-sensitive snapshots before release. Never label a stored snapshot “live”. If a baseline or official rule cannot be verified, omit it or mark it as user-supplied / illustrative. Human review is required for health notices, locale quality and public-holiday interpretation.
+
+### Population baseline verification state
+
+The official [UNData WPP 2024 record](https://data.un.org/Data.aspx?d=PopDiv&f=variableID%3A12%3BcrID%3A900%3BvarID%3A2) identifies the series as “Total population, both sexes combined (thousands)” for World / Medium and cites the 2024 Revision. The application currently seeds 1 July 2025 and 1 July 2026 values from that WPP 2024 medium-variant series. Those numbers have been cross-checked against independent public reproductions, but the direct downloadable UN dataset file and its checksum have not yet been archived in this repository. Therefore, exact baseline-to-file verification remains an open release check; do not describe this dataset audit as fully closed.
