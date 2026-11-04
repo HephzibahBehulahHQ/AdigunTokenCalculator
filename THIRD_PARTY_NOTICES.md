@@ -301,6 +301,7 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `@esbuild/win32-arm64` | `0.25.12` | `MIT` |
 | `@esbuild/win32-ia32` | `0.25.12` | `MIT` |
 | `@esbuild/win32-x64` | `0.25.12` | `MIT` |
+| `@js-temporal/polyfill` | `0.5.1` | `ISC` |
 | `@rollup/rollup-android-arm-eabi` | `4.67.5` | `MIT` |
 | `@rollup/rollup-android-arm64` | `4.67.5` | `MIT` |
 | `@rollup/rollup-android-x64` | `4.67.5` | `MIT` |
@@ -333,6 +334,7 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `fdir` | `6.5.0` | `MIT` |
 | `fsevents` | `2.3.3` | `MIT` |
 | `js-tiktoken` | `1.0.21` | `MIT` |
+| `jsbi` | `4.3.2` | `Apache-2.0` |
 | `nanoid` | `3.3.20` | `MIT` |
 | `picocolors` | `1.1.1` | `ISC` |
 | `picomatch` | `4.0.7` | `MIT` |
@@ -343,7 +345,6 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `source-map-js` | `1.2.2` | `BSD-3-Clause` |
 | `tinyglobby` | `0.2.17` | `MIT` |
 | `vite` | `6.4.5` | `MIT` |
-
 
 ## ISC License — standard text
 
