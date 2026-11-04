@@ -58,3 +58,23 @@ yo:{Years:"Ọdún",Months:"Oṣù",Days:"Ọjọ́",Category:"Ẹ̀ka","After c
 pcm:{Years:"Years",Months:"Months",Days:"Days",Category:"Category","After cycles":"After cycles"}
 };
 for(const [k,v] of Object.entries(extraOutputs))Object.assign(I[k].outputs,v);
+
+Object.assign(I.en.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (in)"});
+Object.assign(I.de.fields,{weightImperial:"Gewicht (lb)",heightImperial:"Größe (in)"});
+Object.assign(I.yo.fields,{weightImperial:"Ìwọ̀n ara (lb)",heightImperial:"Gíga (in)"});
+Object.assign(I.pcm.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (in)"});
+Object.assign(I.en.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.de.options,{modulo:"Rest",sin:"Sinus (Grad)",cos:"Kosinus (Grad)",tan:"Tangens (Grad)",log:"Logarithmus zur Basis 10",ln:"Natürlicher Logarithmus",factorial:"Fakultät",metric:"Metrisch (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.yo.options,{modulo:"Ìyókù",sin:"Sine (degree)",cos:"Cosine (degree)",tan:"Tangent (degree)",log:"Logarithm base 10",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.pcm.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+const moreOutputs={
+en:{Direction:"Direction","Days from today":"Days from today"},
+de:{Direction:"Richtung","Days from today":"Tage ab heute"},
+yo:{Direction:"Ìtọ́sọ́nà","Days from today":"Ọjọ́ láti òní"},
+pcm:{Direction:"Direction","Days from today":"Days from today"}
+};
+for(const [k,v] of Object.entries(moreOutputs))Object.assign(I[k].outputs,v);
+I.en.notices.math="Trigonometric inputs use degrees. Factorial is limited to integers from 0 to 170.";
+I.de.notices.math="Trigonometrische Eingaben verwenden Grad. Fakultät nur für ganze Zahlen von 0 bis 170.";
+I.yo.notices.math="Ìṣirò trigonometry lo degree. Factorial jẹ́ fún odidi nọ́ńbà láti 0 sí 170.";
+I.pcm.notices.math="Trigonometry use degrees. Factorial dey limited to whole numbers from 0 to 170.";
