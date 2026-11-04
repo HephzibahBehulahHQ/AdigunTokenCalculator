@@ -1,11 +1,9 @@
 # Next tasks
 
-1. Confirm the completion-branch CI passes (unit tests and production build); fix every failure.
-2. Inspect the final diff and run static syntax checks on all changed JavaScript.
-3. Inspect the committed npm lockfile and transitive licence notices before future dependency updates.
-4. Verify UN WPP mid-year population baselines directly against the official downloadable dataset; retain births, deaths and CO₂ as withheld until verified.
-5. Complete human review of translations by fluent speakers.
-6. Obtain written approval for the official corporate logo asset and project-wide licence; integrate only approved exact artwork.
-7. Complete the manual checklist in docs/TEST_PLAN.md: all 18 workflows, keyboard, screen reader, contrast, responsive, console, network/privacy and deployed asset paths.
-8. Open a PR, pass CI, merge the milestone and verify the GitHub Pages deployment uses the merged commit.
-9. Update project status with observed test/deployment evidence and remaining limitations.
+1. **Release PR #6:** Mark ready for review, confirm the latest successful CI run (#141: 57/57 tests, Chromium smoke test, production build), merge to `main`, and verify the resulting GitHub Pages workflow deploys the merge commit.
+2. **Live smoke test:** After deployment, open the live site and verify the 38-tool directory, category/search navigation, deep links, representative calculator workflows, tokenizer asset paths and no console/runtime errors.
+3. **Population data audit:** Download the official UN WPP 2024 dataset directly, compare the 1 July 2025 and 2026 World / Medium baselines against the code, and record the dataset URL, file revision and SHA-256 checksum. Keep births, deaths and CO₂ withheld until independently sourced.
+4. **Human locale review:** Have fluent speakers review all new and existing German, Yoruba and Nigerian Pidgin labels, help text, result labels and sensitive health/safety notices.
+5. **Manual accessibility review:** Complete the remaining manual checklist in `docs/TEST_PLAN.md`: keyboard-only navigation, screen reader, focus order, responsive devices, 200% zoom, contrast, offline/network/privacy and all 38 tool workflows.
+6. **Owner licence decision:** Select and authorize a project-wide licence before adding a root `LICENSE`. Third-party dependency licences and notices are already inventoried.
+7. **Final status:** Record the observed Pages deployment run and the outcomes of the human/data checks in `docs/PROJECT_STATUS.md`. Do not claim production certification while any required manual gate remains untested.
