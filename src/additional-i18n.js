@@ -73,3 +73,9 @@ Object.assign(I.pcm.additionalOutputs,{"Source UTC offset":"Source UTC offset","
 
 I.en.dropFileHint="Or drop a file here (maximum 25 MB).";I.de.dropFileHint="Oder Datei hier ablegen (maximal 25 MB).";I.yo.dropFileHint="Tàbí ju fáìlì síbí (ó pọ̀ jù 25 MB).";I.pcm.dropFileHint="Or drop file here (maximum 25 MB).";
 I.en.daysAway="days away";I.de.daysAway="Tage entfernt";I.yo.daysAway="ọjọ́ sí";I.pcm.daysAway="days away";
+
+I.en.daysAgo="days ago";I.de.daysAgo="Tage her";I.yo.daysAgo="ọjọ́ sẹ́yìn";I.pcm.daysAgo="days ago";
+Object.assign(I.en.additionalOutputs,{Ambiguous:"Ambiguous local time"});
+Object.assign(I.de.additionalOutputs,{Ambiguous:"Mehrdeutige Ortszeit"});
+Object.assign(I.yo.additionalOutputs,{Ambiguous:"Àkókò agbègbè méjì"});
+Object.assign(I.pcm.additionalOutputs,{Ambiguous:"Ambiguous local time"});
