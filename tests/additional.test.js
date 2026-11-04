@@ -25,7 +25,7 @@ test("tip splitter applies tax, tip basis and rounding",()=>{
 });
 test("calorie macro estimate validates adult inputs and percentages",()=>{
  const r=a.calorieTargets(70,175,30,"male","moderate");
- assert.equal(r.bmr,1668.75);assert.ok(r.tdee>r.bmr);assert.equal(r.proteinGrams,r.tdee*.25/4);
+ assert.equal(r.bmr,1648.75);assert.ok(r.tdee>r.bmr);assert.equal(r.proteinGrams,r.tdee*.25/4);
  assert.throws(()=>a.calorieTargets(70,175,17,"male","moderate"));
 });
 test("pregnancy dates estimate due date and gestational age",()=>{
@@ -100,4 +100,13 @@ test("currency rate editor validates a dated EUR-base table",()=>{
 test("MD5 matches the standard empty and ASCII test vectors",()=>{
  assert.equal(a.md5Hex(new TextEncoder().encode("")),"d41d8cd98f00b204e9800998ecf8427e");
  assert.equal(a.md5Hex(new TextEncoder().encode("abc")),"900150983cd24fb0d6963f7d28e17f72");
+});
+
+test("fall-back daylight-saving ambiguity is surfaced",()=>{
+ const r=a.convertTimeZone("2026-10-25T02:30","Europe/Berlin","UTC");
+ assert.equal(r.ambiguous,true);assert.equal(r.local,"2026-10-25T00:30");
+});
+test("ECB snapshot contains major currency cross-rate inputs",()=>{
+ assert.equal(a.ECB_EUR_RATES.CHF,.9188);assert.equal(a.ECB_EUR_RATES.CAD,1.5701);
+ assert.equal(a.ECB_EUR_RATES.ZAR,18.5404);
 });
