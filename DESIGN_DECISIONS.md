@@ -23,7 +23,7 @@ The world population tool uses two dated 1 July UN WPP 2024 medium-variant basel
 No project-wide product licence has been authorized; no root `LICENSE` file is added until the owner chooses one. Third-party notices are included for `js-tiktoken@1.0.21` (MIT), `qrcode-generator@2.0.4` (MIT) and the development-only `playwright-core@1.57.0` (Apache-2.0). The corporate logo is copied byte-for-byte from the approved canonical design-system asset, with source revision and provenance recorded in `docs/LICENSING.md`.
 
 ## Release gates
-Automated lockfile installation, 57 unit/browser tests, Chromium smoke test and production build pass on the current feature branch. The approved logo asset is integrated. Remaining gates are fluent translation review, manual keyboard/screen-reader/responsive/contrast/offline checks, direct UN WPP downloadable-file verification with checksum, and an owner decision on the project-wide licence. The owner has explicitly authorized completion, merge and deployment; the expanded feature branch is not yet merged or deployed.
+Automated lockfile installation, 58 unit/browser tests, Chromium smoke test and production build pass on the current feature branch. The approved logo asset is integrated. Remaining gates are fluent translation review, manual keyboard/screen-reader/responsive/contrast/offline checks, direct UN WPP downloadable-file verification with checksum, and an owner decision on the project-wide licence. The owner has explicitly authorized completion, merge and deployment; the expanded feature branch is not yet merged or deployed.
 
 
 ## Completion milestone decisions
