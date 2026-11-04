@@ -204,7 +204,7 @@ export function parseCurrencyRates(text) {
     if(extra.length||! /^[A-Z]{3}$/.test(code||"")||!positive(rate)||rates[code])throw Error("rates");
     rates[code]=rate;
   }
-  if(!positive(rates.EUR))throw Error("rates");
+  if(!positive(rates.EUR)||Math.abs(rates.EUR-1)>1e-9)throw Error("rates");
   return rates;
 }
 export function md5Hex(input) {
