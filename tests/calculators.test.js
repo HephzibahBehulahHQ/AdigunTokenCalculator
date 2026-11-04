@@ -26,3 +26,5 @@ test("unit conversion distinguishes decimal and binary storage",()=>{assert.equa
 test("loan non-zero interest and sleep day rollover",()=>{const r=c.loan(1000,12,1);assert.ok(Math.abs(r.payment-88.8487886783)<1e-8);assert.ok(r.total>1000);assert.equal(c.sleep("00:30","wake",90,15)[0],"22:45");});
 test("Qibla bearing at the Kaaba is due north by convention",()=>{assert.ok(c.bearing(21.4225,39.8262)<1e-8);});
 test("special whitespace-sensitive token examples are distinct",async()=>{const {tokenize}=await import("../src/tokenizer.js");const a=await tokenize("red","cl100k_base"),b=await tokenize(" Red","cl100k_base"),d=await tokenize(" red","cl100k_base");assert.notDeepEqual(a.ids,b.ids);assert.notDeepEqual(a.ids,d.ids);assert.deepEqual(await tokenize("","o200k_base"),{ids:[],pieces:[],chars:0});});
+
+test("percentage modes return values with distinct meanings",()=>{assert.equal(c.percent("of",20,50),10);assert.equal(c.percent("as",20,50),40);assert.equal(c.percent("change",100,125),25);assert.equal(c.percent("change",100,75),-25);assert.equal(c.percent("change",-100,-50),50);});
