@@ -84,8 +84,9 @@ export function pregnancyEstimate(method,inputDate,today=new Date()) {
 }
 export function waterRange(weightKg,extraMl=0) {
   weightKg=Number(weightKg);extraMl=Number(extraMl);
-  if(!positive(weightKg)||weightKg>500||!finite(extraMl)||extraMl<0||extraMl>5000) throw Error("number");
-  return {lowMl:weightKg*30+extraMl,highMl:weightKg*35+extraMl};
+  if(!positive(weightKg)||weightKg>500||!finite(extraMl)||extraMl< -2000||extraMl>5000) throw Error("number");
+  const lowMl=weightKg*30+extraMl,highMl=weightKg*35+extraMl;if(lowMl<=0)throw Error("number");
+  return {lowMl,highMl};
 }
 export function bloodAlcohol(weightKg,sex,drinks,drinkMl,abv,hours) {
   [weightKg,drinks,drinkMl,abv,hours]=[weightKg,drinks,drinkMl,abv,hours].map(Number);
