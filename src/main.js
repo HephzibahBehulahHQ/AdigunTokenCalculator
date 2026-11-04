@@ -138,6 +138,7 @@ function renderTool(){
  if(k==="timezone"){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);inputs.dateTime.value=local;}
  if(k==="inflation"){inputs.annualRate.min="-99.99";for(const key of ["fromYear","toYear"]){inputs[key].min="1800";inputs[key].max="2200";}}
  if(k==="tip")inputs.people.min="1";
+ if(k==="water")inputs.extraMl.min="-2000";
  if(k==="calories"){inputs.age.min="18";inputs.age.max="120";inputs.weightKg.max="500";inputs.heightCm.max="280";}
  if(k==="bases"){for(const key of ["fromBase","toBase"]){inputs[key].min="2";inputs[key].max="36";}}
  if(k==="password"){inputs.length.min="8";inputs.length.max="128";}
