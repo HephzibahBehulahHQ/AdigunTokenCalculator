@@ -27,6 +27,11 @@ GitHub Actions **Build and test**, run #103 (41916487375), with a clean npm ci a
 - Production build: PASS.
 - Pages base path remains configured for /AdigunTokenCalculator/.
 
+## Pages configuration action required
+- GitHub Actions run #4 for the custom Vite workflow and the auto-generated Jekyll Pages workflow both reported deployment success for the same main commit. The latter can overwrite the compiled Vite artifact with unbuilt repository source.
+- Set Repository Settings → Pages → Build and deployment → Source to **GitHub Actions**. The updated custom workflow now verifies this setting and fails rather than silently publishing from the wrong source.
+- See docs/PAGES_CONFIGURATION.md.
+
 ## Not yet verified
 - **NOT TESTED:** Manual browser interaction for every tool, assistive technology/screen reader, keyboard-only end-to-end, responsive device matrix, full contrast audit, offline behaviour, live-site network/privacy inspection and browser console.
 - Translation quality requires fluent-speaker review.
