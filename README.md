@@ -40,6 +40,7 @@ Architecture and assumptions:
 - [Design decisions](DESIGN_DECISIONS.md)
 - [Licensing status](docs/LICENSING.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
+- [GitHub Pages configuration](docs/PAGES_CONFIGURATION.md)
 
 ## Local development
 
