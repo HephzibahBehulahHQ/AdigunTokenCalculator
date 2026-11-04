@@ -92,3 +92,12 @@ test("statistics handles even medians, ties and sample variance",()=>{
  assert.equal(r.populationVariance,.5);assert.ok(r.sampleVariance>r.populationVariance);
  assert.throws(()=>a.summarizeNumbers("1, nope"));
 });
+
+test("currency rate editor validates a dated EUR-base table",()=>{
+ const rates=a.parseCurrencyRates("EUR,1\nUSD,1.1267\nGBP,0.83460");
+ assert.equal(rates.USD,1.1267);assert.throws(()=>a.parseCurrencyRates("USD,1"));
+});
+test("MD5 matches the standard empty and ASCII test vectors",()=>{
+ assert.equal(a.md5Hex(new TextEncoder().encode("")),"d41d8cd98f00b204e9800998ecf8427e");
+ assert.equal(a.md5Hex(new TextEncoder().encode("abc")),"900150983cd24fb0d6963f7d28e17f72");
+});
