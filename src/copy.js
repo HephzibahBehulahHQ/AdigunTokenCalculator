@@ -50,3 +50,11 @@ I.de.fields.encoding="Tokenizer-Kodierung";I.de.fields.op="Operation";
 I.yo.fields.encoding="Tokenizer encoding";I.yo.fields.op="Iṣẹ́";
 I.pcm.fields.encoding="Tokenizer encoding";I.pcm.fields.op="Operation";
 for(const k of Object.keys(I)){I[k].outputs.Tokens=k==="de"?"Tokens":k==="yo"?"Tokens":k==="pcm"?"Tokens":"Tokens";}
+
+const extraOutputs={
+en:{Years:"Years",Months:"Months",Days:"Days",Category:"Category", "After cycles":"After cycles"},
+de:{Years:"Jahre",Months:"Monate",Days:"Tage",Category:"Kategorie","After cycles":"Nach Zyklen"},
+yo:{Years:"Ọdún",Months:"Oṣù",Days:"Ọjọ́",Category:"Ẹ̀ka","After cycles":"Lẹ́yìn cycle"},
+pcm:{Years:"Years",Months:"Months",Days:"Days",Category:"Category","After cycles":"After cycles"}
+};
+for(const [k,v] of Object.entries(extraOutputs))Object.assign(I[k].outputs,v);
