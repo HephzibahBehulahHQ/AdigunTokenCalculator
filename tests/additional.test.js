@@ -14,7 +14,7 @@ test("offline ECB currency rates are dated and editable",()=>{
  assert.throws(()=>a.convertCurrency(1,"EUR","NGN"));
 });
 test("inflation calculator supports forward and reverse years",()=>{
- assert.equal(a.inflationValue(100,2020,2022,10),121);
+ assert.ok(Math.abs(a.inflationValue(100,2020,2022,10)-121)<1e-9);
  assert.ok(Math.abs(a.inflationValue(121,2022,2020,10)-100)<1e-9);
  assert.throws(()=>a.inflationValue(1,2020,2021,-100));
 });
@@ -69,7 +69,7 @@ test("color conversion and WCAG contrast calculations",()=>{
 });
 test("discount calculation and reverse original price",()=>{
  const r=a.discountPrice(100,20,10);assert.equal(r.total,88);assert.equal(r.saved,20);
- assert.equal(a.originalPriceFromSale(88,20,10),100);
+ assert.ok(Math.abs(a.originalPriceFromSale(88,20,10)-100)<1e-9);
  assert.throws(()=>a.originalPriceFromSale(10,100));
 });
 test("recipe scaler handles fractions and preserves units and names",()=>{
