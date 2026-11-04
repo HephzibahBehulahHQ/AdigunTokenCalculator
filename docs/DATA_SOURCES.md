@@ -44,3 +44,6 @@ The expanded calculator suite's full source register is maintained in the root [
 - IANA time-zone database through the browser's native Intl implementation; the app does not fetch time-zone services.
 
 The water range is explicitly a project-selected editable heuristic (30–35 mL/kg plus user-entered adjustment), not an official health recommendation. Inflation uses a user-supplied annual rate rather than an unverified CPI series. Holiday outputs are rule-based calendar dates, not legal confirmation of public-holiday status.
+
+
+The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.md). Exact 2025/2026 numeric rows still require a direct downloadable WPP file comparison and recorded checksum; the values have not been certified against an archived source file.
