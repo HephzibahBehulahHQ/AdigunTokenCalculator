@@ -30,3 +30,13 @@
 .field.dragover{outline:2px dashed var(--violet);outline-offset:3px;background:#F5F1FF}
 
 .bac-consent{border:1px solid #B45309;background:#FFF7ED;border-radius:10px;padding:.85rem}.bac-consent .warning-text{font-weight:800;color:#7C2D12;margin:.1rem 0 .65rem}.bac-consent .consent-label{display:flex;gap:.65rem;align-items:flex-start}.bac-consent input[type=checkbox]{width:1.1rem;min-width:1.1rem;margin:.2rem 0 0}
+
+@media(max-width:600px){
+ header{flex-wrap:wrap;align-items:flex-start}
+ .brand{flex:1;min-width:0}
+ .brand strong{overflow-wrap:anywhere}
+ .language{width:100%;justify-content:flex-end}
+ .intro h1{overflow-wrap:anywhere}
+ .privacy{max-width:100%;white-space:normal;line-height:1.35}
+ .tool-card-title,.tool-card-description{overflow-wrap:anywhere}
+}
