@@ -1,7 +1,7 @@
 # Test plan
 
 ## Automated
-Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. Latest successful CI run #188 passed 58 tests, full 38-view Chromium smoke test, privacy/geolocation checks and production build.
+Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. Latest successful CI run #190 passed 58 tests, full 38-view Chromium smoke test, privacy/geolocation checks and production build.
 
 Unit coverage includes Unicode text statistics; age/date-only calendar arithmetic; arithmetic, percentages, temperature limits, BMI metric/imperial; Qibla bearing and compass validation; zero-rate loans; GPA and percentage averages; metric and imperial fuel; unit conversion; Zakat; practice projections; named demographic shares; sleep rollover; scientific operations; calculator memory; annual countdowns; population estimate baseline; four-locale tool catalogues, fields, options and results; tokenizer whitespace, newlines, emoji, non-Latin text, special-token literals, token IDs and UTF-8 reconstruction.
 
