@@ -1,8 +1,9 @@
 # Project status — AdigunTokenCalculator
 
-**Milestone:** 3 — Project-site deployment preparation and expanded calculator coverage.
-**Branch:** codex/milestone-1-foundation.
-**Owner decisions:** confirmed — HB Artificial Intelligence; English/German/Yoruba/Nigerian Pidgin; system-font fallback.
+**Current state:** Published to GitHub Pages.
+**Production commit:** 4b338de154350437697425a162e342d45702d9b4.
+**Live URL:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
+**Owner decisions:** HB Artificial Intelligence; English/German/Yoruba/Nigerian Pidgin; system-font fallback.
 
 ## Implemented
 - Static Vite app with grouped directory for all 18 tools.
@@ -13,23 +14,21 @@
 - Date difference with upcoming/elapsed countdown status.
 - Initial calculators for text statistics, temperature, age, percentages, user-entered demographics, practice time, Zakat arithmetic, Qibla bearing, unit conversions, loans, GPA, fuel and sleep.
 - Vite project-site base path configured as /AdigunTokenCalculator/.
-- GitHub Actions workflow to deploy the built site from main.
+- GitHub Actions workflow builds, tests and deploys the site from main.
 - Privacy/architecture documentation. Unsourced world-statistics figures remain withheld.
 
-## Verified CI evidence
-GitHub Actions **Build and test**, run #68 (41913773155), commit d843d03e493c327715a9170d3443ee9d3388866e:
-- Dependency install: PASS.
-- Unit tests: **12 passed, 0 failed**.
-- Production build: PASS using Vite 6.4.5.
+## Verification and deployment evidence
+- Pre-merge GitHub Actions Build and test run #68 (41913773155): **12 tests passed, 0 failed; production build passed**.
+- Post-merge Pages workflow run #70 (41913949546), commit 4b338de154350437697425a162e342d45702d9b4: dependency install PASS, tests PASS, production build PASS, Pages artifact upload PASS, deployment PASS.
+- GitHub Actions reported the deployment URL as https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/.
 - Main app bundle: 46.01 kB (gzip 16.49 kB).
-- Tokenizer rank data is lazy-loaded: cl100k_base 1.09 MB and o200k_base 2.33 MB minified (gzip 502 kB and 1.14 MB respectively). These are fetched only when the selected encoding is first used.
+- Tokenizer rank data is lazy-loaded: cl100k_base 1.09 MB and o200k_base 2.33 MB minified (gzip 502 kB and 1.14 MB respectively), fetched only when the selected encoding is first used.
 
-## Not yet verified
-- **NOT TESTED:** manual browser interaction, assistive technology, keyboard-only end-to-end, responsive device matrix, contrast audit, offline behavior and full network/privacy inspection.
+## Remaining validation
+- Manual browser interaction, assistive technology, keyboard-only end-to-end, responsive device matrix, contrast audit, offline behavior and full network/privacy inspection: **NOT TESTED**.
 - Translation quality needs fluent-speaker review.
 - Tokenizer model mappings need release-time verification against official model documentation.
 - No committed npm lockfile yet.
-- **NOT DEPLOYED YET:** Pages deployment workflow must run after merge, then the published URL must be checked.
 
 ## Known product gaps
-Official corporate logo is not integrated; HB monogram is a placeholder. Engineering memory, richer demographics category labels, source/methodology views and some detailed master-prompt UX remain incomplete. World-statistics metrics remain hidden until credible dated baselines are sourced. This is a tested foundation, not a fully production-certified release.
+Official corporate logo is not integrated; HB monogram is a placeholder. Engineering memory, richer demographics category labels, source/methodology views and some detailed master-prompt UX remain incomplete. World-statistics metrics remain hidden until credible dated baselines are sourced. This is published and CI-tested, but not a fully production-certified release.
