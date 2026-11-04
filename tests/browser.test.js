@@ -20,7 +20,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     browser=await chromium.launch({headless:true});
     const page=await browser.newPage(),pageErrors=[],externalRequests=[];
     page.on("pageerror",e=>pageErrors.push(e.message));
-    page.on("request",request=>{if(!request.url().startsWith("http://127.0.0.1:4173"))externalRequests.push(request.url());});
+    page.on("request",request=>{try{if(new URL(request.url()).host!=="127.0.0.1:4173")externalRequests.push(request.url());}catch{externalRequests.push(request.url());}});
     await page.addInitScript(()=>{window.__geoCalls=0;Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(){window.__geoCalls++;}}});});
     await page.goto("http://127.0.0.1:4173/");
     assert.equal(await page.locator(".tool-card").count(),38);
