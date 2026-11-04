@@ -16,7 +16,13 @@ const schema={
  bmi:[["unit","select",[["metric","Metric (kg, m)"],["imperial","Imperial (lb, in)"]]],["weight","number"],["height","number"]],
  percent:[["mode","select",[["of","X percent of Y"],["as","X as percent of Y"],["change","Percentage change"]]],["a","number"],["b","number"]],
  world:[],
- demographics:[["total","number"],["shares","textarea",null,"Christianity, 28.8\nIslam, 25.6\nHinduism, 14.9\nBuddhism, 4.1\nJudaism, 0.2\nOther religions (including folk/traditional), 2.2\nReligiously unaffiliated, 24.2"]],
+ demographics:[["total","number"],["shares","textarea",null,`Christianity, 28.8
+Islam, 25.6
+Hinduism, 14.9
+Buddhism, 4.1
+Judaism, 0.2
+Other religions (including folk/traditional), 2.2
+Religiously unaffiliated, 24.2`]],
  practice:[["minutes","number"],["sessions","number"],["years","number"]],
  zakat:[["cash","number"],["gold","number"],["silver","number"],["investments","number"],["rate","number",null,"2.5"]],
  qibla:[["lat","number"],["lon","number"]],
