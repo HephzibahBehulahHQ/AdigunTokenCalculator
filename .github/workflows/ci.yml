@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci --no-audit --no-fund
+      - name: Install Chromium for browser integration tests
+        run: npx playwright-core install --with-deps chromium
       - run: npm test
       - run: npm run build
   lockfile:
