@@ -77,7 +77,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     }
     await page.setViewportSize({width:375,height:812});
     const mobile=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
-    assert.ok(mobile.scroll<=mobile.width,"mobile directory should not overflow horizontally");
+    assert.ok(mobile.scroll<=mobile.width,"mobile directory overflow: "+JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll("body *")].map(e=>({tag:e.tagName,cls:e.className?.toString?.()||"",id:e.id,right:Math.round(e.getBoundingClientRect().right),left:Math.round(e.getBoundingClientRect().left),width:Math.round(e.getBoundingClientRect().width)})).filter(x=>x.right>innerWidth+1||x.left<0).slice(0,12))));
     await page.locator(".tool-card").first().focus();
     await page.keyboard.press("Enter");
     await page.waitForFunction(()=>!document.querySelector("#panel")?.hidden);
