@@ -104,7 +104,7 @@ test("MD5 matches the standard empty and ASCII test vectors",()=>{
 
 test("fall-back daylight-saving ambiguity is surfaced",()=>{
  const r=a.convertTimeZone("2026-10-25T02:30","Europe/Berlin","UTC");
- assert.equal(r.ambiguous,true);assert.equal(r.local,"2026-10-25T00:30");
+ assert.equal(r.ambiguous,true);assert.equal(r.local,"2026-10-25T00:30");assert.equal(r.fromOffset,"+02:00");assert.equal(r.toOffset,"+00:00");assert.match(r.localFormatted,/2026|25 Oct 2026/);
 });
 test("ECB snapshot contains major currency cross-rate inputs",()=>{
  assert.equal(a.ECB_EUR_RATES.CHF,.9188);assert.equal(a.ECB_EUR_RATES.CAD,1.5701);
