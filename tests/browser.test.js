@@ -31,7 +31,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.locator("#search").fill("");
     await page.getByRole("button",{name:"Offline currency converter"}).click();
     await page.locator('input[name="amount"]').fill("100");
+    const validity=await page.locator("#panel form").evaluate(form=>({valid:form.checkValidity(),invalid:[...form.querySelectorAll(":invalid")].map(x=>({name:x.name,value:x.value,type:x.type,required:x.required}))}));
+    assert.equal(validity.valid,true,JSON.stringify(validity.invalid));
     await page.locator("#panel form button[type=submit]").click();
+    await page.locator(".result").waitFor({timeout:5000});
     assert.match(await page.locator(".result").innerText(),/112\.67\s+USD/);
     await page.locator(".back-directory").click();
     assert.equal(await page.locator(".tool-card").count(),38);
