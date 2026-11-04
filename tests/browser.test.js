@@ -18,8 +18,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     }
     assert.ok(ready,"Vite development server should start");
     browser=await chromium.launch({headless:true});
-    const page=await browser.newPage(),pageErrors=[];
+    const page=await browser.newPage(),pageErrors=[],externalRequests=[];
     page.on("pageerror",e=>pageErrors.push(e.message));
+    page.on("request",request=>{if(!request.url().startsWith("http://127.0.0.1:4173"))externalRequests.push(request.url());});
+    await page.addInitScript(()=>{window.__geoCalls=0;Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(){window.__geoCalls++;}}});});
     await page.goto("http://127.0.0.1:4173/");
     assert.equal(await page.locator(".tool-card").count(),38);
     assert.equal(await page.locator(".category-chip").count(),11);
@@ -78,10 +80,12 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.locator(".tool-card").first().focus();
     await page.keyboard.press("Enter");
     await page.waitForFunction(()=>!document.querySelector("#panel")?.hidden);
+    assert.equal(await page.evaluate(()=>window.__geoCalls),0,"Qibla must not request geolocation before explicit activation");
     await page.goto("http://127.0.0.1:4173/#/timezone");
     assert.match(await page.locator("#panel h2").innerText(),/Time zone converter/);
     assert.equal(await page.locator("#panel form").count(),1);
     assert.deepEqual(pageErrors,[]);
+    assert.deepEqual(externalRequests,[],"calculator workflows must not make third-party network requests");
   }finally{
     if(browser)await browser.close();
     server.kill("SIGTERM");
