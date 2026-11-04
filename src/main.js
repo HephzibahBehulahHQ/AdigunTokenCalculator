@@ -1,0 +1,50 @@
+import {I} from "./i18n.js";import "./copy.js";import * as c from "./calculators.js";import {tokenize,encodings} from "./tokenizer.js";import "./styles.css";
+const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");let lang="en",active=0;
+const keys=["token","math","text","temp","age","bmi","percent","world","demographics","practice","zakat","qibla","units","loan","dates","gpa","fuel","sleep"];
+const schema={
+token:[["text","textarea"],["encoding","select",encodings]],
+math:[["a","number"],["b","number"],["op","select",[["add","Add"],["subtract","Subtract"],["multiply","Multiply"],["divide","Divide"],["power","Power"],["modulo","Remainder"],["sqrt","Square root"],["sin","Sine (degrees)"],["cos","Cosine (degrees)"],["tan","Tangent (degrees)"],["log","Base-10 logarithm"],["ln","Natural logarithm"],["factorial","Factorial"]]]],
+text:[["text","textarea"]],temp:[["value","number"],["direction","select",[["c","Celsius to Fahrenheit"],["f","Fahrenheit to Celsius"]]]],age:[["birth","date"]],bmi:[["unit","select",[["metric","Metric (kg, m)"],["imperial","Imperial (lb, in)"]]],["weight","number"],["height","number"]],
+percent:[["mode","select",[["of","X percent of Y"],["as","X as percent of Y"],["change","Percentage change"]]],["a","number"],["b","number"]],
+world:[],demographics:[["total","number"],["shares","text"]],practice:[["minutes","number"],["sessions","number"],["years","number"]],
+zakat:[["cash","number"],["gold","number"],["silver","number"],["investments","number"],["rate","number",null,"2.5"]],
+qibla:[["lat","number"],["lon","number"]],
+units:[["value","number"],["group","select",[["length","Length"],["mass","Mass"],["volume","Volume (US)"],["area","Area"],["speed","Speed"],["digital","Digital storage"]]],["from","select"],["to","select"]],
+loan:[["principal","number"],["annualRate","number"],["term","number"]],dates:[["start","date"],["end","date"]],gpa:[["grades","textarea"]],fuel:[["distance","number"],["efficiency","number"],["price","number"]],
+sleep:[["mode","select",[["bed","Calculate wake times from bedtime"],["wake","Calculate bedtimes from wake time"]]],["time","time",null,"22:30"],["cycle","number",null,"90"],["buffer","number",null,"15"]]
+};
+const units={length:["m","km","mi","ft","in"],mass:["kg","g","lb","oz"],volume:["L","mL","US gal","US qt"],area:["m²","ft²","acre","ha"],speed:["km/h","mph","m/s"],digital:["bit","byte","kB","MB","GB","KiB","MiB","GiB"]};
+const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
+function tr(){return I[lang];}
+function label(key){return tr().fields[key]||key;}
+function option(select,value,text){const o=el("option","",text);o.value=value;select.append(o);}
+function makeField(form,spec){const [key,type,opts,def]=spec,wrap=el("label","field");wrap.append(el("span","field-label",label(key)));let input;if(type==="select"){input=el("select");(opts||[]).forEach(([v,l])=>option(input,v,tr().options?.[v]||l));}else if(type==="textarea"){input=el("textarea");input.rows=key==="text"?7:4;}else{input=el("input");input.type=type;input.step="any";if(type==="number"){input.required=true;if(["lat","lon","value","a","b"].includes(key)){}else input.min="0";if(key==="lat"){input.min="-90";input.max="90";}if(key==="lon"){input.min="-180";input.max="180";}}else if(type!=="textarea")input.required=true;}input.name=key;if(def)input.value=def;wrap.append(input);form.append(wrap);return input;}
+function renderNav(){nav.replaceChildren();const q=search.value.toLocaleLowerCase();[...new Set(tr().groups)].forEach(cat=>{const indexes=tr().groups.map((g,i)=>g===cat?i:-1).filter(i=>i>=0&&(!q||tr().names[i].toLocaleLowerCase().includes(q)));if(!indexes.length)return;const group=el("div","nav-group");group.append(el("h3","nav-heading",cat));indexes.forEach(i=>{const b=el("button","nav-item",tr().names[i]);b.type="button";b.setAttribute("aria-current",i===active?"page":"false");b.addEventListener("click",()=>{active=i;renderNav();renderTool();});group.append(b);});nav.append(group);});if(!nav.children.length)nav.append(el("p","muted",tr().noResults||"No matching tools."));}
+function out(k){if(tr().outputs?.[k])return tr().outputs[k];if(k.startsWith("Category "))return (tr().outputs?.Category||"Category")+" "+k.slice(9);if(k.startsWith("After "))return (tr().outputs?.["After cycles"]||"After cycles")+" "+k.slice(6).replace(" cycles","");return k;}
+function result(rows,note){panel.querySelector(".result")?.remove();const box=el("section","result");box.setAttribute("role","status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);}
+function fmt(n,d=3){return Number(n).toLocaleString(lang,{maximumFractionDigits:d});}
+async function execute(k,d){const T=tr(),N=T.notices;let rows=[],note="";
+switch(k){
+case"token":{if(!d.text)throw Error("empty");const r=await tokenize(d.text,d.encoding);rows=[["Tokens",r.ids.length],["Unicode code points",r.chars],["Token IDs",r.ids.join(", ")||"—"]];result(rows,N.token);const box=panel.querySelector(".result"),seg=el("div","segments");r.pieces.forEach((p,i)=>{const s=el("span","piece",p);s.title="Token "+r.ids[i];seg.append(s);});box.append(seg);return;}
+case"math":rows=[["Result",fmt(c.engineering(d.a,d.b,d.op),8)]];note=N.math||"";break;
+case"text":if(!d.text)throw Error("empty");{const r=c.stats(d.text);rows=[["Words",r.words],["Characters (Unicode code points)",r.chars],["Characters excluding whitespace",r.noSpace],["Sentences (estimate)",r.sentences],["Paragraphs",r.paragraphs],["Reading time at 200 wpm",fmt(r.words/200)+" min"]];}break;
+case"temp":rows=[["Result",fmt(c.temperature(d.value,d.direction),4)+(d.direction==="c"?" °F":" °C")]];break;
+case"age":{const r=c.age(d.birth);rows=[["Years",r.years],["Months",r.months],["Days",r.days]];}break;
+case"bmi":rows=[["BMI",fmt(c.bmi(d.weight,d.height,d.unit))]];note=N.bmi;break;
+case"percent":rows=[["Result",fmt(c.percent(d.mode,d.a,d.b))+"%"]];break;
+case"world":throw Error("notAvailable");
+case"demographics":{const r=c.shares(d.total,d.shares);rows=[["Entered percentage total",fmt(r.total)+"%"],...r.counts.map((v,i)=>["Category "+(i+1),fmt(v,0)])];note=N.demographics;}break;
+case"practice":{const r=c.practice(d.minutes,d.sessions,d.years);rows=[["Weekly minutes",fmt(r.week)],["Annual hours",fmt(r.year/60)],["Lifetime hours",fmt(r.lifetime/60)]];}break;
+case"zakat":{const r=c.zakat(d,d.rate);rows=[["Entered assets",fmt(r.assets)],["Calculated amount",fmt(r.due)]];note=N.zakat;}break;
+case"qibla":rows=[["Initial bearing",fmt(c.bearing(d.lat,d.lon),1)+"°"]];note=N.qibla;break;
+case"units":rows=[["Converted value",fmt(c.unit(d.value,d.from,d.to,d.group),8)+" "+d.to]];break;
+case"loan":{const r=c.loan(d.principal,d.annualRate,d.term);rows=[["Monthly payment",fmt(r.payment)],["Total repayment",fmt(r.total)],["Total interest",fmt(r.interest)]];note=N.loan;}break;
+case"dates":{const r=c.dateDifference(d.start,d.end);rows=[["Calendar days",Math.abs(r.days)],["Direction",r.direction==="forward"?"Until end date":"Since end date"],["Days from today",r.fromToday]];}break;
+case"gpa":rows=[["Weighted GPA (4.0 scale)",fmt(c.gpa(d.grades),3)]];break;
+case"fuel":{const r=c.fuel(d.distance,d.efficiency,d.price);rows=[["Fuel required",fmt(r.litres)+" L"],["Estimated cost",fmt(r.cost)]];note=N.fuel;}break;
+case"sleep":rows=c.sleep(d.time,d.mode,d.cycle,d.buffer).map((v,i)=>["After "+(i+1)+" cycles",v]);note=N.sleep;break;
+}result(rows,note);}
+function renderTool(){const i=active,k=keys[i];panel.replaceChildren();const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);if(k==="world"){panel.append(el("p","notice",tr().notices.world));return;}const form=el("form","form");form.noValidate=false;const inputs={};(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));if(k==="math"){const second=inputs.b.closest(".field"),refresh=()=>{second.hidden=["sqrt","sin","cos","tan","log","ln","factorial"].includes(inputs.op.value);inputs.b.required=!second.hidden;};inputs.op.addEventListener("change",refresh);refresh();}if(k==="bmi"){const refresh=()=>{const imp=inputs.unit.value==="imperial";form.querySelector('[for="weight"]');inputs.weight.closest(".field").querySelector(".field-label").textContent=imp?tr().fields.weightImperial:tr().fields.weight;inputs.height.closest(".field").querySelector(".field-label").textContent=imp?tr().fields.heightImperial:tr().fields.height;inputs.weight.min="0.01";inputs.height.min="0.01";};inputs.unit.addEventListener("change",refresh);refresh();}if(k==="units"){const refresh=()=>{const opts=units[inputs.group.value]||[];for(const key of ["from","to"]){inputs[key].replaceChildren();opts.forEach(u=>option(inputs[key],u,u));}};inputs.group.addEventListener("change",refresh);refresh();}
+const actions=el("div","actions"),go=el("button","primary",tr().calculate),reset=el("button","secondary",tr().reset);go.type="submit";reset.type="reset";actions.append(go,reset);form.append(actions);form.addEventListener("submit",async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(form));try{await execute(k,data);}catch(err){result([[tr().result,tr().invalid]],"");}});form.addEventListener("reset",()=>panel.querySelector(".result")?.remove());panel.append(form);}
+function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;renderNav();renderTool();}
+search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));setLang("en");

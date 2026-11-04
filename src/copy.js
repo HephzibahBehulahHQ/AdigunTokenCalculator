@@ -1,0 +1,80 @@
+import {I} from "./i18n.js";
+I.en.descriptions=[
+"Count text tokens for a selected encoding. This is not an API billing estimate.",
+"Safely evaluate a basic arithmetic operation.",
+"Count words, Unicode characters, sentences and paragraphs.",
+"Convert Celsius and Fahrenheit, respecting absolute zero.",
+"Calculate completed calendar years, months and days from a birth date.",
+"Calculate BMI as a general adult screening measure, not a diagnosis.",
+"Calculate a percentage of a value, a ratio, or percentage change.",
+"Illustrative world metrics are withheld until credible dated source baselines are verified.",
+"Apply percentages you enter to a total population; no unsupported defaults are supplied.",
+"Estimate practice time over a week, year and selected lifetime.",
+"Add entered assets and calculate a user-selected percentage rate.",
+"Calculate the approximate initial great-circle bearing to the Kaaba from manual coordinates.",
+"Convert length, mass, volume, area, speed and digital storage units.",
+"Estimate monthly payments and interest for a fixed-rate loan.",
+"Count calendar days between two dates.",
+"Calculate a weighted GPA using the documented 4.0 grade mapping.",
+"Estimate trip fuel quantity and fuel cost from distance and consumption.",
+"Plan approximate sleep and wake times using configurable cycle and fall-asleep duration."
+];
+I.de.descriptions=[
+"Texttokens für eine Kodierung zählen. Keine API-Kostenschätzung.","Eine einfache Rechenoperation sicher ausführen.","Wörter, Unicode-Zeichen, Sätze und Absätze zählen.","Celsius und Fahrenheit umrechnen; den absoluten Nullpunkt beachten.","Vollendete Kalenderjahre, -monate und -tage berechnen.","BMI als allgemeiner Screeningwert für Erwachsene, keine Diagnose.","Prozentwert, Verhältnis oder prozentuale Änderung berechnen.","Weltwerte bleiben verborgen, bis glaubwürdige datierte Quellen geprüft sind.","Eigene Prozentanteile auf eine Gesamtbevölkerung anwenden; keine unbelegten Standardwerte.","Übungszeit pro Woche, Jahr und gewähltem Zeitraum schätzen.","Eingegebene Vermögenswerte addieren und einen selbst gewählten Satz anwenden.","Ungefähren Großkreis-Azimut zur Kaaba aus manuellen Koordinaten berechnen.","Länge, Masse, Volumen, Fläche, Geschwindigkeit und Datenspeicher umrechnen.","Monatsraten und Zinsen eines Festzinskredits schätzen.","Kalendertage zwischen zwei Daten zählen.","Gewichteten GPA anhand der dokumentierten 4,0-Skala berechnen.","Kraftstoffmenge und Kosten anhand von Entfernung und Verbrauch schätzen.","Ungefähre Schlaf- und Aufwachzeiten mit anpassbaren Zyklen planen."
+];
+I.yo.descriptions=[
+"Ka token ọ̀rọ̀ gẹ́gẹ́ bí encoding tí a yàn; kì í ṣe owó API.","Ṣe iṣẹ́ ìṣirò ìpìlẹ̀ láìlo kóòdù tí kò léwu.","Ka ọ̀rọ̀, àmì Unicode, gbólóhùn àti ìpínrọ̀.","Yí Celsius àti Fahrenheit padà; ṣọ́ra fún absolute zero.","Ṣírò ọdún, oṣù àti ọjọ́ tó pé láti ọjọ́ ìbí.","Ṣírò BMI gẹ́gẹ́ bí àyẹ̀wò gbogbogbò, kì í ṣe àyẹ̀wò àìsàn.","Ṣírò ìpín ọgọ́rùn-ún, ìpín iye, tàbí ìyípadà.","A fi iye pamọ́ títí orísun dátà tó ní ọjọ́ yóò fi jẹ́rìí.","Lo ìpín tí o tẹ̀ sílẹ̀ fún àpapọ̀ iye ènìyàn; kò sí àfojúsùn tí a dá sílẹ̀.","Ṣírò àkókò ìṣe lọ́sẹ̀, lọ́dún àti àkókò tí o yàn.","Ṣàkójọ ohun ìní tí o tẹ̀ sílẹ̀, lo ìwọ̀n tí o yàn.","Ṣírò ìtọ́sọ́nà tó súnmọ́ sí Kaaba láti ipo tí o tẹ̀ sílẹ̀.","Yí ẹyọ gígùn, ìwọ̀n, omi, agbègbè, iyára àti data padà.","Ṣírò ìsanwó oṣooṣù àti èrè awin tó ní ìwọ̀n tó dúró.","Ka ọjọ́ kalẹ́ńdà láàárín ọjọ́ méjì.","Ṣírò GPA tó ní ìwọ̀n pẹ̀lú grade scale 4.0.","Ṣírò epo àti owó ìrìn-àjò láti ìjìnnà àti bí ọkọ ṣe ń jẹ epo.","Gbero àkókò sísùn àti jíjí tó súnmọ́ pẹ̀lú cycle tí o lè yí padà."
+];
+I.pcm.descriptions=[
+"Count text token with the encoding wey you choose. E no be API bill.","Do simple maths operation safely.","Count words, Unicode characters, sentences and paragraphs.","Convert Celsius and Fahrenheit; check absolute zero.","Calculate complete years, months and days from birth date.","Calculate BMI as general adult screening, no be diagnosis.","Calculate percentage, ratio or percentage change.","We hide world figures until credible dated source data don verify.","Use percentage wey you enter for total population; no default guess.","Estimate practice time for week, year and the period wey you choose.","Add assets wey you enter and apply your selected rate.","Calculate approximate direction to Kaaba from coordinates wey you enter.","Convert length, mass, volume, area, speed and digital storage.","Estimate monthly payment and interest for fixed-rate loan.","Count calendar days between two dates.","Calculate weighted GPA with the stated 4.0 grade scale.","Estimate fuel quantity and trip cost from distance and fuel use.","Plan approximate sleep and wake time with cycle and fall-asleep buffer."
+];
+const options={
+en:{add:"Add",subtract:"Subtract",multiply:"Multiply",divide:"Divide",power:"Power",sqrt:"Square root",c:"Celsius to Fahrenheit",f:"Fahrenheit to Celsius",of:"X percent of Y",as:"X as percent of Y",change:"Percentage change",bed:"Wake times from bedtime",wake:"Bedtimes from wake time",length:"Length",mass:"Mass",volume:"Volume (US)",area:"Area",speed:"Speed",digital:"Digital storage"},
+de:{add:"Addieren",subtract:"Subtrahieren",multiply:"Multiplizieren",divide:"Dividieren",power:"Potenz",sqrt:"Quadratwurzel",c:"Celsius zu Fahrenheit",f:"Fahrenheit zu Celsius",of:"X Prozent von Y",as:"X als Prozent von Y",change:"Prozentuale Änderung",bed:"Aufwachzeiten ab Schlafenszeit",wake:"Schlafenszeiten ab Aufwachzeit",length:"Länge",mass:"Masse",volume:"Volumen (US)",area:"Fläche",speed:"Geschwindigkeit",digital:"Digitalspeicher"},
+yo:{add:"Àfikún",subtract:"Yọkúrò",multiply:"Ìlọ́po",divide:"Pín",power:"Agbára",sqrt:"Gbòngbò onígun",c:"Celsius sí Fahrenheit",f:"Fahrenheit sí Celsius",of:"X% ti Y",as:"X gẹ́gẹ́ bí ìpín Y",change:"Ìyípadà ìpín",bed:"Àkókò jíjí láti ìgbà sísùn",wake:"Àkókò sísùn láti ìgbà jíjí",length:"Gígùn",mass:"Ìwọ̀n",volume:"Ìwọ̀n omi (US)",area:"Agbègbè",speed:"Iyára",digital:"Ìpamọ́ digital"},
+pcm:{add:"Add",subtract:"Subtract",multiply:"Multiply",divide:"Divide",power:"Power",sqrt:"Square root",c:"Celsius to Fahrenheit",f:"Fahrenheit to Celsius",of:"X percent of Y",as:"X as percent of Y",change:"Percentage change",bed:"Wake time from bed time",wake:"Bed time from wake time",length:"Length",mass:"Mass",volume:"Volume (US)",area:"Area",speed:"Speed",digital:"Digital storage"}
+};
+for(const k of Object.keys(options))I[k].options=options[k];
+
+const outputs={
+en:{"Token IDs":"Token IDs","Unicode code points":"Unicode code points","Words":"Words","Characters (Unicode code points)":"Characters (Unicode code points)","Characters excluding whitespace":"Characters excluding whitespace","Sentences (estimate)":"Sentences (estimate)","Paragraphs":"Paragraphs","Reading time at 200 wpm":"Reading time at 200 wpm","Result":"Result","BMI":"BMI","Entered percentage total":"Entered percentage total","Weekly minutes":"Weekly minutes","Annual hours":"Annual hours","Lifetime hours":"Lifetime hours","Entered assets":"Entered assets","Calculated amount":"Calculated amount","Initial bearing":"Initial bearing","Converted value":"Converted value","Monthly payment":"Monthly payment","Total repayment":"Total repayment","Total interest":"Total interest","Calendar days":"Calendar days","Weighted GPA (4.0 scale)":"Weighted GPA (4.0 scale)","Fuel required":"Fuel required","Estimated cost":"Estimated cost","After 1 cycles":"After 1 cycles"},
+de:{"Token IDs":"Token-IDs","Unicode code points":"Unicode-Codepoints","Words":"Wörter","Characters (Unicode code points)":"Zeichen (Unicode-Codepoints)","Characters excluding whitespace":"Zeichen ohne Leerraum","Sentences (estimate)":"Sätze (Schätzung)","Paragraphs":"Absätze","Reading time at 200 wpm":"Lesezeit bei 200 Wörtern/Min.","Result":"Ergebnis","BMI":"BMI","Entered percentage total":"Summe der eingegebenen Anteile","Weekly minutes":"Minuten pro Woche","Annual hours":"Stunden pro Jahr","Lifetime hours":"Stunden insgesamt","Entered assets":"Eingegebene Vermögenswerte","Calculated amount":"Berechneter Betrag","Initial bearing":"Anfangsazimut","Converted value":"Umgerechneter Wert","Monthly payment":"Monatsrate","Total repayment":"Gesamtrückzahlung","Total interest":"Gesamtzinsen","Calendar days":"Kalendertage","Weighted GPA (4.0 scale)":"Gewichteter GPA (4,0-Skala)","Fuel required":"Kraftstoffbedarf","Estimated cost":"Geschätzte Kosten"},
+yo:{"Token IDs":"Token IDs","Unicode code points":"Àwọn àmì Unicode","Words":"Ọ̀rọ̀","Characters (Unicode code points)":"Àwọn àmì Unicode","Characters excluding whitespace":"Àwọn àmì láìka ààyè","Sentences (estimate)":"Gbólóhùn (àfojúsùn)","Paragraphs":"Ìpínrọ̀","Reading time at 200 wpm":"Àkókò kíkà","Result":"Àbájáde","BMI":"BMI","Entered percentage total":"Àpapọ̀ ìpín tí a tẹ̀ sílẹ̀","Weekly minutes":"Ìṣẹ́jú lọ́sẹ̀","Annual hours":"Wákàtí lọ́dún","Lifetime hours":"Wákàtí gbogbo","Entered assets":"Ohun ìní tí a tẹ̀ sílẹ̀","Calculated amount":"Iye tí a ṣírò","Initial bearing":"Ìtọ́sọ́nà àkọ́kọ́","Converted value":"Iye tí a yí padà","Monthly payment":"Ìsanwó oṣooṣù","Total repayment":"Àpapọ̀ ìsanwó","Total interest":"Àpapọ̀ èrè","Calendar days":"Ọjọ́ kalẹ́ńdà","Weighted GPA (4.0 scale)":"GPA tó ní ìwọ̀n","Fuel required":"Epo tí a nílò","Estimated cost":"Iye owó àfojúsùn"},
+pcm:{"Token IDs":"Token IDs","Unicode code points":"Unicode characters","Words":"Words","Characters (Unicode code points)":"Characters","Characters excluding whitespace":"Characters without spaces","Sentences (estimate)":"Sentences (estimate)","Paragraphs":"Paragraphs","Reading time at 200 wpm":"Reading time","Result":"Result","BMI":"BMI","Entered percentage total":"Total percentage wey you enter","Weekly minutes":"Minutes per week","Annual hours":"Hours per year","Lifetime hours":"Total hours","Entered assets":"Assets wey you enter","Calculated amount":"Calculated amount","Initial bearing":"Direction bearing","Converted value":"Converted value","Monthly payment":"Monthly payment","Total repayment":"Total repayment","Total interest":"Total interest","Calendar days":"Calendar days","Weighted GPA (4.0 scale)":"Weighted GPA","Fuel required":"Fuel needed","Estimated cost":"Estimated cost"}
+};
+for(const [k,v] of Object.entries(outputs))I[k].outputs=v;
+
+I.en.noResults="No matching tools.";I.de.noResults="Keine passenden Werkzeuge.";I.yo.noResults="Kò sí irinṣẹ tó bá ìwá rẹ mu.";I.pcm.noResults="No tool match your search.";
+I.en.fields.encoding="Tokenizer encoding";I.en.fields.op="Operation";
+I.de.fields.encoding="Tokenizer-Kodierung";I.de.fields.op="Operation";
+I.yo.fields.encoding="Tokenizer encoding";I.yo.fields.op="Iṣẹ́";
+I.pcm.fields.encoding="Tokenizer encoding";I.pcm.fields.op="Operation";
+for(const k of Object.keys(I)){I[k].outputs.Tokens=k==="de"?"Tokens":k==="yo"?"Tokens":k==="pcm"?"Tokens":"Tokens";}
+
+const extraOutputs={
+en:{Years:"Years",Months:"Months",Days:"Days",Category:"Category", "After cycles":"After cycles"},
+de:{Years:"Jahre",Months:"Monate",Days:"Tage",Category:"Kategorie","After cycles":"Nach Zyklen"},
+yo:{Years:"Ọdún",Months:"Oṣù",Days:"Ọjọ́",Category:"Ẹ̀ka","After cycles":"Lẹ́yìn cycle"},
+pcm:{Years:"Years",Months:"Months",Days:"Days",Category:"Category","After cycles":"After cycles"}
+};
+for(const [k,v] of Object.entries(extraOutputs))Object.assign(I[k].outputs,v);
+
+Object.assign(I.en.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (in)"});
+Object.assign(I.de.fields,{weightImperial:"Gewicht (lb)",heightImperial:"Größe (in)"});
+Object.assign(I.yo.fields,{weightImperial:"Ìwọ̀n ara (lb)",heightImperial:"Gíga (in)"});
+Object.assign(I.pcm.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (in)"});
+Object.assign(I.en.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.de.options,{modulo:"Rest",sin:"Sinus (Grad)",cos:"Kosinus (Grad)",tan:"Tangens (Grad)",log:"Logarithmus zur Basis 10",ln:"Natürlicher Logarithmus",factorial:"Fakultät",metric:"Metrisch (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.yo.options,{modulo:"Ìyókù",sin:"Sine (degree)",cos:"Cosine (degree)",tan:"Tangent (degree)",log:"Logarithm base 10",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.pcm.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+const moreOutputs={
+en:{Direction:"Direction","Days from today":"Days from today"},
+de:{Direction:"Richtung","Days from today":"Tage ab heute"},
+yo:{Direction:"Ìtọ́sọ́nà","Days from today":"Ọjọ́ láti òní"},
+pcm:{Direction:"Direction","Days from today":"Days from today"}
+};
+for(const [k,v] of Object.entries(moreOutputs))Object.assign(I[k].outputs,v);
+I.en.notices.math="Trigonometric inputs use degrees. Factorial is limited to integers from 0 to 170.";
+I.de.notices.math="Trigonometrische Eingaben verwenden Grad. Fakultät nur für ganze Zahlen von 0 bis 170.";
+I.yo.notices.math="Ìṣirò trigonometry lo degree. Factorial jẹ́ fún odidi nọ́ńbà láti 0 sí 170.";
+I.pcm.notices.math="Trigonometry use degrees. Factorial dey limited to whole numbers from 0 to 170.";
