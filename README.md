@@ -41,12 +41,12 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Number base converter | Signed integer conversion between bases 2–36 using BigInt. |
 | Password generator | Local cryptographic random generation; nothing is uploaded or stored. |
 | QR code generator | Locally generated downloadable QR image; scanned content is visible to others. |
-| Hash / checksum | Local SHA-256, SHA-1 and MD5 for text or selected files; MD5/SHA-1 are not security choices. |
+| Hash / checksum | Local SHA-256, SHA-1 and MD5 for text, selected files or dropped files (25 MB limit); MD5/SHA-1 are not security choices. |
 | JSON formatter / validator | Local pretty-print, minify and syntax validation with line/column errors. |
 | Color & contrast checker | HEX/RGB/HSL conversion and WCAG contrast ratio. |
 | Discount & tax calculator | Discount, tax and reverse original-price estimate. |
 | Recipe scaler | Scale ingredient quantities while preserving entered units and names. |
-| Holiday dates | Rule-based dates for selected regions; not legal entitlement advice. |
+| Holiday dates | Countdown to common rule-based holidays for selected regions; not legal entitlement advice. |
 | Morse code translator | Bidirectional supported International Morse mapping. |
 | Statistics calculator | Mean, median, mode, range, population and sample standard deviation. |
 
