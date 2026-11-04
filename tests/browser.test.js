@@ -29,7 +29,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.locator("#search").fill("currency");
     assert.equal(await page.locator(".tool-card").count(),1);
     await page.locator("#search").fill("");
-    await page.getByRole("button",{name:"Offline currency converter"}).click();
+    await page.locator('.tool-card[data-tool-key="currency"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="Offline currency converter");
     await page.locator('input[name="amount"]').fill("100");
     const validity=await page.locator("#panel form").evaluate(form=>({valid:form.checkValidity(),invalid:[...form.querySelectorAll(":invalid")].map(x=>({name:x.name,value:x.value,type:x.type,required:x.required}))}));
@@ -40,7 +40,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/112\.67\s+USD/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
-    await page.getByRole("button",{name:"QR code generator"}).click();
+    await page.locator('.tool-card[data-tool-key="qr"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="QR code generator");
     await page.locator('textarea[name="text"]').fill("https://example.com");
     await page.locator("#panel form").evaluate(form=>form.requestSubmit());
@@ -48,7 +48,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/https:\/\/example\.com/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
-    await page.getByRole("button",{name:"Blood alcohol estimate (educational)"}).click();
+    await page.locator('.tool-card[data-tool-key="bac"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="Blood alcohol estimate (educational)");
     await page.locator('input[name="weightKg"]').fill("70");
     await page.locator('input[name="drinks"]').fill("2");
