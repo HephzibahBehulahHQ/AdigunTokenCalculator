@@ -71,14 +71,14 @@ function renderNav(){
  chips.replaceChildren();categories.forEach((name,i)=>{const b=el("button","category-chip",name);b.type="button";b.setAttribute("aria-pressed",values[i]===activeCategory?"true":"false");b.addEventListener("click",()=>{activeCategory=values[i]||"All";renderNav();});chips.append(b);});
  const icons={"Token & AI":"🔤","Math":"∑","Text & Language":"文","Conversion":"⇄","Health":"♥","Finance":"¤","Time & Date":"◷","World & Culture":"◎","Developer":"{}","Security & Privacy":"⌑"};
  keys.forEach((key,i)=>{const category=tr().toolCategoryByKey[key]||tr().groups[i];if(activeCategory!=="All"&&category!==activeCategory)return;if(q&&!tr().names[i].toLocaleLowerCase().includes(q)&&!tr().descriptions[i].toLocaleLowerCase().includes(q))return;
-  const card=el("button","tool-card");card.type="button";card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{active=i;location.hash="#/"+key;renderTool();});nav.append(card);
+  const card=el("button","tool-card");card.type="button";card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",tr().toolCategoryLabels?.[category]||category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{active=i;location.hash="#/"+key;renderTool();});nav.append(card);
  });
  if(!nav.children.length)nav.append(el("p","muted",tr().noResults||"No matching tools."));
 }
 function out(k){if(tr().additionalOutputs?.[k])return tr().additionalOutputs[k];if(tr().outputs?.[k])return tr().outputs[k];if(k.startsWith("Category "))return (tr().outputs?.Category||"Category")+" "+k.slice(9);if(k.startsWith("After "))return (tr().outputs?.["After cycles"]||"After cycles")+" "+k.slice(6).replace(" cycles","");return k;}
 function result(rows,note="",kind="status"){panel.querySelector(".result")?.remove();const box=el("section","result");box.className="result "+(kind==="error"?"result-error":"");box.setAttribute("role",kind==="error"?"alert":"status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);return box;}
 function fmt(n,d=3){return Number(n).toLocaleString(lang,{maximumFractionDigits:d});}
-function errorResult(err){const message=err?.message==="empty"?tr().empty:tr().invalid;result([["",message]],"", "error");}
+function errorResult(err){const message=err?.message==="empty"?tr().empty:(String(err?.message||"").startsWith("JSON syntax error")?err.message:tr().invalid);result([["",message]],"", "error");}
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 async function execute(k,d){
  const T=tr(),N=T.notices;let rows=[],note="";
@@ -123,7 +123,7 @@ async function execute(k,d){
  case"stats":{const r=a.summarizeNumbers(d.numbers);rows=[["Mean",fmt(r.mean,6)],["Median",fmt(r.median,6)],["Mode",r.mode.length?r.mode.join(", "):"No unique mode"],["Minimum",fmt(r.min,6)],["Maximum",fmt(r.max,6)],["Range",fmt(r.range,6)],["PopulationSD",fmt(r.populationStdDev,6)],["SampleSD",r.sampleStdDev===null?"Not defined for one value":fmt(r.sampleStdDev,6)],["Count",r.count]];break;}
 
  }
- const box=result(rows,note);if(k==="demographics"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const a=el("a","", "Pew Research Center (2025; estimates for 2020)");a.href="https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);}
+ const box=result(rows,note);if(k==="currency"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const aLink=el("a","","European Central Bank reference rates (4 November 2026)");aLink.href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html";aLink.target="_blank";aLink.rel="noopener noreferrer";p.append(aLink);box.append(p);}if(k==="demographics"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const a=el("a","", "Pew Research Center (2025; estimates for 2020)");a.href="https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);}
 }
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
 function renderTool(){
@@ -135,6 +135,14 @@ function renderTool(){
  const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
+ if(k==="timezone"){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);inputs.dateTime.value=local;}
+ if(k==="inflation"){inputs.annualRate.min="-99.99";for(const key of ["fromYear","toYear"]){inputs[key].min="1800";inputs[key].max="2200";}}
+ if(k==="tip")inputs.people.min="1";
+ if(k==="calories"){inputs.age.min="18";inputs.age.max="120";inputs.weightKg.max="500";inputs.heightCm.max="280";}
+ if(k==="bases"){for(const key of ["fromBase","toBase"]){inputs[key].min="2";inputs[key].max="36";}}
+ if(k==="password"){inputs.length.min="8";inputs.length.max="128";}
+ if(k==="holidays"){inputs.year.min="1583";inputs.year.max="4099";}
+ if(k==="discount")inputs.discountPct.max="99.99";
  if(k==="hash"){inputs.text.required=false;inputs.file.required=false;inputs.file.accept="*/*";}
  if(k==="discount"){const refresh=()=>{const reverse=inputs.mode.value==="reverse";inputs.price.closest(".field").hidden=reverse;inputs.salePrice.closest(".field").hidden=!reverse;inputs.price.required=!reverse;inputs.salePrice.required=reverse;};inputs.mode.addEventListener("change",refresh);refresh();}
  if(k==="token"){
