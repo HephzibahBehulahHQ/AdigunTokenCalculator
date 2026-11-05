@@ -57,7 +57,7 @@ test("load UI: CSV includes inputs, all results, ranked devices and 24 bins; use
   for(const lang of Object.keys(LOAD_COPY)){
     const csv=buildLoadCsv([device],{tariff:0.3,currency:"EUR"},lang);
     assert.ok(csv.startsWith("\uFEFF"));assert.ok(csv.includes(LOAD_COPY[lang].profile));
-    assert.ok(csv.includes("'=SUM(1,2) ""quoted"""));assert.ok(csv.includes('"0.972"'));
+    assert.ok(csv.includes(`'=SUM(1,2) ""quoted""`));assert.ok(csv.includes('"0.972"'));
     assert.ok(csv.includes(LOAD_COPY[lang]["field.seasonalFactor"]));assert.ok(csv.includes(LOAD_COPY[lang]["result.netGridKWh"]));
     const lines=csv.trimEnd().split("\r\n");
     assert.equal(lines.filter(line=>/^"(?:[0-9]|1[0-9]|2[0-3])","[0-9.e+-]+"$/.test(line)).length,24);

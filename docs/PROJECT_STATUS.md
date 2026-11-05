@@ -82,4 +82,7 @@ No full production/accessibility certification is claimed while human review rem
 | 14 | `src/calculators/loadProfile.js` | All 8 profile tests passed after remaining CO2 null default fix | Align power/factor numerical boundaries |
 | 15 | `tests/loadCalculator.test.js` | New full-day factor regression fails as expected | Fix roundoff and tiny PF evaluation |
 | 16 | `src/calculators/loadCalculator.js` | 22 engine/profile tests passed after numerical fixes | Build UI and interaction checks |
-| 17 | `tests/loadUI.test.js` | Expected red: UI module missing; production preview tests proposed router additions in memory only | Implement isolated UI |
+| 17 | `tests/loadUI.test.js` | Initial UI test failed during parsing (quoted CSV assertion); preview is designed to test proposed router additions in memory only | Implement isolated UI |
+| 18 | `src/tools/loadCalculatorUI.js` | Pure UI/CSV implementation added; test blocked by quoted assertion syntax | Correct new UI test syntax |
+| 19 | `tests/loadUI.test.js` | Parser fixed; CSV numeric formatting assertion fails on floating-point residue | Normalize export display precision |
+| 20 | `src/tools/loadCalculatorUI.js` | 3 pure UI tests pass: registration, isolated memory state, multilingual CSV and formula-injection escaping; DOM mounting NOT IMPLEMENTED yet | Implement DOM renderer |
