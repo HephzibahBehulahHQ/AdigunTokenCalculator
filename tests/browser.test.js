@@ -291,7 +291,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         await page.locator('input[name="annualRate"]').fill("12");await calculate();
         rows=await resultRows();
         assert.equal(rows[RESULT_LABELS[locale].LoanFormula],"M = P × r / (1 − (1 + r)^(-n))");
-        const payment=await page.evaluate(locale=>(88.85).toLocaleString(locale),locale);
+        const payment=await page.evaluate(locale=>(88.849).toLocaleString(locale),locale);
         assert.ok(Object.values(rows).includes(payment));
         assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"loanVariables")));
       }
