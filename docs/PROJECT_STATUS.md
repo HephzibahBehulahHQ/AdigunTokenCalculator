@@ -73,3 +73,7 @@ No full production/accessibility certification is claimed while human review rem
 | 5 | `tests/loadPresets.test.js` | Expected red: missing preset library | Add requested estimates |
 | 6 | `src/data/loadPresets.js` | 3 preset tests passed; 19 appliances and 2 generation offsets | Add localized interface copy |
 | 7 | `tests/loadI18n.test.js` | Expected red: missing localization module | Add explicit EN/DE/YO/PCM copy |
+| 8 | `src/tools/loadCalculator-i18n.js` | 5 localization tests passed; explicit four-locale keys, placeholders, presets and legacy catalogue preservation | Add requested export/status copy |
+| 9 | `tests/loadI18n.test.js` | Expected red for newly requested CSV/status/export-failure keys | Supply those four-locale keys |
+| 10 | `src/tools/loadCalculator-i18n.js` | 5 localization tests passed including CSV/status/export-failure keys | Add editable CO₂ assumption notice |
+| 11 | `src/tools/loadCalculator-i18n.js` | 5 localization tests passed; illustrative CO₂ default explained in four locales | Implement isolated UI with these translation keys |
