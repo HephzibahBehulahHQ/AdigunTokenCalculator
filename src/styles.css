@@ -17,6 +17,8 @@
 .tool-card-description{grid-column:2;color:var(--muted);font-size:.78rem;line-height:1.4}
 .tool-card-category{grid-column:2;justify-self:start;margin-top:.2rem;padding:.2rem .45rem;border-radius:5px;background:#F1F5F9;color:#475569;font-size:.68rem;font-weight:700}
 .back-directory{margin-bottom:1rem}
+.memory-status{grid-column:1/-1;overflow-wrap:anywhere}
+#panel,.tool-card{min-width:0;overflow-wrap:anywhere}
 .qr-preview{display:block;width:min(100%,320px);height:auto;margin:1rem auto;border:1px solid var(--line);background:white}
 .result pre{max-width:100%;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
 .field input[type=color]{height:3.1rem;padding:.25rem}

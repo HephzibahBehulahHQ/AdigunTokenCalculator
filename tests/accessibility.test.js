@@ -135,6 +135,7 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
 
     await t.test("all 39 panels reflow on narrow, tablet, desktop and enlarged layouts",async()=>{
       const layouts=[{width:320,height:800,zoom:1},{width:768,height:1024,zoom:1},{width:1440,height:900,zoom:1},{width:1280,height:900,zoom:2}];
+      const failures=[];
       for(const locale of locales){
         await directory();
         await page.locator("#language").selectOption(locale);
@@ -143,14 +144,19 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
           await page.evaluate(zoom=>{document.documentElement.style.zoom=String(zoom);},layout.zoom);
           for(const key of ["",...toolKeys]){
             if(key)await openTool(key);else await directory();
-            const geometry=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
-            assert.ok(geometry.scroll<=geometry.width+1,`${locale}/${key||"directory"} at ${layout.width}px, ${layout.zoom}x: ${JSON.stringify(geometry)}`);
+            const geometry=await page.evaluate(()=>{
+              const width=document.documentElement.clientWidth,scroll=document.documentElement.scrollWidth;
+              const overflowing=scroll>width+1?[...document.querySelectorAll("#panel *,header *,.tool-card *")].filter(node=>node.getBoundingClientRect().right>innerWidth+1).slice(0,5).map(node=>({tag:node.tagName,class:node.className,text:node.textContent.slice(0,70)})):[];
+              return {width,scroll,overflowing};
+            });
+            if(geometry.scroll>geometry.width+1)failures.push(`${locale}/${key||"directory"} at ${layout.width}px, ${layout.zoom}x: ${JSON.stringify(geometry)}`);
             if(key==="bac")await page.keyboard.press("Escape");
           }
         }
       }
       await page.evaluate(()=>{document.documentElement.style.zoom="1";});
       await page.setViewportSize({width:1280,height:900});
+      assert.deepEqual(failures,[],"translated panels must reflow without page-level horizontal scrolling");
     });
 
     await t.test("already loaded calculations stay local and usable while offline",async()=>{
@@ -162,12 +168,14 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
       await page.locator('#panel button[type="submit"]').click();
       await page.locator(".result").waitFor();
       const submitted=[];
-      const record=request=>{if(!request.url().includes("/node_modules/.vite/"))submitted.push(request.url());};
+      const record=request=>submitted.push(request.url());
       page.on("request",record);
       await context.setOffline(true);
       try{
+        const previousResult=await page.locator(".result").elementHandle();
         await page.locator('input[name="passwordInput"]').fill("Offline-private-3sK!8");
         await page.locator('#panel button[type="submit"]').click();
+        await page.waitForFunction(previous=>!previous.isConnected,previousResult);
         await page.locator(".result").waitFor();
         assert.doesNotMatch(await page.locator(".result").innerText(),/Offline-private-3sK!8/);
         await openTool("hash");

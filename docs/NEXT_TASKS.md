@@ -1,11 +1,10 @@
 # Next tasks
 
-1. **Human locale review:** Fluent speakers review German, Yoruba and Nigerian Pidgin labels, dynamic results and health/safety notices.
-2. **Human accessibility review:** Complete the outstanding checklist in `docs/TEST_PLAN.md`, including assistive technology, keyboard-only workflows, target devices, zoom, contrast and offline/network inspection.
-3. **Owner licence decision:** Select and authorize a project-wide licence before adding a root `LICENSE`. Dependency notices are complete and published separately.
+The current objective, branch, verification state and release receipts are maintained in [PROJECT_STATUS.md](PROJECT_STATUS.md#current-continuation--accessibility-and-release-checks).
 
-PRs #6–#10 and #12 are merged and deployed. Required GPA, age, recipe, empty-file, BAC-dialog and accessible-validation details are implemented. Exact receipts for the latest functional release are in `docs/PROJECT_STATUS.md`.
+1. Complete the accessibility/release-check continuation in [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17), including its exact-candidate browser/build gates. Obtain the explicit merge/deployment authorization required by `AGENTS.md` once the candidate is reviewable.
+2. **Human locale review:** Fluent speakers review German, Yoruba and Nigerian Pidgin labels, dynamic results, navigation/action descriptions and health/safety notices.
+3. **Human accessibility review:** Complete the outstanding human checklist in [TEST_PLAN.md](TEST_PLAN.md), including assistive technology, complete keyboard workflows, target devices, browser zoom and visual contrast. Automated checks are recorded separately.
+4. **Owner licence decision:** Select and authorize a project-wide licence before adding a root `LICENSE`. Dependency notices are complete and published separately.
 
-## Separate workstream
-
-Draft [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11), the electrical-load feature, awaits independent integration review. Its PR body requires separate owner approval before shared-file integration; it is outside the completed 38-tool release scope.
+The application already contains 39 tools. Electrical-load PRs #11, #14, #15 and #16 are merged; they are not a pending separate feature workstream. No additional calculator feature remains in the recorded implementation backlog.

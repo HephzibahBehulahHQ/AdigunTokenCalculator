@@ -209,7 +209,7 @@ function renderTool(){
   const memoryAction=(symbol,key,fn)=>{const button=addAction(memoryBar,symbol,fn);button.setAttribute("aria-label",copy[key]);button.title=copy[key];};
   const changeMemory=operation=>{
    try{memoryValue=c.memory(inputs.a.value,operation,memoryValue);clearFormError(form);panel.querySelector(".result-error")?.remove();announceMemory();}
-   catch{errorResult(Error("number"));}
+   catch{errorResult(Error("number"),{form,tool:"math",data:{a:inputs.a.value,op:"add"}});}
   };
   memoryAction("M+","memoryAdd",()=>changeMemory("M+"));
   memoryAction("M−","memorySubtract",()=>changeMemory("M-"));
