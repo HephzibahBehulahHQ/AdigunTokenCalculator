@@ -1,11 +1,14 @@
 import {I} from "./i18n.js";
 import "./copy.js";
 import * as c from "./calculators.js";
-import {tokenize,encodings} from "./tokenizer.js";
+import {tokenize,encodings,cancelTokenization} from "./tokenizer-client.js";
 import * as a from "./additional.js";
 import "./additional-i18n.js";
 import {RESULT_COPY,RESULT_LABELS,resultText} from "./result-i18n.js";
 import "./feature-i18n.js";
+import {COMPLETION_COPY,completionText} from "./completion-i18n.js";
+import {formatJsonAsync,cancelJsonWork} from "./json-client.js";
+import {mountOfflineStatus} from "./offline.js";
 import {normalizeHexColor,rgbToHex,hslToHex} from "./colors.js";
 import {formatNumber} from "./format.js";
 import {mountBacGate} from "./bac-gate.js";
@@ -17,6 +20,7 @@ import "./styles.css";
 
 const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
 const main=$("#main");
+const offlineStatus=mountOfflineStatus($("footer"),{language:"en"});
 main.tabIndex=-1;
 $("#categories").setAttribute("role","group");
 $(".skip").addEventListener("click",event=>{
@@ -59,7 +63,7 @@ Religiously unaffiliated, 24.2`]],
  tip:[["bill","number"],["tipRate","number",null,"10"],["taxRate","number",null,"0"],["people","number",null,"2"],["tipBasis","select",[["subtotal","Before tax"],["with-tax","After tax"]],"subtotal"],["rounding","select",[["nearest","Nearest cent"],["up","Round up"],["down","Round down"]],"nearest"]],
  calories:[["weightKg","number"],["heightCm","number"],["age","number"],["sex","select",[["male","Male"],["female","Female"]],"male"],["activity","select",[["sedentary","Sedentary"],["light","Light"],["moderate","Moderate"],["high","High"],["veryHigh","Very high"]],"moderate"],["proteinPct","number",null,"25"],["carbPct","number",null,"45"],["fatPct","number",null,"30"]],
  pregnancy:[["method","select",[["lmp","Last menstrual period"],["conception","Conception date"]],"lmp"],["inputDate","date"]],
- water:[["weightKg","number"],["extraMl","number",null,"0"]],
+ water:[["weightKg","number"],["lowMlPerKg","number",null,"30"],["highMlPerKg","number",null,"35"],["activityFactor","number",null,"1"],["climateFactor","number",null,"1"],["extraMl","number",null,"0"]],
  bac:[["weightKg","number"],["sex","select",[["male","Male"],["female","Female"]],"male"],["drinks","number"],["drinkMl","number",null,"330"],["abv","number",null,"5"],["hours","number",null,"0"]],
  roman:[["mode","select",[["toRoman","Integer to Roman"],["fromRoman","Roman to integer"]],"toRoman"],["value","text"]],
  bases:[["value","text"],["fromBase","number",null,"10"],["toBase","number",null,"16"]],
@@ -70,7 +74,7 @@ Religiously unaffiliated, 24.2`]],
  color:[["colorMode","select",[["hex","HEX"],["rgb","RGB"],["hsl","HSL"]],"hex"],["foreground","text",null,"#000000"],["red","number",null,"0"],["green","number",null,"0"],["blue","number",null,"0"],["hue","number",null,"0"],["saturation","number",null,"0"],["lightness","number",null,"0"],["background","color",null,"#ffffff"]],
  discount:[["mode","select",[["forward","Discount a price"],["reverse","Find original price"]],"forward"],["price","number"],["discountPct","number"],["taxRate","number",null,"0"],["salePrice","number"]],
  recipe:[["text","textarea"],["fromServings","number"],["toServings","number"],["recipeUnits","select",[["keep","Keep entered units"],["small","Convert kg/L to g/mL"],["large","Convert g/mL to kg/L"]],"keep"]],
- holidays:[["year","number",null,"2026"],["region","select",[["US","United States"],["GB","United Kingdom"],["DE","Germany"],["NG","Nigeria"],["CA","Canada"]],"US"]],
+ holidays:[["year","number",null,"2026"],["region","select",[["US","United States"],["GB","United Kingdom"],["DE","Germany"],["NG","Nigeria"],["CA","Canada"]],"US"],["referenceZone","select",a.TIME_ZONES.map(zone=>[zone,zone]),"UTC"]],
  morse:[["text","textarea"],["direction","select",[["text","Text to Morse"],["morse","Morse to text"]],"text"]],
  stats:[["numbers","textarea"]]
 };
@@ -101,16 +105,26 @@ function errorResult(err,context={}){
  let message=err?.message==="empty"?tr().empty:location?resultText(lang,"jsonSyntaxAt",{line:location[1],column:location[2]}):tr().invalid;
  if(err?.message==="zero")message=resultText(lang,"nonzeroDivisor");
  if(err?.message==="future")message=resultText(lang,"futureDateError");
+ if(err?.code==="json-too-large"||err?.message==="json-too-large")message=COMPLETION_COPY[lang].jsonTooLarge;
+ if(err?.code==="statistics-too-large"||err?.message==="statistics-too-large")message=COMPLETION_COPY[lang].statisticsTooLarge;
+ if(err?.message==="worker unavailable")message=COMPLETION_COPY[lang].workerError;
  if(tool==="gpa"&&fields.includes("grades"))message=resultText(lang,data.mode==="percentage"?"gpaPercentError":"gpaGradeError");
  const box=result([["",message]],"","error"),messageNode=box.querySelector(".result-row strong");
  messageNode.id="calculator-error-"+(tool||"general");attachFormError(form,messageNode,fields);
 }
-function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
+function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(typeof text==="function"?text():text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 function foregroundColor(d){if(d.colorMode==="hex")return normalizeHexColor(d.foreground);if(d.colorMode==="rgb")return rgbToHex(d.red,d.green,d.blue);if(d.colorMode==="hsl")return hslToHex(d.hue,d.saturation,d.lightness);throw Error("number");}
 async function execute(k,d,isCurrent){
- const T=tr(),N=T.notices;let rows=[],note="";
+ const T=tr(),N=T.notices,C=COMPLETION_COPY[lang];let rows=[],note="";
  switch(k){
- case"token":{if(!d.text)throw Error("empty");const r=await tokenize(d.text,d.encoding);if(!isCurrent())return;const box=result([["Tokens",r.ids.length],["Unicode code points",r.chars],["Token IDs",r.ids.join(", ")||"—"]],N.token);const seg=el("div","segments");r.pieces.forEach((p,i)=>{const s=el("span","piece",p);s.title="Token "+r.ids[i];seg.append(s);});box.append(seg);const actions=el("div","actions");addCopyButton(actions,r.ids.join(", "),T.copyIds||"Copy token IDs");addCopyButton(actions,r.pieces.join(""),T.copyText||"Copy reconstructed text");box.append(actions);return;}
+ case"token":{
+  if(!d.text)throw Error("empty");const r=await tokenize(d.text,d.encoding);if(!isCurrent())return;
+  const box=result([["Tokens",r.ids.length],["Unicode code points",r.chars],[C.encoding,d.encoding],["Token IDs",""]],N.token),ids=box.querySelector(".result-row:last-of-type strong"),seg=el("div","segments"),preview=el("p","notice token-preview"),pager=el("div","actions");
+  const pageSize=2000;let start=0;seg.setAttribute("aria-label",C.tokenPreview);preview.setAttribute("role","status");preview.setAttribute("aria-live","polite");
+  const previous=addAction(pager,C.previous,()=>{start=Math.max(0,start-pageSize);draw();}),next=addAction(pager,C.next,()=>{start+=pageSize;draw();});
+  function draw(){const end=Math.min(start+pageSize,r.ids.length);ids.textContent=r.ids.slice(start,end).join(", ")||"—";seg.replaceChildren();const fragment=document.createDocumentFragment();for(let index=start;index<end;index++){const piece=el("span","piece",r.pieces[index]);piece.title=C.tokenId+" "+r.ids[index];fragment.append(piece);}seg.append(fragment);preview.textContent=completionText(lang,"previewRange",{start:r.ids.length?start+1:0,end,total:r.ids.length});previous.disabled=start===0;next.disabled=end>=r.ids.length;pager.hidden=r.ids.length<=pageSize;preview.hidden=r.ids.length<=pageSize;}
+  draw();box.append(preview,seg,pager);const actions=el("div","actions");addCopyButton(actions,()=>r.ids.join(", "),T.copyIds||"Copy token IDs");addCopyButton(actions,()=>r.pieces.join(""),T.copyText||"Copy reconstructed text");box.append(actions);return;
+ }
  case"math":{const v=c.engineering(d.a,d.b,d.op);rows=[["Result",fmt(v,8)]];note=(N.math||"")+(d.op==="percentOf"?" "+resultText(lang,"engineeringPercentNotice"):"");break;}
  case"text":{if(!d.text)throw Error("empty");const r=c.stats(d.text);rows=[["Words",r.words],["Characters (Unicode code points)",r.chars],["Characters excluding whitespace",r.noSpace],["Sentences (estimate)",r.sentences],["Paragraphs",r.paragraphs],["Reading time at 200 wpm",fmt(r.words/200)+" min"]];note=T.textAssumption||"Sentence and reading-time counts are estimates; reading speed is 200 words per minute.";break;}
  case"temp":rows=[["Result",fmt(c.temperature(d.value,d.direction),4)+(d.direction==="c"?" °F":" °C")]];break;
@@ -118,9 +132,9 @@ async function execute(k,d,isCurrent){
  case"bmi":rows=[["BMI",fmt(c.bmi(d.weight,d.height,d.unit))]];note=N.bmi;break;
  case"percent":rows=[["Result",fmt(c.percent(d.mode,d.a,d.b))+(d.mode==="of"?"":"%")]];note=d.mode==="of"?resultText(lang,"engineeringPercentNotice"):d.mode==="as"?resultText(lang,"percentageRatioNotice"):(T.percentageAssumption||"Percentage change is signed: increases are positive and decreases are negative.");break;
  case"world":{const r=c.populationEstimate(new Date());rows=[["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate],["Estimate timestamp UTC",new Date().toISOString()]];note=T.worldEstimateNotice||"Estimate, not live data. Linear interpolation from UN medium-variant mid-year projections.";break;}
- case"demographics":{const r=c.demographics(d.total,d.shares);rows=r.rows.map(x=>[x.name,fmt(x.count,0)+" ("+fmt(x.share,2)+"%)"]);rows.push(["Entered percentage total",fmt(r.totalShare,2)+"%"]);note=(T.demographicsSourceNote||"Starting shares are Pew Research Center global estimates for 2020; editable and not individual beliefs. ") + N.demographics+" "+(resultText(lang,r.totalShare<100?"sharesBelow":r.totalShare>100?"sharesAbove":"sharesExact"));break;}
+ case"demographics":{const r=c.demographics(d.total,d.shares),decimal=new Intl.NumberFormat(lang).formatToParts(1.1).find(part=>part.type==="decimal")?.value||".",unchanged=d.shares.trim().replace(/\r\n/g,"\n")===schema.demographics[1][3];rows=r.rows.map(x=>[x.name,fmt(x.count,0)+" ("+fmt(x.share,2)+"%)"]);rows.push(["Entered percentage total",r.totalShareExact.replace(".",decimal)+"%"]);note=(unchanged?C.demographicsDefault:C.demographicsCustom)+" "+N.demographics+" "+resultText(lang,{below:"sharesBelow",above:"sharesAbove",equal:"sharesExact"}[r.shareStatus]);break;}
  case"practice":{const r=c.practice(d.minutes,d.sessions,d.years);rows=[["Daily average minutes",fmt(r.day)],["Weekly minutes",fmt(r.week)],["Annual hours",fmt(r.year/60)],["Lifetime hours",fmt(r.lifetime/60)]];note=T.practiceAssumption||"Annual projection assumes 52 weeks per year; daily value is a weekly average.";break;}
- case"zakat":{const r=c.zakat(d,d.rate);rows=[["Entered assets",fmt(r.assets)],["Applied rate",fmt(d.rate)+"%"],["Calculated amount",fmt(r.due)]];note=N.zakat;break;}
+ case"zakat":{const r=c.zakat(d,d.rate),assetKeys=["cash","gold","silver","investments"];rows=[...assetKeys.map(key=>[T.fields[key],fmt(d[key],6,true)]),["Entered assets",fmt(r.assets)],["Applied rate",fmt(d.rate)+"%"],["Calculated amount",fmt(r.due)],[C.formula,assetKeys.map(key=>fmt(d[key],6,true)).join(" + ")+" = "+fmt(r.assets,6,true)+"; "+fmt(r.assets,6,true)+" × "+fmt(d.rate,6,true)+" / 100 = "+fmt(r.due,6,true)]];note=N.zakat;break;}
  case"qibla":{const b=c.bearing(d.lat,d.lon);rows=[["Initial bearing",fmt(b,1)+"°"],["Compass direction",c.compass(b)]];note=N.qibla;break;}
  case"units":rows=[["Converted value",fmt(c.unit(d.value,d.from,d.to,d.group),8,true)+" "+d.to]];break;
  case"loan":{const r=c.loan(d.principal,d.annualRate,d.term);rows=[["Monthly payment",fmt(r.payment)],["Total repayment",fmt(r.total)],["Total interest",fmt(r.interest)],["NumberOfPayments",Number(d.term)*12],["LoanFormula",Number(d.annualRate)/1200===0?"M = P / n":"M = P × r / (1 − (1 + r)^(-n))"]];note=(N.loan||"")+" "+(T.loanAssumption||"Assumes 12 monthly payments per year and a nominal annual rate divided monthly.")+" "+resultText(lang,"loanVariables");break;}
@@ -134,7 +148,7 @@ async function execute(k,d,isCurrent){
  case"tip":{const r=a.splitTip(d.bill,d.tipRate,d.taxRate,d.people,d.tipBasis,d.rounding);rows=[["Tip",fmt(r.tip,2)],["Tax",fmt(r.tax,2)],["Total",fmt(r.total,2)],["PerPerson",fmt(r.perPerson,2)]];note=N.tip;break;}
  case"calories":{const r=a.calorieTargets(d.weightKg,d.heightCm,d.age,d.sex,d.activity,d.proteinPct,d.carbPct,d.fatPct);rows=[["BMR",fmt(r.bmr,0)],["TDEE",fmt(r.tdee,0)],["Protein",fmt(r.proteinGrams,1)],["Carbohydrates",fmt(r.carbGrams,1)],["Fat",fmt(r.fatGrams,1)]];note=N.calories;break;}
  case"pregnancy":{const r=a.pregnancyEstimate(d.method,d.inputDate);rows=[["DueDate",r.dueDate],["Gestation",resultText(lang,"weeksDays",{weeks:r.gestationalWeeks,days:r.gestationalDays})],["Trimester",r.trimester],["Overdue",resultText(lang,r.overdue?"yes":"no")]];note=N.pregnancy;break;}
- case"water":{const r=a.waterRange(d.weightKg,d.extraMl);rows=[["WaterLow",fmt(r.lowMl,0)],["WaterHigh",fmt(r.highMl,0)]];note=N.water;break;}
+ case"water":{const r=a.waterRange(d.weightKg,d.extraMl,{lowMlPerKg:d.lowMlPerKg,highMlPerKg:d.highMlPerKg,activityFactor:d.activityFactor,climateFactor:d.climateFactor});rows=[["WaterLow",fmt(r.lowMl,0)],["WaterHigh",fmt(r.highMl,0)],[C.formula,fmt(d.weightKg)+" × ("+fmt(d.lowMlPerKg)+"–"+fmt(d.highMlPerKg)+") × "+fmt(d.activityFactor)+" × "+fmt(d.climateFactor)+" + ("+fmt(d.extraMl)+") mL"]];note=N.water;break;}
  case"bac":{const r=a.bloodAlcohol(d.weightKg,d.sex,d.drinks,d.drinkMl,d.abv,d.hours);rows=[["Ethanol",fmt(r.ethanolGrams,1)],["BAC",fmt(r.bacPercent,3)]];note=N.bac;break;}
  case"roman":{const v=d.mode==="toRoman"?a.toRoman(d.value):a.fromRoman(d.value);rows=[[d.mode==="toRoman"?"Roman":"Integer",v]];break;}
  case"bases":rows=[["Converted",a.convertBase(d.value,d.fromBase,d.toBase)],["Target base",d.toBase]];break;
@@ -145,11 +159,11 @@ async function execute(k,d,isCurrent){
  }if(d.passwordMode!=="generate")throw Error("number");const r=a.generatePassword(d.length,d.charset);const box=result([["Password",r.password],["Entropy",fmt(r.entropyBits,1)]],N.password);const actions=el("div","actions");addCopyButton(actions,r.password,T.copyPassword||"Copy password");box.append(actions);return;}
  case"qr":{if(!d.text)throw Error("empty");const qr=createQr(d.text);const url=qr.createDataURL(6,4),box=result([["QR content",d.text]],N.qr);const img=el("img","qr-preview");img.alt=tr().qrPreviewAlt||"Generated QR code";img.src=url;box.append(img);const link=el("a","secondary",T.downloadQr||"Download QR code");link.href=url;link.download="adigun-qr-code.gif";box.append(link);return;}
  case"hash":{const file=d.file&&d.file.name?d.file:null;if(file&&file.size>25000000)throw Error("number");if(!file&&!d.text)throw Error("empty");const data=file?new Uint8Array(await file.arrayBuffer()):new TextEncoder().encode(d.text);if(!isCurrent())return;let digest;if(d.algorithm==="MD5")digest=a.md5Hex(data);else{const raw=await crypto.subtle.digest(d.algorithm,data);digest=[...new Uint8Array(raw)].map(x=>x.toString(16).padStart(2,"0")).join("");}rows=[["Hash",digest],["Input",file?file.name:resultText(lang,"textBytes",{count:fmt(data.length,0)})]];note=N.hash;break;}
- case"json":{const formatted=a.jsonTransform(d.text,d.mode);const box=result([["Formatted",formatted]],N.json);const actions=el("div","actions");addCopyButton(actions,formatted,T.copyResult||"Copy result");box.append(actions);return;}
+ case"json":{const formatted=await formatJsonAsync(d.text,d.mode);if(!isCurrent())return;const box=result([["Formatted",formatted]],N.json);const actions=el("div","actions");addCopyButton(actions,formatted,T.copyResult||"Copy result");box.append(actions);return;}
  case"color":{const fg=foregroundColor(d),bg=d.background,rgb=a.parseHexColor(fg),hsl=a.rgbToHsl(rgb.r,rgb.g,rgb.b),ratio=a.contrastRatio(fg,bg);rows=[["HEX",fg.toUpperCase()],["RGB",rgb.r+", "+rgb.g+", "+rgb.b],["HSL",fmt(hsl.h,1)+"°, "+fmt(hsl.s,1)+"%, "+fmt(hsl.l,1)+"%"],["Contrast",fmt(ratio,2)+":1"],["AA",resultText(lang,ratio>=4.5?"pass":"fail")],["AAA",resultText(lang,ratio>=7?"pass":"fail")]];note=N.color;break;}
  case"discount":{if(d.mode==="reverse")rows=[["Original",fmt(a.originalPriceFromSale(d.salePrice,d.discountPct,d.taxRate),2)]];else{const r=a.discountPrice(d.price,d.discountPct,d.taxRate);rows=[["Discounted",fmt(r.discounted,2)],["Tax",fmt(r.tax,2)],["Total",fmt(r.total,2)],["Saved",fmt(r.saved,2)]];}note=N.discount;break;}
  case"recipe":{const r=a.scaleRecipe(d.text,d.fromServings,d.toServings,d.recipeUnits),formatted=r.join("\n");const box=result([["Scaled",formatted]],N.recipe);const actions=el("div","actions");addCopyButton(actions,formatted,T.copyResult||"Copy result");box.append(actions);return;}
- case"holidays":{const r=a.holidayDates(d.year,d.region),now=new Date(),today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()),items=r.map(([name,date])=>({name,date,days:Math.round((Date.parse(date+"T00:00:00Z")-today)/86400000)})).sort((x,y)=>(x.days>=0?x.days:100000+Math.abs(x.days))-(y.days>=0?y.days:100000+Math.abs(y.days)));rows=items.map(x=>[x.name,x.date+" · "+Math.abs(x.days)+" "+(x.days>=0?(T.daysAway||"days away"):(T.daysAgo||"days ago"))]);note=N.holiday;break;}
+ case"holidays":{const r=a.holidayCountdowns(d.year,d.region,d.referenceZone);rows=[[C.referenceDate,r.referenceDate+" · "+r.timeZone],...r.holidays.map(x=>[x.name,x.date+" · "+Math.abs(x.days)+" "+(x.days>=0?(T.daysAway||"days away"):(T.daysAgo||"days ago"))])];note=N.holiday;break;}
  case"morse":rows=[["Converted",a.translateMorse(d.text,d.direction)]];break;
  case"stats":{const r=a.summarizeNumbers(d.numbers);rows=[["Mean",fmt(r.mean,6)],["Median",fmt(r.median,6)],["Mode",r.mode.length?r.mode.map(value=>fmt(value,6)).join("; "):resultText(lang,"noUniqueMode")],["Minimum",fmt(r.min,6)],["Maximum",fmt(r.max,6)],["Range",fmt(r.range,6)],["PopulationVariance",fmt(r.populationVariance,6)],["SampleVariance",r.sampleVariance===null?resultText(lang,"singletonDeviation"):fmt(r.sampleVariance,6)],["PopulationSD",fmt(r.populationStdDev,6)],["SampleSD",r.sampleStdDev===null?resultText(lang,"singletonDeviation"):fmt(r.sampleStdDev,6)],["Count",r.count]];break;}
 
@@ -159,6 +173,7 @@ async function execute(k,d,isCurrent){
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
 function renderTool(){
  calculationRequest++;
+ cancelTokenization();cancelJsonWork();
  const aside=$("aside");
  if(active<0||!keys[active]){delete panel.dataset.toolKey;panel.replaceChildren();aside.hidden=false;panel.hidden=true;return;}
  aside.hidden=true;panel.hidden=false;
@@ -168,6 +183,9 @@ function renderTool(){
  if(k==="electrical-load"){mountLoadCalculator(panel,{lang});return;}
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};let bacConsent=null;(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
+ const C=COMPLETION_COPY[lang];
+ const helpText={water:C.waterHelp,holidays:C.holidayHelp,qibla:C.qiblaLocation,zakat:C.zakatDefault,json:C.jsonHelp,stats:C.statsHelp}[k];
+ if(helpText){const help=el("p","notice form-help",helpText);help.id=k+"-help";panel.append(help);form.setAttribute("aria-describedby",help.id);}
  if(k==="timezone"){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);inputs.dateTime.value=local;}
  if(k==="inflation"){inputs.annualRate.min="-99.99";for(const key of ["fromYear","toYear"]){inputs[key].min="1800";inputs[key].max="2200";}}
  if(k==="tip")inputs.people.min="1";
@@ -189,14 +207,14 @@ function renderTool(){
    previousMode=inputs.colorMode.value;panel.querySelector(".result")?.remove();refresh();
   });refresh();
  }
- if(k==="holidays"){inputs.year.min="1583";inputs.year.max="4099";}
+ if(k==="holidays"){inputs.year.min="1583";inputs.year.max="4099";inputs.year.value=String(new Date().getFullYear());const zone=Intl.DateTimeFormat().resolvedOptions().timeZone||"UTC";if(![...inputs.referenceZone.options].some(item=>item.value===zone))option(inputs.referenceZone,zone,zone);inputs.referenceZone.value=zone;}
  if(k==="discount")inputs.discountPct.max="99.99";
  if(k==="bac"){const consent=el("div","field bac-consent");const warning=el("p","warning-text",tr().bacConsentWarning||"Educational estimate only. Never use this to decide whether to drive.");const label=el("label","consent-label");const check=el("input");check.type="checkbox";check.name="acknowledge";check.required=true;label.append(check,document.createTextNode(tr().bacConsent||"I understand this is educational only and will never use it to decide whether to drive."));consent.append(warning,label);form.append(consent);bacConsent={consent,checkbox:check};}
  if(k==="hash"){inputs.text.required=false;inputs.file.required=false;inputs.file.accept="*/*";const drop=inputs.file.closest(".field");drop.append(el("small","muted",tr().dropFileHint||"Or drop a file here (maximum 25 MB)."));drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("dragover");});drop.addEventListener("dragleave",()=>drop.classList.remove("dragover"));drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("dragover");const file=e.dataTransfer?.files?.[0];if(file){const transfer=new DataTransfer();transfer.items.add(file);inputs.file.files=transfer.files;inputs.file.dispatchEvent(new Event("change",{bubbles:true}));}});}
  if(k==="discount"){const refresh=()=>{const reverse=inputs.mode.value==="reverse";inputs.price.closest(".field").hidden=reverse;inputs.salePrice.closest(".field").hidden=!reverse;inputs.price.required=!reverse;inputs.salePrice.required=reverse;inputs.price.disabled=reverse;inputs.salePrice.disabled=!reverse;};inputs.mode.addEventListener("change",refresh);refresh();}
  if(k==="token"){
   const live=el("p","muted","");live.setAttribute("role","status");live.setAttribute("aria-live","polite");form.append(live);
-  let seq=0;const update=async()=>{const id=++seq,text=inputs.text.value;if(!text){live.textContent=tr().tokenLiveEmpty||"Enter text to see a live token count.";return;}live.textContent=tr().tokenCounting||"Counting…";try{const r=await tokenize(text,inputs.encoding.value);if(id===seq&&form.isConnected)live.textContent=(tr().liveTokens||"Live token count")+": "+r.ids.length+" · "+r.chars+" "+(tr().characters||"characters");}catch{if(id===seq&&form.isConnected)live.textContent=tr().tokenError||"Tokenizer could not initialise.";}};
+  let seq=0;const update=async()=>{const id=++seq,text=inputs.text.value;if(!text){cancelTokenization();live.textContent=tr().tokenLiveEmpty||"Enter text to see a live token count.";return;}live.textContent=tr().tokenCounting||"Counting…";try{const r=await tokenize(text,inputs.encoding.value);if(id===seq&&form.isConnected)live.textContent=(tr().liveTokens||"Live token count")+": "+r.ids.length+" · "+r.chars+" "+C.codePoints;}catch(error){if(error.name!=="AbortError"&&id===seq&&form.isConnected)live.textContent=tr().tokenError||"Tokenizer could not initialise.";}};
   inputs.text.addEventListener("input",update);inputs.encoding.addEventListener("change",update);
   const quick=el("div","actions");addAction(quick,tr().clear||"Clear",()=>{calculationRequest++;inputs.text.value="";panel.querySelector(".result")?.remove();update();});form.append(quick);
  }
@@ -225,14 +243,21 @@ function renderTool(){
  if(k==="qibla"){const geo=el("div","actions");addAction(geo,tr().useLocation||"Use my location",()=>{if(!navigator.geolocation){errorResult(Error("geo"));return;}const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;navigator.geolocation.getCurrentPosition(p=>{if(!isCurrent())return;inputs.lat.value=p.coords.latitude.toFixed(6);inputs.lon.value=p.coords.longitude.toFixed(6);clearFormError(form);},()=>{if(isCurrent())errorResult(Error("geo"));});});form.append(geo);}
  if(k==="dates"){const refresh=()=>{const annual=inputs.mode.value==="annual";inputs.start.closest(".field").hidden=annual;inputs.start.required=!annual;inputs.start.disabled=annual;};inputs.mode.addEventListener("change",refresh);refresh();}
  if(k==="gpa"||k==="dates"){const mode=inputs.mode,dependent=inputs.grades?.closest(".field");if(mode&&dependent){const refresh=()=>{dependent.querySelector(".field-label").textContent=mode.value==="percentage"?(tr().fields.percentCredit||"Percentage, credits (one pair per line)"):(tr().fields.grades||"Grade, credits (one pair per line)");};mode.addEventListener("change",refresh);refresh();}}
+ if(k==="gpa"){
+  const details=el("details","grade-scale form-help"),table=el("table"),caption=el("caption","",C.gradeMapping),thead=el("thead"),header=el("tr"),body=el("tbody");
+  details.append(el("summary","",C.gradeMapping),el("p","notice",C.gradeHelp));for(const name of [C.grade,C.points]){const cell=el("th","",name);cell.scope="col";header.append(cell);}thead.append(header);
+  for(const [grade,value] of Object.entries(c.GRADE_POINTS)){const row=el("tr"),name=el("th","",grade);name.scope="row";row.append(name,el("td","",fmt(value,1)));body.append(row);}table.append(caption,thead,body);details.append(table);form.append(details);
+ }
  const actions=el("div","actions"),go=el("button","primary",tr().calculate),reset=el("button","secondary",tr().reset);go.type="submit";reset.type="reset";actions.append(go,reset);form.append(actions);
- const edited=e=>{calculationRequest++;clearFormError(form,e.target.name);};form.addEventListener("input",edited);form.addEventListener("change",edited);
- form.addEventListener("submit",async e=>{e.preventDefault();if(k==="bac"&&form.dataset.bacApproved!=="true")return;clearFormError(form);if(!form.reportValidity())return;const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;const data=Object.fromEntries(new FormData(form));try{await execute(k,data,isCurrent);}catch(err){if(isCurrent())errorResult(err,{form,tool:k,data});}});
+ const processing=el("p","muted processing-status");processing.setAttribute("role","status");processing.setAttribute("aria-live","polite");processing.hidden=true;form.append(processing);
+ const setBusy=busy=>{form.setAttribute("aria-busy",String(busy));processing.hidden=!busy;processing.textContent=busy?C.working:"";};
+ const edited=e=>{calculationRequest++;clearFormError(form,e.target.name);setBusy(false);if(k==="json")cancelJsonWork();};form.addEventListener("input",edited);form.addEventListener("change",edited);
+ form.addEventListener("submit",async e=>{e.preventDefault();if(k==="bac"&&form.dataset.bacApproved!=="true")return;clearFormError(form);if(!form.reportValidity())return;const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;const data=Object.fromEntries(new FormData(form));setBusy(true);try{await execute(k,data,isCurrent);}catch(err){if(err.name!=="AbortError"&&isCurrent())errorResult(err,{form,tool:k,data});}finally{if(isCurrent())setBusy(false);}});
  form.addEventListener("reset",e=>{e.preventDefault();if(k==="math")memoryValue=0;renderTool();if(!panel.querySelector("dialog[open]"))panel.querySelector('button[type="reset"]')?.focus();});
  panel.append(form);
  if(bacConsent)mountBacGate({panel,form,...bacConsent,copy:{title:resultText(lang,"bacDialogTitle"),continueLabel:resultText(lang,"bacDialogContinue"),cancelLabel:resultText(lang,"bacDialogCancel")},onCancel:()=>{location.hash="#/";}});
 }
-function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
+function setLang(v){lang=v;document.documentElement.lang=v;offlineStatus.setLanguage(v);$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
 search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
 function routeIndex(){
  try{return keys.indexOf(decodeURIComponent(location.hash.replace(/^#\/?/,"")));}

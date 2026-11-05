@@ -54,3 +54,15 @@
 .field input[aria-invalid="true"],.field select[aria-invalid="true"],.field textarea[aria-invalid="true"]{border-color:#B42318}
 
 .result-row strong{white-space:pre-wrap}
+.form-help,.processing-status{grid-column:1/-1}
+.grade-scale{border:1px solid var(--line);border-radius:9px;padding:.8rem}
+.grade-scale summary{cursor:pointer;font-weight:700;color:#26364D}
+.grade-scale table{width:100%;border-collapse:collapse;text-align:left}
+.grade-scale caption{padding:.5rem;text-align:left;font-weight:700}
+.grade-scale th,.grade-scale td{padding:.4rem;border-bottom:1px solid var(--line)}
+.grade-scale summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.offline-status{max-width:1440px;margin:1rem auto 0;border-top:1px solid #B9C5D4;padding-top:.7rem}
+.actions button:disabled{cursor:default;opacity:.55}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}

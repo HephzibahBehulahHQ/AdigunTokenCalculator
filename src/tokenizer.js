@@ -16,7 +16,7 @@ async function getEncoder(name){
 }
 export async function tokenize(text,name){
   if(typeof text!=="string")throw Error("text");
-  const encoder=await getEncoder(name),ids=encoder.encode(text,[],[]),decoder=new TextDecoder("utf-8");
+  const encoder=await getEncoder(name),ids=encoder.encode(text,[],[]),decoder=new TextDecoder("utf-8",{ignoreBOM:true});
   // Public byte API: tokens may split a UTF-8 character. Decode their bytes as
   // one stream so the rendered pieces reconstruct the original Unicode text.
   const pieces=Array.from(ids,id=>decoder.decode(encoder.decode_single_token_bytes(id),{stream:true}));

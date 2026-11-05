@@ -30,7 +30,11 @@ export function createWorkerClient(createWorker,{sameRequest=(a,b)=>a===b}={}){
         created.addEventListener("messageerror",failed);
       }
       worker.postMessage({id:task.id,payload:task.payload});
-    }catch{fail(Error("worker unavailable"));}
+    }catch(cause){
+      const error=Error("worker unavailable");
+      if(typeof cause?.code==="string")error.code=cause.code;
+      fail(error);
+    }
   }
   return{
     request(payload){

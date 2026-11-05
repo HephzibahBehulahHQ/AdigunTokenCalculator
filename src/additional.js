@@ -263,15 +263,7 @@ export function translateMorse(text,direction="text") {
   if(direction==="morse")return String(text).trim().split(/\s*\/\s*/).map(word=>word.trim().split(/\s+/).map(code=>{if(!MORSE_REVERSE[code])throw Error("morse");return MORSE_REVERSE[code];}).join("")).join(" ");
   throw Error("morse");
 }
-export function summarizeNumbers(text) {
-  const values=String(text).trim().split(/[\s,;]+/).filter(Boolean).map(Number);
-  if(!values.length||values.some(x=>!Number.isFinite(x)))throw Error("number");
-  const sorted=[...values].sort((a,b)=>a-b),sum=values.reduce((a,b)=>a+b,0),mean=sum/values.length,mid=Math.floor(sorted.length/2);
-  const counts=new Map();values.forEach(x=>counts.set(x,(counts.get(x)||0)+1));const maxCount=Math.max(...counts.values()),modes=maxCount===1?[]:[...counts].filter(([,n])=>n===maxCount).map(([x])=>x).sort((a,b)=>a-b);
-  const variance=values.reduce((a,x)=>a+(x-mean)**2,0)/values.length;
-  const sampleVariance=values.length>1?values.reduce((a,x)=>a+(x-mean)**2,0)/(values.length-1):null;
-  return {count:values.length,mean,median:values.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2,mode:modes,min:sorted[0],max:sorted.at(-1),range:sorted.at(-1)-sorted[0],populationVariance:variance,populationStdDev:Math.sqrt(variance),sampleVariance,sampleStdDev:sampleVariance===null?null:Math.sqrt(sampleVariance)};
-}
+export {summarizeNumbers} from "./statistics.js";
 
 export function parseCurrencyRates(text) {
   const rates={};
