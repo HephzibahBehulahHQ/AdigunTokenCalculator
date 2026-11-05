@@ -23,6 +23,15 @@ test("percentage denominator errors identify only the denominator for that mode"
  assert.deepEqual(fields("percent","number",{mode:"of",a:"bad",b:100}),["a"]);
  assert.deepEqual(fields("percent","number",{mode:"as",a:100,b:Infinity}),["b"]);
 });
+test("discount errors distinguish a free forward price from an undefined reverse price",()=>{
+ assert.deepEqual(fields("discount","number",{mode:"forward",discountPct:100}),[]);
+ assert.deepEqual(fields("discount","number",{mode:"reverse",discountPct:100}),["discountPct"]);
+ for(const mode of ["forward","reverse"]){
+  for(const discountPct of [0,99.999])assert.deepEqual(fields("discount","number",{mode,discountPct}),[]);
+  for(const discountPct of [-1,101,"", "bad"])assert.deepEqual(fields("discount","number",{mode,discountPct}),["discountPct"]);
+ }
+ assert.deepEqual(fields("discount","unexpected",{mode:"reverse",discountPct:100}),[]);
+});
 test("date errors isolate invalid dates and ignore inactive or reversed dates",()=>{
  assert.deepEqual(fields("dates","date",{mode:"difference",start:"2024-02-30",end:"2024-03-01"}),["start"]);
  assert.deepEqual(fields("dates","date",{mode:"difference",start:"2024-02-29",end:"bad"}),["end"]);
