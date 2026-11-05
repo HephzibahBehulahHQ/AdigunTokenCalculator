@@ -167,3 +167,32 @@ const percentageRatioCopy={
   "pcm": "A na first number (part); B na second number (whole). Result = A / B × 100%. B no fit be zero."
 };
 for(const [locale,copy] of Object.entries(percentageRatioCopy))RESULT_COPY[locale].percentageRatioNotice=copy;
+
+
+const detailFeatures={
+  en:{
+    labels:{AgeReferenceDate:"Today (local date)",WeightedTotal:"Weighted total",TotalCredits:"Total credits",WeightedFormula:"Weighted calculation"},
+    copy:{ageReferenceNotice:"Age uses the local calendar date shown above from this browser.",weightedCourse:"Course {index}: grade → value × credits",recipeUnitsNotice:"Unit conversion changes only exact metric pairs kg↔g and L↔mL. Other units and ingredient text stay as entered; mass is never converted to volume."},
+    field:"Output units",options:{keep:"Keep entered units",small:"Convert kg/L to g/mL",large:"Convert g/mL to kg/L"}
+  },
+  de:{
+    labels:{AgeReferenceDate:"Heute (lokales Datum)",WeightedTotal:"Gewichtete Summe",TotalCredits:"Summe der Credits",WeightedFormula:"Gewichtete Berechnung"},
+    copy:{ageReferenceNotice:"Das Alter wird anhand des oben angezeigten lokalen Kalenderdatums dieses Browsers berechnet.",weightedCourse:"Kurs {index}: Note → Wert × Credits",recipeUnitsNotice:"Die Umrechnung verwendet nur die exakten metrischen Paare kg↔g und L↔mL. Andere Einheiten und Zutaten bleiben unverändert; Masse wird nicht in Volumen umgerechnet."},
+    field:"Ausgabeeinheiten",options:{keep:"Eingegebene Einheiten behalten",small:"kg/L in g/mL umrechnen",large:"g/mL in kg/L umrechnen"}
+  },
+  yo:{
+    labels:{AgeReferenceDate:"Òní (ọjọ́ agbègbè)",WeightedTotal:"Àpapọ̀ tó ní ìwọ̀n",TotalCredits:"Àpapọ̀ credit",WeightedFormula:"Ìṣirò tó ní ìwọ̀n"},
+    copy:{ageReferenceNotice:"Ìṣirò ọjọ́-orí lo ọjọ́ kàlẹ́ńdà agbègbè ti browser yìí tí a fi hàn lókè.",weightedCourse:"Ẹ̀kọ́ {index}: grade → iye × credit",recipeUnitsNotice:"Ìyípadà unit lo àwọn méjì metric tó péye nìkan: kg↔g àti L↔mL. Àwọn unit àti ọ̀rọ̀ ohunelo mìíràn dúró bí a ṣe tẹ̀ wọ́n; a kò yí mass sí volume."},
+    field:"Unit àbájáde",options:{keep:"Pa unit tí a tẹ̀ mọ́",small:"Yí kg/L sí g/mL",large:"Yí g/mL sí kg/L"}
+  },
+  pcm:{
+    labels:{AgeReferenceDate:"Today (local date)",WeightedTotal:"Weighted total",TotalCredits:"Total credits",WeightedFormula:"Weighted calculation"},
+    copy:{ageReferenceNotice:"Age calculation use the local calendar date wey this browser show above.",weightedCourse:"Course {index}: grade → value × credits",recipeUnitsNotice:"Unit conversion use only exact metric pairs kg↔g and L↔mL. Other units and ingredient text stay as you enter am; e no convert mass to volume."},
+    field:"Output units",options:{keep:"Keep units as entered",small:"Convert kg/L to g/mL",large:"Convert g/mL to kg/L"}
+  }
+};
+for(const [locale,feature] of Object.entries(detailFeatures)){
+  Object.assign(RESULT_LABELS[locale],feature.labels);Object.assign(RESULT_COPY[locale],feature.copy);
+  I[locale].fields.recipeUnits=feature.field;
+  for(const [key,value] of Object.entries(feature.options))I[locale].options["recipeUnits:"+key]=value;
+}

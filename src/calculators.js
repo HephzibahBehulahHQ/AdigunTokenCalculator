@@ -25,8 +25,26 @@ export function loan(p,rate,years){
  return{payment,total,interest};
 }
 export function days(a,b){const x=parts(a),y=parts(b);return Math.abs(Date.UTC(y.y,y.m-1,y.d)-Date.UTC(x.y,x.m-1,x.d))/86400000;}
-export function gpa(text){const map={A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0};let p=0,c=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[g,cr,...extra]=line.split(",").map(x=>x.trim()),v=map[g?.toUpperCase()],n=Number(cr);if(extra.length||v===undefined||!pos(n))throw Error("number");p+=v*n;c+=n;}if(!c)throw Error("number");return p/c;}
-export function gpaPercentage(text){let weighted=0,credits=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[p,c,...extra]=line.split(",").map(x=>x.trim()),score=Number(p),credit=Number(c);if(extra.length||!p||!c||!ok(score)||score<0||score>100||!pos(credit))throw Error("number");weighted+=score*credit;credits+=credit;}if(!credits)throw Error("number");return weighted/credits;}
+const GRADE_POINTS=Object.freeze({A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0});
+export function gradeBreakdown(text,mode="gpa"){
+ if(!["gpa","percentage"].includes(mode))throw Error("number");
+ const rows=[];let totalCredits=0,weightedTotal=0;
+ for(const line of String(text).trim().split(/\n/)){
+  if(!line.trim())continue;
+  const[rawGrade,rawCredits,...extra]=line.split(",").map(x=>x.trim());
+  const grade=mode==="gpa"?rawGrade.toUpperCase():rawGrade;
+  const value=mode==="gpa"?(Object.hasOwn(GRADE_POINTS,grade)?GRADE_POINTS[grade]:undefined):Number(rawGrade),credits=Number(rawCredits);
+  if(extra.length||!rawGrade||!rawCredits||!pos(credits)||value===undefined||!ok(value)||value<0||(mode==="percentage"&&value>100))throw Error("number");
+  const weighted=value*credits;totalCredits+=credits;weightedTotal+=weighted;
+  if(![weighted,totalCredits,weightedTotal].every(Number.isFinite))throw Error("number");
+  rows.push({grade,value,credits,weighted});
+ }
+ if(!rows.length||!pos(totalCredits))throw Error("number");
+ const average=weightedTotal/totalCredits;if(!Number.isFinite(average))throw Error("number");
+ return{rows,totalCredits,weightedTotal,average};
+}
+export function gpa(text){return gradeBreakdown(text).average;}
+export function gpaPercentage(text){return gradeBreakdown(text,"percentage").average;}
 
 export function fuel(d,e,p){d=Number(d);e=Number(e);p=Number(p);if(!ok(d)||d<0||!pos(e)||!ok(p)||p<0)throw Error("number");const litres=d*e/100;return{litres,cost:litres*p};}
 export function fuelTrip(distance,efficiency,price,mode="metric",mpgType="us"){distance=Number(distance);efficiency=Number(efficiency);price=Number(price);if(!ok(distance)||distance<0||!pos(efficiency)||!ok(price)||price<0)throw Error("number");let litres,units;

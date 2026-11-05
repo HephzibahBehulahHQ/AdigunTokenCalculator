@@ -25,7 +25,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Extended unit converter | Conversion | Length, mass, volume, area, speed and digital units. | BIPM SI and NIST SP 811 conversion factors. |
 | Loan / mortgage | Finance | Fixed-rate monthly payment, repayment and interest with formula and payment count. | Standard amortization formula; user-supplied rate. |
 | Date difference / countdown | Time & Date | Calendar-day difference and recurring event countdown. | Browser calendar arithmetic. |
-| GPA / grade calculator | Finance | Weighted illustrative 4.0 mapping or percentage average. | Explicit product mapping; percentage mode stays separate. |
+| GPA / grade calculator | Finance | Weighted illustrative 4.0 mapping or percentage average with course calculations. | Explicit product mapping; percentage mode stays separate. |
 | Fuel cost / trip | Finance | Metric, US mpg and Imperial mpg fuel/cost estimate. | NIST unit conversions; user-supplied fuel price. |
 | Sleep cycle planner | Health & Body | Configurable cycle and fall-asleep buffer. | User-adjustable 90-minute heuristic; not medical advice. |
 | Time zone converter | Time & Date | IANA-zone conversion with daylight-saving checks. | Temporal polyfill plus native Intl.DateTimeFormat / browser IANA time-zone database. |

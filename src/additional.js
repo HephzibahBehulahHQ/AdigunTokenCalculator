@@ -164,21 +164,34 @@ export function originalPriceFromSale(salePrice,discountPct,taxPct=0) {
 }
 function fraction(s) {
   const m=/^(?:(\d+)\s+)?(\d+)(?:\/(\d+))?$/.exec(s);
-  if(!m)return Number(s);
+  if(!m){const value=Number(s);return value===0&&/[1-9]/.test(s.split(/[eE]/)[0])?NaN:value;}
   const whole=Number(m[1]||0),num=Number(m[2]),den=Number(m[3]||1);
-  if(!den)return NaN;return whole+num/den;
+  if(![whole,num,den].every(Number.isFinite)||!den)return NaN;return whole+num/den;
 }
-function formatQuantity(n) {return Number(n.toFixed(4)).toString();}
-export function scaleRecipe(text,fromServings,toServings) {
+function formatQuantity(n) {
+  const rounded=Number(n.toFixed(4));
+  return (n!==0&&rounded===0?n:rounded).toString();
+}
+export function scaleRecipe(text,fromServings,toServings,mode="keep") {
   fromServings=Number(fromServings);toServings=Number(toServings);
-  if(!positive(fromServings)||!positive(toServings))throw Error("number");
+  if(!positive(fromServings)||!positive(toServings)||!["keep","small","large"].includes(mode))throw Error("number");
   const factor=toServings/fromServings,lines=String(text).split("\n").filter(x=>x.trim());
+  if(!positive(factor))throw Error("number");
   if(!lines.length)throw Error("empty");
+  const units=mode==="small"?{kg:"g",L:"mL"}:mode==="large"?{g:"kg",mL:"L"}:{};
   return lines.map(line=>{
-    const m=/^\s*(\d+(?:\s+\d+\/\d+|\/\d+)?|\d+\.\d+)\s+(.+?)\s*$/.exec(line);
+    const m=/^\s*((?:\d+\s+)?\d+\/\d+|(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s+(.+?)\s*$/.exec(line);
     if(!m)throw Error("recipe");
     const q=fraction(m[1]);if(!finite(q)||q<0)throw Error("recipe");
-    return formatQuantity(q*factor)+" "+m[2];
+    let quantity=q*factor,rest=m[2];
+    if(!Number.isFinite(quantity)||(q>0&&quantity===0))throw Error("number");
+    const unit=/^(kg|g|mL|L)(?=\s|$)/.exec(rest),target=unit&&units[unit[1]];
+    if(target){
+      const converted=mode==="small"?quantity*1000:quantity/1000;
+      if(!Number.isFinite(converted)||(quantity>0&&converted===0))throw Error("number");
+      quantity=converted;rest=target+rest.slice(unit[1].length);
+    }
+    return formatQuantity(quantity)+" "+rest;
   });
 }
 export function easterSunday(year) {

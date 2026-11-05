@@ -76,7 +76,49 @@ test("discount calculation and reverse original price",()=>{
 });
 test("recipe scaler handles fractions and preserves units and names",()=>{
  assert.deepEqual(a.scaleRecipe("1/2 cup flour\n2 eggs",2,4),["1 cup flour","4 eggs"]);
+ assert.deepEqual(a.scaleRecipe("1 1/2 kg flour\n1/4 L milk",2,4),["3 kg flour","0.5 L milk"]);
+ assert.deepEqual(a.scaleRecipe("1/3 cup flour",1,1,"keep"),["0.3333 cup flour"]);
  assert.throws(()=>a.scaleRecipe("a pinch salt",2,4));
+});
+test("recipe output modes convert only compatible metric mass and volume",()=>{
+ assert.deepEqual(a.scaleRecipe("1 1/2 kg flour\n1/4 L milk",2,4,"small"),["3000 g flour","500 mL milk"]);
+ assert.deepEqual(a.scaleRecipe("750 g flour\n250 mL milk",2,4,"large"),["1.5 kg flour","0.5 L milk"]);
+ assert.deepEqual(a.scaleRecipe("2 kg\n3 L",1,1,"small"),["2000 g","3000 mL"]);
+ assert.deepEqual(a.scaleRecipe("2000 g\n3000 mL",1,1,"large"),["2 kg","3 L"]);
+ assert.deepEqual(a.scaleRecipe("10 g salt\n25 mL oil",1,2,"small"),["20 g salt","50 mL oil"]);
+ assert.deepEqual(a.scaleRecipe("1 kg flour\n2 L water",1,2,"large"),["2 kg flour","4 L water"]);
+});
+test("recipe conversions preserve ingredient text and require a complete unit token",()=>{
+ assert.deepEqual(a.scaleRecipe("1 kg   flour\n2 L\tmilk",1,2,"small"),["2000 g   flour","4000 mL\tmilk"]);
+ const source="1 cup flour\n2 tsp salt\n3 eggs\n4 kgful mixture\n5 ghee\n6 Lime juice\n7 kilogram flour\n8 ml milk\n9 Kg flour\n10 kg, flour";
+ const expected=["2 cup flour","4 tsp salt","6 eggs","8 kgful mixture","10 ghee","12 Lime juice","14 kilogram flour","16 ml milk","18 Kg flour","20 kg, flour"];
+ for(const mode of ["keep","small","large"])assert.deepEqual(a.scaleRecipe(source,1,2,mode),expected);
+});
+test("recipe zero and tiny quantities survive conversion and output reuse",()=>{
+ assert.deepEqual(a.scaleRecipe("0 kg flour\n0 L milk",1,2,"small"),["0 g flour","0 mL milk"]);
+ assert.deepEqual(a.scaleRecipe("0.01 g spice",1,1,"large"),["0.00001 kg spice"]);
+ assert.deepEqual(a.scaleRecipe("1e-8 kg spice",1,1,"small"),["0.00001 g spice"]);
+ for(const source of ["0.00000001 g spice","5e-324 g spice","1E+21 g flour"]){
+  const once=a.scaleRecipe(source,1,1);
+  assert.deepEqual(a.scaleRecipe(once.join("\n"),1,1),once);
+  assert.notEqual(once[0].split(" ")[0],"0");
+ }
+ const converted=a.scaleRecipe("0.00000001 g spice",1,1,"large");
+ assert.ok(Number(converted[0].split(" ")[0])>0);
+ assert.deepEqual(a.scaleRecipe(converted.join("\n"),1,1),converted);
+});
+test("recipe validation rejects unsupported modes malformed quantities and numeric overflow",()=>{
+ for(const mode of ["unknown","SMALL",null,{}])assert.throws(()=>a.scaleRecipe("1 kg flour",1,1,mode),/number/);
+ for(const source of ["1/0 kg flour","1 1/0 kg flour","-1 kg flour","1e kg flour","1e-8kg flour","1e309 kg flour","1e-999 kg flour","NaN kg flour"]){
+  assert.throws(()=>a.scaleRecipe(source,1,1),/recipe/);
+ }
+ for(const servings of [[0,1],[1,0],[-1,1],[1,-1],[Infinity,1],[1,Infinity]])assert.throws(()=>a.scaleRecipe("1 kg flour",...servings),/number/);
+ assert.throws(()=>a.scaleRecipe(" \n ",1,1),/empty/);
+ assert.throws(()=>a.scaleRecipe("1 kg flour",1e-308,1e308),/number/);
+ assert.throws(()=>a.scaleRecipe("1e308 kg flour",1,2),/number/);
+ assert.throws(()=>a.scaleRecipe("1e308 kg flour",1,1,"small"),/number/);
+ assert.throws(()=>a.scaleRecipe("1 kg flour",1e308,1e-308),/number/);
+ assert.throws(()=>a.scaleRecipe("5e-324 g spice",1,1,"large"),/number/);
 });
 test("holiday dates include computus Easter and regional rules",()=>{
  assert.equal(a.easterSunday(2026),"2026-04-05");

@@ -18,7 +18,7 @@ test("every locale covers dynamic result states without losing parameters",()=>{
     assert.deepEqual(Object.keys(RESULT_COPY[locale]).sort(),keys);
     for(const key of keys){
       assert.deepEqual((RESULT_COPY[locale][key].match(/\{\w+\}/g)||[]).sort(),(RESULT_COPY.en[key].match(/\{\w+\}/g)||[]).sort(),locale+":"+key);
-      assert.doesNotMatch(resultText(locale,key,{weeks:12,days:3,count:64,line:2,column:7}),/\{\w+\}/);
+      assert.doesNotMatch(resultText(locale,key,{weeks:12,days:3,count:64,line:2,column:7,index:1}),/\{\w+\}/);
     }
   }
 });

@@ -41,6 +41,41 @@ test("percentage GPA rejects omitted grades without rejecting a genuine zero",()
  assert.equal(c.gpaPercentage("0,3\n90,3"),45);
 });
 
+test("GPA breakdown exposes weighted rows and preserves the numeric API",()=>{
+ const text="A,3\nB,1",details=c.gradeBreakdown(text);
+ assert.deepEqual(details,{rows:[{grade:"A",value:4,credits:3,weighted:12},{grade:"B",value:3,credits:1,weighted:3}],totalCredits:4,weightedTotal:15,average:3.75});
+ assert.equal(c.gpa(text),3.75);
+});
+test("percentage breakdown keeps numeric grades and the percentage return contract",()=>{
+ const text="80,3\n100,1",details=c.gradeBreakdown(text,"percentage");
+ assert.deepEqual(details,{rows:[{grade:"80",value:80,credits:3,weighted:240},{grade:"100",value:100,credits:1,weighted:100}],totalCredits:4,weightedTotal:340,average:85});
+ assert.equal(c.gpaPercentage(text),85);
+});
+test("grade breakdown accepts zero scores, decimal credits and normalized letters",()=>{
+ assert.deepEqual(c.gradeBreakdown("0,3","percentage"),{rows:[{grade:"0",value:0,credits:3,weighted:0}],totalCredits:3,weightedTotal:0,average:0});
+ assert.equal(c.gradeBreakdown("F,3\nA,1").average,1);
+ assert.equal(c.gradeBreakdown("75.5,2.5","percentage").average,75.5);
+ const letters=c.gradeBreakdown("\n a- , 2 \n\n b+ , 2 \n");
+ assert.deepEqual(letters.rows.map(row=>row.grade),["A-","B+"]);
+ assert.equal(letters.average,3.5);
+});
+test("grade breakdown rejects missing, malformed and out-of-range data",()=>{
+ for(const mode of ["gpa","percentage"]){
+  const grade=mode==="gpa"?"A":"80",calculate=mode==="gpa"?c.gpa:c.gpaPercentage;
+  for(const text of [""," \n ",",3",grade,`${grade},`,`${grade},0`,`${grade},-1`,`${grade},NaN`,`${grade},Infinity`,`${grade},3,extra`]){
+   assert.throws(()=>c.gradeBreakdown(text,mode),/number/);assert.throws(()=>calculate(text),/number/);
+  }
+ }
+ for(const text of ["4,3","80,3","Z,3"])assert.throws(()=>c.gradeBreakdown(text),/number/);
+ for(const text of ["-1,3","100.1,3","NaN,3","Infinity,3","A,3"])assert.throws(()=>c.gradeBreakdown(text,"percentage"),/number/);
+ assert.throws(()=>c.gradeBreakdown("A,3","unknown"),/number/);
+});
+test("grade breakdown rejects nonfinite row products and aggregation overflow",()=>{
+ for(const text of ["A,1e308","F,1e308\nF,1e308","A,3e307\nA,3e307"])assert.throws(()=>c.gpa(text),/number/);
+ for(const text of ["100,1e308","0,1e308\n0,1e308","100,1e306\n100,1e306"])assert.throws(()=>c.gpaPercentage(text),/number/);
+ assert.equal(c.gradeBreakdown("0,1e308","percentage").average,0);
+});
+
 test("population interpolation passes through both audited UN July baselines",()=>{assert.equal(c.populationEstimate(new Date(Date.UTC(2025,6,1))).estimate,8231613070);assert.equal(c.populationEstimate(new Date(Date.UTC(2026,6,1))).estimate,8300678396);assert.equal(c.populationEstimate(new Date(Date.UTC(2026,6,1))).annualNet,69065326);});
 
 test("engineering percentage means A percent of B for signed decimal inputs",()=>{
