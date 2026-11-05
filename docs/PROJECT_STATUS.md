@@ -1,63 +1,42 @@
 # Project status — AdigunTokenCalculator
 
-## Released
+## Latest deployed functional release
 
-The 38-tool catalogue is deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/).
+[PR #12](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/12) merged with standing owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/). These receipts identify the latest functional release; later documentation-only commits do not replace them.
 
-- The catalogue shipped in PR #6. [PR #9](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/9) subsequently merged with standing owner authorization on 5 November 2026.
-- Merge commit: `2c90d7ab3ea28511923fb3763b575f584afe6f64`.
-- [Exact-merge build/test run](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42003919750): succeeded.
-- [Exact-merge Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42003919714): succeeded.
-- Public HTTP 200 and deployed asset paths verified. An agent-operated live browser opened all 38 views and checked the directory, Unicode token reconstruction with both encodings and the bundled currency snapshot. This is functional browser verification, not a human accessibility or translation certification.
+- Merge commit: `a33c9827a378565068bb0855f682de44ae932195`.
+- [Exact-merge CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691371): succeeded.
+- [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691478): succeeded.
+- Candidate `9b6e0`: **134 passed, 0 failed, 0 skipped**, including Chromium; production build passed.
+- Live BAC checks passed: initial title focus, unchecked consent with Continue disabled, contained/wrapping Tab navigation, acknowledgement followed by input focus, fresh consent after Reset, and Escape back to the directory.
+- Live JSON checks passed: invalid input receives `aria-invalid`, an `aria-describedby` error association and field focus; editing clears the stale message and attributes.
+- Live recipe checks passed: scaling `1.5 kg flour` and `0.25 L water` from 2 to 4 servings produces `3000 g flour` and `500 mL water` on separate lines. Computed `white-space: pre-wrap` and the exact-metric-pairs/no-density notice were verified.
+- Earlier live checks covered all 38 views, token reconstruction, currency, color conversion, password strength, population baselines, variance, percentages, loan formulas, tiny unit results and weighted grade details. Prior receipts are in merged PRs #6–#10.
 
-The release includes 11 directory categories, four locales, responsive navigation, the original 18 tools and 20 additional tools. Reset/focus, malformed-link, async-result, Unicode QR, lossless JSON and numeric-validation repairs are included. All calculation inputs remain in the browser.
+## Implemented scope
 
-## Released enhancements — PR #7
+The application contains 38 tools in 11 searchable categories and four locales. All calculation inputs remain in the browser. Continuation work includes an archived official UN population audit; localized dynamic results; password strength checking; bidirectional color conversion; variance; engineering percentages; stable loan formulas; nonzero unit precision; GPA weighting; local age reference dates; recipe-unit conversion; and empty-file hashing. PR #12 adds the BAC warning dialog, confirmed-input errors with ARIA associations and focus, stale-error prevention after editing, disabled inactive controls, clearer recipe wording and visible multiline output. Sources, privacy, dependency notices and calculation limitations are documented.
 
-PR #7 passed **95 tests, 0 failed, 0 skipped**, including Chromium, and the production build. Live verification also covered RGB-to-HEX conversion, English/German password scoring, population reference totals, variance output and the localized notices link. Released changes:
+## Separate integration review
 
-- Four-locale dynamic result text, holiday names, JSON locations, time-zone dates and corrected directory descriptions.
-- Direct official UN WPP2024 data audit, with checksums, exact rows and reproduction script. The corrected 2026 population baseline is 8,300,678,396; the 365-day slope reproduces both reference endpoints. See [POPULATION_AUDIT.md](POPULATION_AUDIT.md).
-- Password strength checking with an explicitly loaded local zxcvbn model; no password storage, transmission or result echo.
-- Bidirectional HEX/RGB/HSL input and displayed population/sample variance.
-- Inactive form controls excluded from validation, mode/reset regressions and published dependency notices.
+Draft [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11), the electrical-load feature, remains an independent workstream awaiting integration review. Its PR body requires separate owner approval before shared-file integration. It is outside this deployed release's 38-tool scope.
 
-## Released enhancements — PR #8
+## Remaining human / owner work
 
-PR #8 passed **102 tests, 0 failed, 0 skipped** and the production build. Exact-merge CI and Pages succeeded. Live checks verified both percentage tools and zero/tiny-interest loan cases. The release implements the remaining engineering percentage operation and displayed loan formula from `MASTER_PROMPT.md` §§4.2 and 4.14. The binary operation explicitly means A × B / 100. The dedicated percentage tool now displays amounts without a percentage suffix and explains each mode. Loan results include the applicable zero/nonzero-rate formula, variable definitions and payment count in all four locales. A cancellation defect at tiny positive interest rates is corrected with a stable equivalent formula.
-
-## Released enhancements — PR #9
-
-PR #9 passed **110 tests, 0 failed, 0 skipped** and the production build. Exact-merge CI and Pages succeeded. Live English/German checks confirmed tiny digital-unit results stay nonzero. The release preserves nonzero unit results that would round to zero, using localized scientific notation with eight significant digits. Ordinary display rounding is unchanged. Conversion uses the factor ratio before multiplication to avoid intermediate overflow; genuinely nonfinite outputs are rejected.
-
-## Current continuation branch
-
-`codex/complete-required-details` adds weighted GPA calculation details, the captured local age reference date, compatible recipe-unit conversion, and selected empty-file hashing.
-
-The current release PR is the authoritative exact-candidate verification receipt. Local Chromium execution is **NOT TESTED** because the browser binary is unavailable; CI runs the browser suite. Human reviews below are separate from automated checks.
-
-## Outstanding human / owner work
-
-- **PENDING OWNER DECISION:** Project-wide licence selection. No root `LICENSE` has been added. Dependency licences and notices are inventoried separately.
+- **PENDING OWNER DECISION:** Choose a project-wide licence. No root `LICENSE` has been added. All 71 locked dependency packages have declared licences; complete notices ship with the site.
 - **PENDING HUMAN REVIEW:** Fluent German, Yoruba and Nigerian Pidgin review, including health/safety wording.
-- **NOT TESTED MANUALLY:** Screen reader and assistive technology, complete keyboard-only workflows, target-device matrix, 200% zoom, complete contrast and offline/network inspection. See [TEST_PLAN.md](TEST_PLAN.md).
+- **NOT TESTED MANUALLY:** Screen reader/assistive technology, complete keyboard-only workflows, target-device matrix, 200% zoom, full contrast and offline/network inspection. Automated browser checks and agent-operated live checks are recorded separately in `docs/TEST_PLAN.md`.
 
 ## Calculation limits
 
-- Tokenizer reconstruction uses a version-pinned internal byte map in js-tiktoken 1.0.21.
-- Population is simplified interpolation/extrapolation of dated UN projections. Births, deaths and CO₂ remain withheld.
-- Currency uses a dated ECB snapshot; inflation uses a user-supplied rate.
-- Health/water/BAC estimates are educational; BAC must never decide fitness to drive.
-- MD5/SHA-1 are legacy checksums. Password-strength estimates do not guarantee security.
-- Holiday dates are calendar references, not legal determinations.
-- Demographic shares are dated editable aggregates, not individual beliefs.
+Population is simplified interpolation/extrapolation of dated UN projections; births/deaths/CO₂ remain withheld. Currency is a dated ECB snapshot and inflation uses a user-entered rate. Health/BAC outputs are educational; BAC must never decide fitness to drive. Password strength is an estimate, and MD5/SHA-1 are legacy checksums. Holidays are calendar references, demographic shares are dated aggregates, and grade mappings are illustrative. Recipe conversion uses exact kg↔g and L↔mL pairs without density assumptions. Token reconstruction relies on a version-pinned tokenizer byte map.
 
-No full production/accessibility certification is claimed while human review remains open.
+No full accessibility or production certification is claimed while required human review remains open.
 
 ## Electrical load calculator — current checkpoint
 
 - Objective: add the owner's browser-only electrical load tool, keeping all existing calculators, shared utilities and tests unchanged.
-- Branch: `codex/electrical-load-calculator`; base/last observed remote main: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`.
+- Branch: `codex/electrical-load-calculator`; initial base: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`; refreshed upstream: `84dd508075777ccbc230f1db0fd4e1b6068db3be`.
 - Stage: all new modules implemented. 22 engine/profile, 3 preset, 5 locale and 4 UI/build tests passed locally. Browser interaction test is pending Actions; local Chromium unavailable.
 - Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
 - Scope gate: connecting the tool requires additions to `src/main.js` and updates to the existing browser test's fixed 38-tool assertions. The owner's instruction requires approval before those existing shared/test files change. Complete the new modules and prepare the exact patch first.
@@ -87,3 +66,4 @@ No full production/accessibility certification is claimed while human review rem
 | 19 | `tests/loadUI.test.js` | Parser fixed; CSV numeric formatting assertion fails on floating-point residue | Normalize export display precision |
 | 20 | `src/tools/loadCalculatorUI.js` | 3 pure UI tests pass: registration, isolated memory state, multilingual CSV and formula-injection escaping; DOM mounting NOT IMPLEMENTED yet | Implement DOM renderer |
 | 21 | `src/tools/loadCalculatorUI.js` | 4 UI/unit/build tests passed; 1 browser test skipped locally (no Chromium) | Verify production-preview interactions in Actions |
+| 22 | Upstream synchronization | PRs #12/#13 preserved; both checkpoint/release sections retained. Full suite: 149 passed, 0 failed, 2 browser skips locally | Complete browser verification in Actions |

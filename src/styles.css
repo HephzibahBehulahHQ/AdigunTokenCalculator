@@ -40,3 +40,15 @@
  .privacy{max-width:100%;white-space:normal;line-height:1.35}
  .tool-card-title,.tool-card-description{overflow-wrap:anywhere}
 }
+
+.bac-dialog{box-sizing:border-box;width:min(36rem,calc(100% - 2rem));max-height:calc(100dvh - 2rem);overflow:auto;border:2px solid var(--violet);border-radius:12px;padding:1.25rem;background:#F8FAFC;color:#0B1220;box-shadow:0 16px 48px #0B122044}
+.bac-dialog::backdrop{background:#0B1220B3}
+.bac-dialog h2{margin:0 0 1rem;overflow-wrap:anywhere}
+.bac-dialog .bac-consent{margin-bottom:1rem;overflow-wrap:anywhere}
+.bac-dialog .actions{flex-wrap:wrap}
+.bac-dialog button{white-space:normal;overflow-wrap:anywhere}
+.bac-dialog button:disabled{opacity:.55;cursor:not-allowed}
+
+.field input[aria-invalid="true"],.field select[aria-invalid="true"],.field textarea[aria-invalid="true"]{border-color:#B42318}
+
+.result-row strong{white-space:pre-wrap}

@@ -14,7 +14,7 @@ AdigunTokenCalculator is a static, browser-side utility. All 38 tools process ca
 - Coordinates entered manually or returned by the browser geolocation API only after the user explicitly selects **Use my location** in the Qibla tool.
 - Demographic percentages entered or edited by the user.
 
-The BAC estimator requires the user to affirm an explicit educational-use acknowledgement before calculating. It is not a fitness-to-drive tool.
+The BAC estimator opens a warning dialog and requires an explicit educational-use acknowledgement before revealing its form. Cancel or Escape returns to the directory. Reset or re-entry requires fresh acknowledgement; consent is not persisted. It is not a fitness-to-drive tool.
 
 ## Network behaviour
 
