@@ -67,3 +67,7 @@ Focused formatter checks cover all four locales, real byte→GB and bit→GiB co
 ## Required tool details
 
 Browser regressions cover four-locale grade breakdowns and explicit recipe conversions/reset defaults. An isolated Los Angeles browser at 2026-01-01T00:30Z verifies that age uses and displays the local date 2025-12-31. Selected empty-file hashing is checked against known MD5/SHA-1/SHA-256 digests. Unit tests cover grade validation/aggregation bounds and recipe fractions, unit-token boundaries, unknown units, tiny reusable output and invalid/numeric-range cases.
+
+## Warning gate and accessible validation
+
+Chromium checks the BAC dialog in all four locales: initial focus, Tab/Shift-Tab containment, unchecked/disabled Continue, hidden pre-consent form, guarded submission, Cancel/Escape navigation, accepted focus, checkbox validation and fresh consent after reset/re-entry. Error regressions verify confirmed-input ARIA links/focus, preserved help IDs, unrelated-control exclusion, correction/mode/reset/navigation cleanup, form-level runtime failures and cancellation of delayed errors after editing. Multiline ingredient results remain visibly separated. These automated checks do not replace a human screen-reader review.

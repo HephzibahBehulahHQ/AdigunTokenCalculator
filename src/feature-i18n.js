@@ -193,6 +193,24 @@ const detailFeatures={
 };
 for(const [locale,feature] of Object.entries(detailFeatures)){
   Object.assign(RESULT_LABELS[locale],feature.labels);Object.assign(RESULT_COPY[locale],feature.copy);
-  I[locale].fields.recipeUnits=feature.field;
+  I[locale].fields.recipeUnits=feature.field;I[locale].notices.recipe=feature.copy.recipeUnitsNotice;
   for(const [key,value] of Object.entries(feature.options))I[locale].options["recipeUnits:"+key]=value;
 }
+
+
+const bacDialogCopy={
+  en:{bacDialogTitle:"Before using the alcohol estimate",bacDialogContinue:"Continue for educational use",bacDialogCancel:"Back to tools"},
+  de:{bacDialogTitle:"Vor der Blutalkohol-Schätzung",bacDialogContinue:"Für Lernzwecke fortfahren",bacDialogCancel:"Zurück zu den Werkzeugen"},
+  yo:{bacDialogTitle:"Ṣáájú ìṣirò ọtí inú ẹ̀jẹ̀",bacDialogContinue:"Tẹ̀síwájú fún ẹ̀kọ́",bacDialogCancel:"Padà sí àwọn irinṣẹ́"},
+  pcm:{bacDialogTitle:"Before you use alcohol estimate",bacDialogContinue:"Continue for learning",bacDialogCancel:"Back to tools"}
+};
+for(const [locale,copy] of Object.entries(bacDialogCopy))Object.assign(RESULT_COPY[locale],copy);
+
+
+const validationCopy={
+ en:{nonzeroDivisor:"The divisor must not be zero.",futureDateError:"Choose a date that is not in the future.",gpaGradeError:"Enter grade,credits pairs, one per line (for example A,3). Use supported letter grades and credits greater than zero.",gpaPercentError:"Enter percentage,credits pairs, one per line (for example 80,3). Percentages must be 0–100 and credits greater than zero."},
+ de:{nonzeroDivisor:"Der Divisor darf nicht null sein.",futureDateError:"Wählen Sie ein Datum, das nicht in der Zukunft liegt.",gpaGradeError:"Geben Sie pro Zeile ein Paar Note,Credits ein (zum Beispiel A,3). Verwenden Sie unterstützte Buchstabennoten und Credits größer als null.",gpaPercentError:"Geben Sie pro Zeile ein Paar Prozentwert,Credits ein (zum Beispiel 80,3). Prozentwerte müssen zwischen 0 und 100 liegen, Credits müssen größer als null sein."},
+ yo:{nonzeroDivisor:"Nọ́ńbà tí a fi ń pín kò gbọdọ̀ jẹ́ òdo.",futureDateError:"Yan ọjọ́ tí kò sí ní ọjọ́ iwájú.",gpaGradeError:"Tẹ grade,credits sí ìlà kọ̀ọ̀kan (fún àpẹẹrẹ A,3). Lo grade lẹ́tà tí a ń gbà àti credit tó ju òdo lọ.",gpaPercentError:"Tẹ percentage,credits sí ìlà kọ̀ọ̀kan (fún àpẹẹrẹ 80,3). Percentage gbọdọ̀ wà láti 0 sí 100, credit sì gbọdọ̀ ju òdo lọ."},
+ pcm:{nonzeroDivisor:"The number wey you dey divide by no fit be zero.",futureDateError:"Choose date wey no dey for future.",gpaGradeError:"Enter grade,credits pairs, one for each line (example A,3). Use supported letter grades and credits wey pass zero.",gpaPercentError:"Enter percentage,credits pairs, one for each line (example 80,3). Percentage must be 0–100 and credits must pass zero."}
+};
+for(const [locale,copy] of Object.entries(validationCopy))Object.assign(RESULT_COPY[locale],copy);
