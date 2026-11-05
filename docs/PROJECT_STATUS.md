@@ -2,21 +2,24 @@
 
 ## Latest deployed functional release
 
-[PR #10](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/10) merged with standing owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/).
+[PR #12](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/12) merged with standing owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/). These receipts identify the latest functional release; later documentation-only commits do not replace them.
 
-- Merge commit: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`.
-- [Exact-merge CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42005699636): succeeded.
-- [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42005699723): succeeded.
-- Candidate verification: **122 passed, 0 failed, 0 skipped**, including Chromium and the production build.
-- Live checks verified weighted grade details and exact metric recipe conversion. Earlier live checks covered all 38 views, token reconstruction, currency, color conversion, password strength, population baselines, variance, percentages, loan formulas and tiny unit results. Prior exact receipts are in merged PRs #6–#9.
+- Merge commit: `a33c9827a378565068bb0855f682de44ae932195`.
+- [Exact-merge CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691371): succeeded.
+- [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691478): succeeded.
+- Candidate `9b6e0`: **134 passed, 0 failed, 0 skipped**, including Chromium; production build passed.
+- Live BAC checks passed: initial title focus, unchecked consent with Continue disabled, contained/wrapping Tab navigation, acknowledgement followed by input focus, fresh consent after Reset, and Escape back to the directory.
+- Live JSON checks passed: invalid input receives `aria-invalid`, an `aria-describedby` error association and field focus; editing clears the stale message and attributes.
+- Live recipe checks passed: scaling `1.5 kg flour` and `0.25 L water` from 2 to 4 servings produces `3000 g flour` and `500 mL water` on separate lines. Computed `white-space: pre-wrap` and the exact-metric-pairs/no-density notice were verified.
+- Earlier live checks covered all 38 views, token reconstruction, currency, color conversion, password strength, population baselines, variance, percentages, loan formulas, tiny unit results and weighted grade details. Prior receipts are in merged PRs #6–#10.
 
 ## Implemented scope
 
-The application contains 38 tools in 11 searchable categories and four locales. All calculation inputs remain in the browser. Continuation work includes an archived official UN population audit; localized dynamic results; password strength checking; bidirectional color conversion; variance; engineering percentages; stable loan formulas; nonzero unit precision; GPA weighting; local age reference dates; recipe-unit conversion; and empty-file hashing. Sources, privacy, dependency notices and calculation limitations are documented.
+The application contains 38 tools in 11 searchable categories and four locales. All calculation inputs remain in the browser. Continuation work includes an archived official UN population audit; localized dynamic results; password strength checking; bidirectional color conversion; variance; engineering percentages; stable loan formulas; nonzero unit precision; GPA weighting; local age reference dates; recipe-unit conversion; and empty-file hashing. PR #12 adds the BAC warning dialog, confirmed-input errors with ARIA associations and focus, stale-error prevention after editing, disabled inactive controls, clearer recipe wording and visible multiline output. Sources, privacy, dependency notices and calculation limitations are documented.
 
-## Current continuation candidate
+## Separate integration review
 
-`codex/accessible-validation-bac-gate` adds the specified BAC warning dialog, confirmed-input error associations and focus, stale-error prevention after editing, disabled inactive controls, clearer recipe wording and visible multiline output. Local tests and build pass; the current PR is the authoritative exact-candidate Chromium/build receipt. Local Chromium is unavailable, so local browser execution is **NOT TESTED**.
+Draft [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11), the electrical-load feature, remains an independent workstream awaiting integration review. Its PR body requires separate owner approval before shared-file integration. It is outside this deployed release's 38-tool scope.
 
 ## Remaining human / owner work
 
