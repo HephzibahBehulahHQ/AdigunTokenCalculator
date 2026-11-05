@@ -1,47 +1,65 @@
 # Project status — AdigunTokenCalculator
 
-**Milestone:** 6 — Pages release verification.
+**Milestone:** 7 — expanded 38-tool release candidate; final merge and Pages deployment pending.
 **Default branch:** `main`.
-**Release target:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
-**Implementation:** Milestones 4 and 5 are merged to `main` (PRs #3 and #4).
+**Feature branch:** `codex/milestone-4-6-complete-tools`.
+**Pull request:** [#6 — expand AdigunTokenCalculator to 38 tools](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/6).
+**Live site:** https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
-## Implemented and merged
+## Implemented on the feature branch
 
-- 18 browser-side calculators and tools, including tokenizer, engineering calculator, BMI, fuel, GPA, Qibla, countdown, practice average, religion demographics and population estimate.
-- Tokenizer live count, reconstructed text and token-ID copy controls, clear action and special-token text notice.
-- Explicit supported model-to-encoding mappings; byte-preserving token reconstruction check.
-- Engineering memory controls (M+, M−, MR, MC), clear/backspace; degree-based trigonometry, modulo, logs and factorial.
-- Named editable religion categories with Pew Research Center's sourced 2020 shares and source link.
-- World population estimate based on UN WPP 2024 medium-variant mid-year values, rounded to nearest thousand with UTC timestamp. Births, deaths and CO₂ remain withheld.
-- Qibla compass direction and explicit click-to-request geolocation.
-- Daily practice-time average; annual recurring event countdown with today/upcoming/elapsed status.
-- GPA percentage mode, clearly distinguished from GPA; metric and imperial fuel calculations (US and Imperial mpg).
-- Four locales: English, German, Yoruba and Nigerian Pidgin.
-- Privacy, architecture, data-source, licensing, third-party notice, test-plan and Pages configuration documentation.
-- GitHub Actions CI and Vite Pages deployment workflow. The Pages workflow checks that the repository Pages source is GitHub Actions before deploying.
+- All 18 original tools plus the 20 additional tools required by the latest `MASTER_PROMPT.md`: 38 tools total.
+- Searchable, responsive card directory with 11 category filters, localized descriptions, deep links and back navigation.
+- Four locales: English, German, Yoruba and Nigerian Pidgin. Automated completeness checks cover all 38 tool names, groups, descriptions, form labels, select options, result labels and safety notices; fluent-speaker review remains required.
+- Time-zone conversion across a curated set of IANA zones using Temporal polyfill plus native Intl.DateTimeFormat; daylight-saving gaps are rejected and ambiguous fall-back times flagged.
+- Offline ECB currency conversion with an editable 4 November 2026 reference-rate snapshot for 30 currencies.
+- Inflation, tip/tax splitting, adult calorie/macro estimates, pregnancy date estimates, adjustable water range and educational BAC estimate.
+- Roman numeral, number-base, password, QR, file/text hash, JSON, color/contrast, discount/tax, recipe scaling, regional holiday countdown, Morse and statistics tools.
+- Hashing, password generation, QR generation and calculations run locally. Hashing supports pasted text, selected files and drag/drop (25 MB limit).
+- The BAC tool is explicitly educational and says never to use it to decide whether to drive. Health-related tools include non-medical disclaimers.
+- Exact approved corporate logo artwork copied byte-for-byte from the design-system repository; provenance and reference revisions are recorded.
+- Root `SOURCES.md`, architecture, privacy, licensing, third-party notices, test plan and Pages configuration records updated.
+
+## Continuation repairs — 5 November 2026
+
+- Restore declared form defaults, conditional fields and units on Reset, including the seeded currency/demographic text.
+- Preserve keyboard focus through category filtering, tool entry and back navigation; recover safely from malformed URL fragments.
+- Ignore stale asynchronous token/hash/geolocation results after Reset, Clear, navigation, language changes or a newer calculation.
+- Preserve UTF-8 input in generated QR codes and original numeric tokens when formatting JSON.
+- Return the population reference baseline, reject missing GPA grades and nonpositive calorie estimates, reject non-finite numeric output, and keep sleep times valid across multi-day rollover.
+- Wrap calculator action rows on narrow screens. Regression coverage checks all 38 calculator panels at 375 px.
 
 ## Automated verification
 
-Latest previously recorded main-branch CI checkpoint (run #109, ID 41917476188):
-- Dependency installation with `npm ci`: PASS.
-- Unit tests: **32 passed, 0 failed**.
-- Vite production build: PASS.
+The first repair candidate, commit `038f380dd7eba709ab608eb2834dee8b0d22b8c6`, passed [CI run #193](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41993381331): **72 tests passed, 0 failed, 0 skipped**, including Chromium regressions, all 38 mobile tool panels and the production build.
 
-PR #4 added the Pages source preflight. Its first deployment attempt (run #5, ID 41917476549) correctly stopped because Pages was configured as `legacy`; the repository owner has now changed the Pages source to **GitHub Actions**. A fresh deployment run is now required to verify the corrected setting and published artifact.
+Follow-up invalid-number checks and fresh-page malformed-link coverage require a new CI result. Their exact candidate SHA and latest verification receipt are maintained in the [PR #6 verification section](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/6), avoiding a self-referential documentation/CI commit cycle. A prior green run does not verify later changes.
 
-## Not yet verified
+- Initial repair checks: changed JavaScript syntax and focused isolated JavaScript regressions passed.
+- Full repaired-candidate npm/browser/build verification: pending branch CI when this checkpoint was authored.
+- Local browser and build execution: **NOT TESTED**; the execution environment is unavailable.
+- Manual human checks listed below remain separate from automated CI.
 
-- **PENDING:** Successful post-configuration GitHub Pages deployment and confirmation of the deployed commit/site contents.
-- **NOT TESTED:** Manual browser interaction for every tool, assistive technology/screen reader, keyboard-only end-to-end, responsive device matrix, full contrast audit, offline behaviour, live-site network/privacy inspection and browser console.
-- Translation quality requires fluent-speaker review.
-- Official population baseline values should be rechecked against the official downloadable UN dataset before future data refreshes.
+Earlier deployment run #6 succeeded for commit `862ca832609d8e6dd80e616c37ad75b9c237ff06` after the owner changed GitHub Pages source to **GitHub Actions**. That deployment contains the earlier 18-tool release, not this 38-tool feature branch. PR #6 must merge and its own Pages workflow must pass before the live site contains the expanded catalogue.
 
-## Remaining release limitations
+## Remaining release checks / limitations
 
-- Official corporate logo artwork not integrated; the HB monogram remains a placeholder. The design-system repo provides the exact official artwork, but this product repo has no explicit reuse grant/binary asset copy. Do not generate a substitute.
-- Project-wide licence has not been authorised; no root LICENSE file added.
-- Tokenizer byte-piece adapter relies on the pinned js-tiktoken 1.0.21 internal byte map because the package does not expose a public per-token byte method.
-- World population estimate is a linear interpolation, not live data. Births, deaths and CO₂ remain omitted pending separately verified baselines.
-- Pew 2020 "other religions" aggregates folk/traditional and several smaller traditions; a separate folk percentage is not inferred.
+- **PENDING OWNER DECISION:** Choose and authorize a project-wide licence. No root `LICENSE` has been added.
+- **PENDING HUMAN REVIEW:** Fluent-speaker review of German, Yoruba and Nigerian Pidgin translations and health/safety wording.
+- **NOT TESTED MANUALLY:** Screen-reader/assistive-technology review, keyboard-only end-to-end review, target-device responsive matrix, 200% zoom, full contrast audit, offline network inspection and deployed-site manual walkthrough of all 38 tools. Automated Chromium smoke tests do not replace these.
+- **PENDING DATA AUDIT:** Compare the 2025/2026 population baseline values against a directly downloaded UN WPP 2024 dataset file and record its checksum. The official UNData World / Medium series is identified in `SOURCES.md`; direct file-level verification is not yet archived.
+- **PENDING RELEASE:** Merge PR #6, confirm its Pages workflow deployed the merge commit, then perform a live smoke test.
 
-The application is implementation-complete for the scoped feature set and automated-test/build verified. It is not yet production-certified until the new deployment and the manual release gates above are completed.
+## Known calculation limitations
+
+- Tokenizer byte-piece reconstruction relies on the pinned `js-tiktoken@1.0.21` internal byte map because no public per-token byte method is exposed.
+- Population output is an interpolation/extrapolation from mid-year UN medium-variant projections, not a live count. Births, deaths and CO₂ remain withheld.
+- ECB rates are a dated reference snapshot, not live transaction rates.
+- Inflation uses a user-supplied annual rate, not an official CPI series.
+- The water range is a broad DGE-derived total-water estimate (including food water), with an editable activity/climate adjustment; it is not a medical recommendation.
+- BAC is a simplified Widmark-style educational estimate, never a fitness-to-drive assessment.
+- MD5 and SHA-1 are supported for legacy checksums only, not security-sensitive use.
+- Holiday dates are rule-based calendar references, not legal confirmation of statutory-holiday entitlement.
+- Pew's 2020 “other religions” aggregate includes folk/traditional and smaller traditions; no unsupported separate folk percentage is inferred.
+
+**Release status:** the expanded implementation and continuation repairs are on the feature branch; use PR #6 for the latest exact-candidate automated verification receipt. The 38-tool version is not yet merged or deployed, and the human/owner/data-audit gates above remain open.

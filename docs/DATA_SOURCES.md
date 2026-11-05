@@ -31,3 +31,22 @@ Source: [Pew Research Center, The World's Religious Groups: How Their Sizes Chan
 - Fuel: metric uses L/100 km and price/litre; imperial uses miles per US or Imperial gallon and price per matching gallon.
 - Sleep: cycle and fall-asleep buffer are user-adjustable planning assumptions, not medical advice.
 - Digital units: kB/MB/GB are decimal SI; KiB/MiB/GiB are binary.
+
+
+## Additional tool sources and assumptions
+
+The expanded calculator suite's full source register is maintained in the root [SOURCES.md](../SOURCES.md). Key date-sensitive and consequential references are:
+- ECB euro reference rates dated 4 November 2026; editable, offline, and explicitly not transaction prices.
+- Mifflin–St Jeor (1990) for the adult resting-energy estimate; activity and macro ratios are approximate.
+- ACOG due-date guidance; LMP dating is conventional and ultrasound is more accurate for confirming gestational age.
+- NIST forensic toxicology guidance for Widmark-style alcohol calculations; the app's simplified output is educational only and must never guide driving.
+- WCAG 2.2 contrast criteria, ITU-R M.1677-1 Morse code, and Web Crypto digest API documentation.
+- IANA time-zone database through the browser's native Intl implementation; the app does not fetch time-zone services.
+
+The water range is explicitly a project-selected editable heuristic (30–35 mL/kg plus user-entered adjustment), not an official health recommendation. Inflation uses a user-supplied annual rate rather than an unverified CPI series. Holiday outputs are rule-based calendar dates, not legal confirmation of public-holiday status.
+
+
+The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.md). Exact 2025/2026 numeric rows still require a direct downloadable WPP file comparison and recorded checksum; the values have not been certified against an archived source file.
+
+
+The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.

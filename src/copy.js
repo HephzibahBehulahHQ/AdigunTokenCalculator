@@ -63,10 +63,10 @@ Object.assign(I.en.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (
 Object.assign(I.de.fields,{weightImperial:"Gewicht (lb)",heightImperial:"Größe (in)"});
 Object.assign(I.yo.fields,{weightImperial:"Ìwọ̀n ara (lb)",heightImperial:"Gíga (in)"});
 Object.assign(I.pcm.fields,{weightImperial:"Weight (lb)",heightImperial:"Height (in)"});
-Object.assign(I.en.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
-Object.assign(I.de.options,{modulo:"Rest",sin:"Sinus (Grad)",cos:"Kosinus (Grad)",tan:"Tangens (Grad)",log:"Logarithmus zur Basis 10",ln:"Natürlicher Logarithmus",factorial:"Fakultät",metric:"Metrisch (kg, m)",imperial:"Imperial (lb, in)"});
-Object.assign(I.yo.options,{modulo:"Ìyókù",sin:"Sine (degree)",cos:"Cosine (degree)",tan:"Tangent (degree)",log:"Logarithm base 10",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
-Object.assign(I.pcm.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial",metric:"Metric (kg, m)",imperial:"Imperial (lb, in)"});
+Object.assign(I.en.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial","unit:metric":"Metric (kg, m)","unit:imperial":"Imperial (lb, in)"});
+Object.assign(I.de.options,{modulo:"Rest",sin:"Sinus (Grad)",cos:"Kosinus (Grad)",tan:"Tangens (Grad)",log:"Logarithmus zur Basis 10",ln:"Natürlicher Logarithmus",factorial:"Fakultät","unit:metric":"Metrisch (kg, m)","unit:imperial":"Imperial (lb, in)"});
+Object.assign(I.yo.options,{modulo:"Ìyókù",sin:"Sine (degree)",cos:"Cosine (degree)",tan:"Tangent (degree)",log:"Logarithm base 10",ln:"Natural logarithm",factorial:"Factorial","unit:metric":"Metric (kg, m)","unit:imperial":"Imperial (lb, in)"});
+Object.assign(I.pcm.options,{modulo:"Remainder",sin:"Sine (degrees)",cos:"Cosine (degrees)",tan:"Tangent (degrees)",log:"Base-10 logarithm",ln:"Natural logarithm",factorial:"Factorial","unit:metric":"Metric (kg, m)","unit:imperial":"Imperial (lb, in)"});
 const moreOutputs={
 en:{Direction:"Direction","Days from today":"Days from today"},
 de:{Direction:"Richtung","Days from today":"Tage ab heute"},

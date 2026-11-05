@@ -4,8 +4,9 @@
 - Static single-page application: semantic HTML, CSS custom properties and vanilla JavaScript ES modules.
 - Vite builds the site for GitHub Pages project path `/AdigunTokenCalculator/`.
 - No backend, database, analytics, telemetry, external calculation service or runtime CDN.
-- Pure calculation logic lives in `src/calculators.js`; DOM rendering and interaction live in `src/main.js`.
-- Four UI locales are defined in `src/i18n.js` and product translations/assumptions in `src/copy.js`.
+- Core calculation logic lives in `src/calculators.js`; the expanded offline algorithms live in `src/additional.js`; DOM rendering and interaction live in `src/main.js`.
+- The expanded catalogue and four-locale descriptions are defined in `src/additional-i18n.js`. QR generation is bundled through `qrcode-generator@2.0.4`; no runtime CDN or QR API is used.
+- Four UI locales are defined in `src/i18n.js`, core translations in `src/copy.js`, and expanded calculator translations in `src/additional-i18n.js`.
 
 ## Tokenizer data flow
 `src/tokenizer.js` dynamically imports only the selected local `cl100k_base` or `o200k_base` rank chunk from pinned `js-tiktoken@1.0.21`. The package's per-token byte map is used to reconstruct display pieces with a streaming UTF-8 decoder; concatenated pieces are checked against the exact input. The pinned JS package does not expose a public per-token-byte method, so this adapter is version-pinned and fails closed if its expected map is unavailable.
@@ -20,3 +21,11 @@ Form values are read from the active form, passed to pure calculation functions 
 - `npm run dev`
 
 Production output is `dist/`; GitHub Actions deploys only that directory after tests and build succeed.
+
+
+## Expanded local utilities
+- Time-zone conversion uses the bundled `@js-temporal/polyfill@0.5.1` for explicit DST disambiguation plus native `Intl.DateTimeFormat` and the browser's IANA data; ambiguous fall-back times choose the earlier instant and are flagged, while nonexistent spring-forward times are rejected.
+- Currency conversion uses a static, editable ECB EUR-base snapshot dated 4 November 2026. No request is made when calculating.
+- Password generation uses `crypto.getRandomValues`; hashes use `crypto.subtle.digest` for SHA-1/SHA-256 and a local MD5 compatibility implementation.
+- QR code generation is bundled with `qrcode-generator` and creates a local data URL for preview/download.
+- Hashing reads an explicitly selected file fully into memory (25 MB limit) or text. No file contents are transmitted.
