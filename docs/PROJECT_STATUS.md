@@ -58,13 +58,15 @@ No full production/accessibility certification is claimed while human review rem
 
 - Objective: add the owner's browser-only electrical load tool, keeping all existing calculators, shared utilities and tests unchanged.
 - Branch: `codex/electrical-load-calculator`; base/last observed remote main: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`.
-- Stage: 24-hour profile and validation implemented. `npm test -- tests/loadProfile.test.js`: 7 passed, 0 failed.
+- Stage: pure engine and profile implemented; 20 new tests pass, 0 fail. Includes signed reactive power, vector apparent power, active/standby energy, demand/diversity/growth, costs/carbon, capped renewable offsets, idealized battery duration, phase/current and limits.
 - Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
 - Scope gate: connecting the tool requires additions to `src/main.js` and updates to the existing browser test's fixed 38-tool assertions. The owner's instruction requires approval before those existing shared/test files change. Complete the new modules and prepare the exact patch first.
-- Next bounded action: specify and implement the isolated electrical calculation engine, then test/checkpoint.
-- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. First verified connector checkpoint pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
+- Next bounded action: add the editable appliance presets and their validation tests, then implement isolated UI/locales.
+- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `b3619e9417b5bd13ba5e6e297cf3544681abde2b` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
 
 | Step | File | Observed verification | Next |
 | --- | --- | --- | --- |
 | 1 | `tests/loadProfile.test.js` | Expected red: missing implementation | Implement profile and input validation |
 | 2 | `src/calculators/loadProfile.js` | 7 profile tests passed | Specify calculation engine |
+| 3 | `tests/loadCalculator.test.js` | Expected red: missing engine | Implement pure engine |
+| 4 | `src/calculators/loadCalculator.js` | 20 engine/profile tests passed | Add presets |
