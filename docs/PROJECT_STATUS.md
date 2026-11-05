@@ -1,5 +1,16 @@
 # Project status — AdigunTokenCalculator
 
+## Current continuation — accessibility and release checks
+
+- Base: deployed main `e2d581d5c43240ff9e52d32b4f2840ebe8e089d1` (merged PR #16). All 39 tools and the electrical extensions already exist.
+- Branch: `codex/accessibility-release-review`. This continuation addresses the remaining keyboard, localization, responsive and privacy verification work; no new calculator is being introduced.
+- Implemented: the skip link focuses the existing main region without changing its route or losing inputs; navigation labels and engineering action descriptions use all four locales; memory changes have visible status feedback. Overflowing memory addition/subtraction now rejects the result before replacing valid stored memory.
+- Observed checks: baseline 206 passed, 0 failed, 6 browser skips. The new memory-overflow regression failed against the baseline and passes with the fix. The local candidate suite passed 207 tests with 7 browser skips. Local Chromium installation failed at the download gateway, so browser behavior is **NOT TESTED locally**.
+- Remote checkpoint: `b2e62fd36220ad2ec53c3aa2c58eaffa2591e780` verified on the feature branch at 2026-11-05 13:54 Europe/Berlin, [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17). Its [first Chromium CI run](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42031127239) passed the new skip-link, localized controls and overflow-recovery flows, but exposed a German temperature-heading overflow at 320 px. The failing viewport is now covered by a text-wrapping repair; the full reflow matrix and fresh offline-result check require the next candidate run.
+- Verified repair: `ec5a2a6d7796e2ccc8e025aa0b11cfe586abd92f` is synchronized on the feature branch. [Chromium CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42031676420) passed **237 tests, 0 failed, 0 skipped**, and the production build passed. All 39 panels and the directory passed in four locales at 320/768/1440 px and 2× content zoom. Fresh offline password/hash/currency results, zero initiated requests and empty local/session storage passed. Stale 38-tool and draft-electrical references have been reconciled.
+- Next: owner review and explicit merge/deployment authorization for [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17). Its final documentation commit and exact-candidate CI receipts are recorded in the PR, avoiding another self-referential status commit.
+- Integration: this continuation is held on its feature branch; it has not been merged or deployed. The repository's `AGENTS.md` requires explicit authorization for those steps. Human locale/assistive-technology review and the owner licence decision remain open.
+
 ## Verified deployed release
 
 [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11) added Electrical Load Calculator as tool 39, merged with explicit owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/#/electrical-load). These are the verified release receipts at the start of the continuation below. Final follow-up receipts also belong in its merged pull request, avoiding a self-referential post-deployment commit.

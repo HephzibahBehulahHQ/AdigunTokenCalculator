@@ -12,6 +12,18 @@ test("date difference preserves countdown direction",()=>{assert.deepEqual(c.dat
 test("named demographics preserve user categories and do not normalise totals",()=>{const r=c.demographics(1000,"Christianity, 30\nIslam, 25\nUnaffiliated, 20");assert.equal(r.totalShare,75);assert.deepEqual(r.rows.map(x=>x.name),["Christianity","Islam","Unaffiliated"]);assert.equal(r.rows[0].count,300);assert.throws(()=>c.demographics(100,"Unknown, 101"));assert.throws(()=>c.demographics(100," , 20"));});
 test("compass points and annual recurring events",()=>{assert.equal(c.compass(0),"N");assert.equal(c.compass(90),"E");assert.equal(c.compass(180),"S");assert.equal(c.compass(270),"W");assert.deepEqual(c.recurringDate("2024-02-29",new Date(2026,1,28)),{date:"2026-02-28",days:0});assert.throws(()=>c.compass(360));});
 test("engineering memory operations are deterministic",()=>{assert.equal(c.memory(5,"M+",2),7);assert.equal(c.memory(3,"M-",7),4);assert.equal(c.memory(0,"MR",4),4);assert.equal(c.memory(0,"MC",4),0);assert.throws(()=>c.memory(1,"bad",0));});
+
+test("engineering memory rejects overflow without replacing the last usable value",()=>{
+ let stored=c.memory(1e308,"M+",0);
+ assert.throws(()=>{stored=c.memory(1e308,"M+",stored);},/number/);
+ assert.equal(c.memory(0,"MR",stored),1e308);
+ assert.equal(c.memory(0,"MC",stored),0);
+ stored=-1e308;
+ assert.throws(()=>{stored=c.memory(1e308,"M-",stored);},/number/);
+ assert.equal(c.memory(0,"MR",stored),-1e308);
+ assert.equal(c.memory(Number.MAX_VALUE,"M+",0),Number.MAX_VALUE);
+ assert.equal(c.memory(1e308,"M-",1e308),0);
+});
 test("GPA percentage mode is credit weighted and validates bounds",()=>{assert.equal(c.gpaPercentage("90,3\n80,1"),87.5);assert.throws(()=>c.gpaPercentage("101,1"));assert.throws(()=>c.gpaPercentage("80,0"));assert.throws(()=>c.gpa("A,2,extra"));});
 test("imperial fuel economy supports US and Imperial gallons",()=>{const us=c.fuelTrip(100,25,4,"imperial","us");assert.ok(Math.abs(us.litres-15.141647136)<1e-9);assert.equal(us.cost,16);const uk=c.fuelTrip(100,25,4,"imperial","uk");assert.ok(uk.litres>us.litres);assert.throws(()=>c.fuelTrip(100,0,4,"imperial","us"));});
 test("practice projections include daily weekly and annual totals",()=>{const r=c.practice(30,7,1);assert.equal(r.day,30);assert.equal(r.week,210);assert.equal(r.year,10920);});

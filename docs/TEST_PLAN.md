@@ -6,7 +6,7 @@ Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. See the current r
 Unit coverage includes Unicode text statistics; age/date-only calendar arithmetic; arithmetic, percentages, temperature limits, BMI metric/imperial; Qibla bearing and compass validation; zero-rate loans; GPA and percentage averages; metric and imperial fuel; unit conversion; Zakat; practice projections; named demographic shares; sleep rollover; scientific operations; calculator memory; annual countdowns; population estimate baseline; four-locale tool catalogues, fields, options and results; tokenizer whitespace, newlines, emoji, non-Latin text, special-token literals, token IDs and UTF-8 reconstruction.
 
 ## Manual release checklist
-- [ ] Open all 38 tools and submit valid and invalid examples (automated unit coverage is separate).
+- [ ] Open all 39 tools and submit valid and invalid examples (automated unit coverage is separate).
 - [ ] Keyboard-only directory navigation, form submission, reset and memory controls.
 - [ ] Screen-reader inspection of labels, errors, live token count and result announcements.
 - [ ] Mobile/tablet/desktop layouts and 200% zoom; no horizontal overflow.
@@ -36,10 +36,10 @@ Manual checks require a human on target browsers before claiming full accessibil
 - [x] Easter computus and regional holiday rules, Morse round-trip and statistics edge cases.
 
 ## Automated browser integration
-- [x] `tests/browser.test.js` runs Chromium against the Vite development server in CI. It checks all 38 tool views, the 38-card directory, category filters, search, currency conversion, QR generation, BAC acknowledgement, back navigation, a direct time-zone deep link, mobile overflow, keyboard activation, no third-party requests and no geolocation before explicit user action. It is skipped locally when the Playwright browser binary is not installed.
+- [x] `tests/browser.test.js` runs Chromium against the Vite development server in CI. It checks all 39 tool views, the 39-card directory, category filters, search, currency conversion, QR generation, BAC acknowledgement, back navigation, a direct time-zone deep link, mobile overflow, keyboard activation, no third-party requests and no geolocation before explicit user action. It is skipped locally when the Playwright browser binary is not installed.
 
 ## Expanded manual browser checklist
-- [ ] Verify all 38 cards, category filters, search, deep links and back navigation.
+- [ ] Verify all 39 cards, category filters, search, deep links and back navigation.
 - [ ] Verify every new tool in all four locales; fluent German, Yoruba and Nigerian Pidgin review is still required.
 - [ ] Confirm currency and other calculations work with network disabled after the static site loads.
 - [ ] Confirm password and hash data are never sent in network requests; file hashing is local and rejects files above 25 MB.
@@ -50,7 +50,7 @@ Manual checks require a human on target browsers before claiming full accessibil
 
 ## Continuation regression coverage
 
-Automated regressions cover default restoration and conditional form state, BMI unit labels in all four locales, keyboard focus, malformed fragments on fresh page loads, non-finite numeric results, delayed hash/geolocation results, and mobile overflow across all 38 panels. Unit regressions cover UTF-8 QR byte vectors, JSON numeric-token and string preservation, population baseline output, multi-day sleep rollover, omitted GPA grades and nonpositive calorie estimates. The presence of a test is not a pass receipt: consult the current PR CI result.
+Automated regressions cover default restoration and conditional form state, BMI unit labels in all four locales, keyboard focus, malformed fragments on fresh page loads, non-finite numeric results, delayed hash/geolocation results, and mobile overflow across all 39 panels. Unit regressions cover UTF-8 QR byte vectors, JSON numeric-token and string preservation, population baseline output, multi-day sleep rollover, omitted GPA grades and nonpositive calorie estimates. The presence of a test is not a pass receipt: consult the current PR CI result.
 
 ## Post-release feature regressions
 
@@ -71,3 +71,21 @@ Browser regressions cover four-locale grade breakdowns and explicit recipe conve
 ## Warning gate and accessible validation
 
 Chromium checks the BAC dialog in all four locales: initial focus, Tab/Shift-Tab containment, unchecked/disabled Continue, hidden pre-consent form, guarded submission, Cancel/Escape navigation, accepted focus, checkbox validation and fresh consent after reset/re-entry. Error regressions verify confirmed-input ARIA links/focus, preserved help IDs, unrelated-control exclusion, correction/mode/reset/navigation cleanup, form-level runtime failures and cancellation of delayed errors after editing. Multiline ingredient results remain visibly separated. These automated checks do not replace a human screen-reader review.
+
+## Electrical load coverage
+
+The electrical suite covers device presets and validation, P/Q/S and current calculations, surge estimates, power-factor correction, cable-planning assumptions, hourly/15-minute energy conservation, device windows, tariff bands, seasonal projections and customer-estimate cent arithmetic. Profile tests cover explicit local Save/Load/Delete, version migration, corrupted storage and preservation of unfinished edits. These are numerical and software checks, not hardware tests or certified electrical-design approval.
+
+`tests/loadUI.test.js` and `tests/loadV2UI.test.js` exercise the actual production bundle: device editing, four locales, persistence, CSV and printing, customer validation, exclusion of customer details from saved profiles/CSV, print cleanup and multi-page A4 output. Consult the corresponding PR receipt for exact executed results.
+
+## Keyboard, reflow and offline continuation
+
+`tests/accessibility.test.js` adds browser checks for:
+
+- Skip-link focus and the next Tab destination, while preserving the active route, history, entered values, results and directory filters in all four locales.
+- Localized navigation/group names, descriptive engineering action names and keyboard-operated memory/edit controls with visible live status.
+- Overflow recovery: the stored finite memory remains available to Recall and Clear after an accessible error. Pure unit tests separately cover addition/subtraction overflow, cancellation and the largest finite value.
+- Every one of the 39 panels and the directory in all four locales at 320, 768 and 1440 CSS pixels, plus a 1280-pixel viewport with 2× content zoom. Root CSS zoom is a repeatable reflow check; it does not replace human browser-zoom and target-device review.
+- Password strength, a known SHA-256 vector and currency calculation after their required code has loaded, with the browser offline. The checks require fresh results, no initiated requests, no local/session storage and no password echoed in output.
+
+All browser tests skip locally when Chromium is absent; CI installs Chromium before running the suite. A fully offline first visit or reload is not promised: this application does not install a service worker or offline asset cache. Human screen-reader behavior, visual focus/contrast, fluent translation review and target-browser zoom remain separate unchecked release items above. Current candidate and execution receipts belong in [PROJECT_STATUS.md](PROJECT_STATUS.md) and its linked PR.
