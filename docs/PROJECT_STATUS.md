@@ -62,7 +62,7 @@ No full production/accessibility certification is claimed while human review rem
 - Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
 - Scope gate: connecting the tool requires additions to `src/main.js` and updates to the existing browser test's fixed 38-tool assertions. The owner's instruction requires approval before those existing shared/test files change. Complete the new modules and prepare the exact patch first.
 - Next bounded action: add the editable appliance presets and their validation tests, then implement isolated UI/locales.
-- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `b3619e9417b5bd13ba5e6e297cf3544681abde2b` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
+- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `873f3e2f1c5fd9ea1c69927d6a93cd3ed7967535` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
 
 | Step | File | Observed verification | Next |
 | --- | --- | --- | --- |
@@ -70,3 +70,5 @@ No full production/accessibility certification is claimed while human review rem
 | 2 | `src/calculators/loadProfile.js` | 7 profile tests passed | Specify calculation engine |
 | 3 | `tests/loadCalculator.test.js` | Expected red: missing engine | Implement pure engine |
 | 4 | `src/calculators/loadCalculator.js` | 20 engine/profile tests passed | Add presets |
+| 5 | `tests/loadPresets.test.js` | Expected red: missing preset library | Add requested estimates |
+| 6 | `src/data/loadPresets.js` | 3 preset tests passed; 19 appliances and 2 generation offsets | Add localized interface copy |
