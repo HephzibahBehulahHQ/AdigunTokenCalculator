@@ -123,11 +123,14 @@ test("load v2 UI: device windows, advanced electrical settings, TOU, seasonality
     await field("occupancyEnabled").check();await field("startHour").fill("22");await field("endHour").fill("6");
     await action("add-device").click();await waitResult("dailyKWh", 0.25);
     await waitResult("peakDemandKW", 0.25);near(await result("surgeCurrentA"), 6000 / (230 * 0.8));
+    assert.equal(await ui.locator('[data-result="annualCost"]').innerText(), "€27.38");
+    assert.equal(await ui.locator("[data-profile-table] > summary").innerText(), LOAD_COPY.en["action.showProfileTable"]);
     near(await result("startingKW"), 6);near(await result("designCurrentA"), 1000 / (230 * 0.8));near(await result("suggestedBreakerA"), 10);
     assert.equal(await ui.locator("[data-load-chart] [data-profile-hour]").count(), 24);
     near(Number(await ui.locator('[data-profile-hour="18"]').getAttribute("data-kw")), 0.25);
     near(Number(await ui.locator('[data-profile-hour="22"]').getAttribute("data-kw")), 0);
     await field("resolutionMinutes").selectOption("15");await waitResult("peakDemandKW", 1);await waitResult("peakAverageRatio", 96);
+    assert.equal(await ui.locator("[data-profile-table] > summary").innerText(), LOAD_V2_COPY.en["section.profile"]);
     const profile = await ui.locator("[data-load-chart] [data-profile-hour]").evaluateAll(nodes => nodes.map(node => Number(node.dataset.kw)));
     assert.equal(profile.length, 96);near(profile.reduce((total, kW) => total + kW / 4, 0), 0.25);
     const curve = ui.locator("[data-cumulative-curve]");near(Number(await curve.getAttribute("data-final-kwh")), 0.25);

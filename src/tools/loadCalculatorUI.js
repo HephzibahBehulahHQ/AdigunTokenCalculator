@@ -649,11 +649,14 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     return svg;
   }
   function money(value,currency){return new Intl.NumberFormat(locale,{style:"currency",currency}).format(value);}
+  // Forecast sums can land just below a half-cent because of floating-point residue.
+  // Match CSV precision for display only; bill values already have integer-cent rounding.
+  function forecastMoney(value,currency){return money(Number(value.toPrecision(15)),currency);}
   function extraMetrics(items,settings) {
     const metrics=node("dl",undefined,"load-metrics load-v2-metrics");
     for(const [key,value,unit=""] of items){
       const item=node("div",undefined,"load-metric");
-      const display=value===null?t("notApplicable"):unit==="currency"?money(value,settings.currency):fmt(value)+(unit?" "+unit:"");
+      const display=value===null?t("notApplicable"):unit==="currency"?forecastMoney(value,settings.currency):fmt(value)+(unit?" "+unit:"");
       const output=node("dd",display);output.dataset.result=key;output.dataset.value=value===null?"":String(value);
       item.append(node("dt",v("result."+key)),output);metrics.append(item);
     }
@@ -702,12 +705,12 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
       const bands=table([v("section.tou"),t("field.startHour"),t("field.endHour"),t("field.tariff")+" ("+settings.currency+"/kWh)",
         v("result.bandEnergy"),v("result.grossCost"),v("result.renewableCredit"),v("result.bandCost")],
         analysis.bandCosts.map(band=>({data:{band:band.id},values:[v("band."+band.id),hourText(band.startHour),hourText(band.endHour),
-          fmt(band.rate,6),fmt(band.kWh,6),money(band.grossCost,settings.currency),money(band.renewableCredit,settings.currency),money(band.netCost,settings.currency)]})));
+          fmt(band.rate,6),fmt(band.kWh,6),forecastMoney(band.grossCost,settings.currency),forecastMoney(band.renewableCredit,settings.currency),forecastMoney(band.netCost,settings.currency)]})));
       bands.dataset.bandCosts="";results.append(bands,node("p",v("help.renewableCredit"),"load-help"));
     }
     const seasons=node("details");seasons.append(node("summary",v("section.seasonal")),
       table([v("field.selectedMonth"),v("field.monthFactor"),t("result.dailyKWh"),t("result.dailyCost")],
-        analysis.seasonal.months.map(month=>({values:[monthName(month.month),fmt(month.factor,6),fmt(month.dailyKWh,6),money(month.netCost,settings.currency)]}))),
+        analysis.seasonal.months.map(month=>({values:[monthName(month.month),fmt(month.factor,6),fmt(month.dailyKWh,6),forecastMoney(month.netCost,settings.currency)]}))),
       node("p",v("help.seasonal"),"load-help"));
     results.append(seasons);
     const inputs=node("section",undefined,"load-print-settings");inputs.append(node("h3",v("section.profile")));
@@ -728,7 +731,7 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
       if(key==="intervalEnergyWh")label+=" ("+t("option."+settings.measurementInterval)+")";
       let value=summary[key],display;
       if(value===null)display=t("notApplicable");
-      else if(unit==="currency")display=new Intl.NumberFormat(locale,{style:"currency",currency:settings.currency}).format(value);
+      else if(unit==="currency")display=forecastMoney(value,settings.currency);
       else display=fmt(key==="loadFactor"?value*100:value)+(unit==="hours"?" "+t("unit.hours"):" "+unit);
       const result=node("dd",display);result.dataset.result=key;result.dataset.value=value===null?"":String(value);
       item.append(node("dt",label),result);metrics.append(item);
@@ -736,13 +739,13 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     results.append(metrics,node("h3",t("profile")),chart(summary.profile),node("p",v("help.profile"),"load-help"));
     renderProfileDepth(analysis,settings);
     const profileDetails=node("details");profileDetails.dataset.profileTable="";
-    profileDetails.append(node("summary",t("action.showProfileTable")),table([t("hour"),t("loadKW")],summary.profile.map(p=>({values:[p.hour,fmt(p.kW,6)]}))));results.append(profileDetails);
+    profileDetails.append(node("summary",options.resolutionMinutes===15?v("section.profile"):t("action.showProfileTable")),table([t("hour"),t("loadKW")],summary.profile.map(p=>({values:[p.hour,fmt(p.kW,6)]}))));results.append(profileDetails);
     results.append(node("h3",t("breakdown")));
     if(summary.breakdown.length)results.append(table([
       t("field.name"),t("result.activeKWh"),t("result.standbyKWh"),t("result.dailyKWh"),t("result.dailyCost"),
       v("result.ratedCurrentA"),v("result.surgeCurrentA"),v("result.startingKW"),v("result.dailyGrossCO2"),v("result.netCO2")
     ],summary.breakdown.map(row=>({data:{breakdownRow:String(row.index)},values:[
-      row.name,fmt(row.activeKWh,6),fmt(row.standbyKWh,6),fmt(row.dailyKWh,6),money(row.dailyCost,settings.currency),
+      row.name,fmt(row.activeKWh,6),fmt(row.standbyKWh,6),fmt(row.dailyKWh,6),forecastMoney(row.dailyCost,settings.currency),
       ...["ratedCurrentA","surgeCurrentA","startingKW"].map(key=>row[key]===null?t("notApplicable"):fmt(row[key],6)),
       fmt(row.grossCarbonKgCO2,6),fmt(row.carbonKgCO2,6)
     ]})),"load-breakdown-table"));
