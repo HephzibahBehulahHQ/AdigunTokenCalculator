@@ -5,7 +5,7 @@ Adopt **HB-AI-ENGINEERING-001 · v2.0**, pinned to `d42d4e04ac6ab77ebafa1d4fccb7
 
 ## Confirmed owner decisions
 - Division: **HB Artificial Intelligence**, approved violet accent `#A78BFA`.
-- Full UI language scope: English (`en`), German (`de`), Yoruba (`yo`) and Nigerian Pidgin (`pcm`) across all 18 tools.
+- Full UI language scope: English (`en`), German (`de`), Yoruba (`yo`) and Nigerian Pidgin (`pcm`) across all 38 tools.
 - Typography: system-font fallback until official typography is supplied.
 
 ## Working rules

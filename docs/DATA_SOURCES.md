@@ -1,15 +1,14 @@
 # Data sources and calculation assumptions
 
 ## World population estimate
-The dashboard displays one population estimate only. It uses UN DESA Population Division, *World Population Prospects 2024*, medium variant, world population at 1 July:
-- 2025: 8,231,613,070
-- 2026: 8,300,678,395
+The dashboard displays one population estimate using UN DESA Population Division, *World Population Prospects 2024*, World / Medium variant, population at 1 July:
 
-The app derives an average daily net change from the difference between these mid-year values divided by 365.2425 days, then applies that rate linearly from the 1 July 2026 baseline to the current UTC instant. The display is rounded to the nearest thousand and labelled an estimate, not live data. This is simplified interpolation, not a live headcount or replacement for later UN revisions.
+- 2025: **8,231,613,070** people.
+- 2026: **8,300,678,396** people.
 
-Primary official record: [UNdata — Total population, both sexes combined (thousands), World, Medium variant](https://data.un.org/Data.aspx?d=PopDiv&f=variableID%3A12%3BcrID%3A900%3BvarID%3A2). Methodology and downloadable datasets: [UN DESA — World Population Prospects 2024](https://population.un.org/wpp/). The 2026 value is also listed in [PopulationPyramid's 2026 world profile](https://www.populationpyramid.net/world/2026/), which attributes it to UN WPP 2024 (medium variant). The 2025 value is listed in [StatisticsTimes' world population table](https://statisticstimes.com/demographics/world-population.php), also attributed to UN WPP 2024. Recheck exact values against the official downloadable dataset before future releases.
+The exact increase of 69,065,326 people is divided by the actual **365-day** interval between these UTC dates. The app applies this daily slope from 1 July 2026 to the current UTC instant. Dates within the reference interval are interpolated; dates outside it are extrapolated. Output is rounded to the nearest thousand and labelled an estimate, not live data.
 
-Births, deaths and CO₂ are not displayed. A consistently dated global baseline for each was not established for this release; these metrics are omitted rather than fabricated.
+The values were verified directly against the official UN WPP2024 Medium CSV on 5 November 2026, including the source's thousands-to-people conversion. [The source audit](POPULATION_AUDIT.md) records original URLs, SHA-256 checksums, exact rows and a reproducible standard-library verification script. Births, deaths and CO₂ remain withheld because separately verified baselines are not bundled.
 
 ## Religion demographics
 Starting shares are Pew Research Center estimates for 2020, published 9 June 2025:
