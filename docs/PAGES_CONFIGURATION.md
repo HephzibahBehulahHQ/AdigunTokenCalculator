@@ -18,3 +18,7 @@ After changing Source to GitHub Actions:
 - Confirm the custom workflow's build and deploy jobs both pass.
 - Confirm the published site URL is `https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/`.
 - Confirm no generated Jekyll/branch deployment is triggered for the same push.
+
+The `verify-live` job then downloads that run's published artifact and uses `scripts/verify-deployment.mjs` to compare every file's SHA-256 digest with the live site and exercise all 39 tools in Chromium. Its result is part of the release gate, alongside the exact-main test/build and deploy results. CI also runs this verifier against a local production preview before changes are merged.
+
+The current receipt is linked from [PROJECT_STATUS.md](PROJECT_STATUS.md). Do not change Pages settings merely because publication stalls after deployment creation; inspect the failed job and distinguish a service-side timeout from an actual source-setting or permission error.
