@@ -298,6 +298,59 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.locator("#language").selectOption("en");
     });
 
+    await t.test("GPA breakdown and recipe conversions are localized",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);await openTool("gpa");
+        await page.locator('textarea[name="grades"]').fill("A,3\nB,1");await calculate();
+        let rows=await resultRows();
+        assert.equal(rows[RESULT_LABELS[locale].TotalCredits],"4");
+        assert.equal(rows[RESULT_LABELS[locale].WeightedTotal],"15");
+        assert.equal(rows[resultText(locale,"weightedCourse",{index:1})],"A → 4 × 3 = 12");
+        assert.equal(rows[RESULT_LABELS[locale].WeightedFormula],"15 / 4 = "+(locale==="de"?"3,75":"3.75"));
+        await page.locator('select[name="mode"]').selectOption("percentage");
+        await page.locator('textarea[name="grades"]').fill("80,3\n100,1");await calculate();
+        rows=await resultRows();assert.equal(rows[RESULT_LABELS[locale].WeightedFormula],"340 / 4 = 85%");
+        await openTool("recipe");
+        await page.locator('textarea[name="text"]').fill("1 1/2 kg flour\n1/4 L milk\n2 tsp salt");
+        await page.locator('input[name="fromServings"]').fill("2");await page.locator('input[name="toServings"]').fill("4");
+        await page.locator('select[name="recipeUnits"]').selectOption("small");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["3000 g flour\n500 mL milk\n4 tsp salt"]);
+        assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"recipeUnitsNotice")));
+        await page.locator('textarea[name="text"]').fill("750 g flour\n250 mL milk");
+        await page.locator('select[name="recipeUnits"]').selectOption("large");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["1.5 kg flour\n0.5 L milk"]);
+        await reset();assert.equal(await page.locator('select[name="recipeUnits"]').inputValue(),"keep");
+      }
+      await page.locator("#language").selectOption("en");
+    });
+    await t.test("age states the same local date used for its calculation",async()=>{
+      const context=await browser.newContext({locale:"en-US",timezoneId:"America/Los_Angeles"});
+      try{
+        const agePage=await context.newPage();agePage.on("pageerror",e=>pageErrors.push(e.message));
+        await agePage.clock.setFixedTime(new Date("2026-01-01T00:30:00Z"));
+        await agePage.goto("http://127.0.0.1:4173/#/age");
+        for(const locale of ["en","de","yo","pcm"]){
+          await agePage.locator("#language").selectOption(locale);
+          await agePage.locator('input[name="birth"]').fill("2000-12-31");
+          await agePage.locator('button[type="submit"]').click();await agePage.locator(".result").waitFor();
+          const rows=await agePage.locator(".result-row").evaluateAll(rows=>Object.fromEntries(rows.map(row=>[row.querySelector("span").textContent,row.querySelector("strong").textContent])));
+          assert.equal(rows[RESULT_LABELS[locale].AgeReferenceDate],"2025-12-31");
+          assert.ok(Object.values(rows).includes("25"));
+          assert.ok((await agePage.locator(".result").innerText()).includes(resultText(locale,"ageReferenceNotice")));
+        }
+      }finally{await context.close();}
+    });
+    await t.test("selected empty files hash as zero-byte input for every algorithm",async()=>{
+      await openTool("hash");
+      for(const [algorithm,nodeAlgorithm] of [["SHA-256","sha256"],["SHA-1","sha1"],["MD5","md5"]]){
+        await reset();await page.locator('select[name="algorithm"]').selectOption(algorithm);
+        await page.locator('input[name="file"]').setInputFiles({name:"empty.txt",mimeType:"text/plain",buffer:Buffer.alloc(0)});
+        await calculate();const rows=await resultRows();
+        assert.ok(Object.values(rows).includes(createHash(nodeAlgorithm).update("").digest("hex")));
+        assert.equal(rows[RESULT_LABELS.en.Input],"empty.txt");
+      }
+    });
+
     await t.test("small unit results remain nonzero and localized",async()=>{
       for(const locale of ["en","de","yo","pcm"]){
         await page.locator("#language").selectOption(locale);await openTool("units");

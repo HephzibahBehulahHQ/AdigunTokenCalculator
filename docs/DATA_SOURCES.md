@@ -54,3 +54,7 @@ The README now contains the full 38-tool catalogue with category, purpose and so
 ## Unit result display
 
 Unit conversions retain the full JavaScript number until display. Results normally use up to eight fractional digits; nonzero results below that rounding threshold use localized scientific notation with eight significant digits, so 1 byte → GB is shown as 1E-9 GB instead of zero. Input/output values outside the finite number range are rejected.
+
+## Grade, age and recipe details
+
+GPA shows each grade value × credits, total weighted points, total credits and the resulting quotient. Percentage mode uses scores from 0–100 with the same weighting. The 4.0 letter mapping remains illustrative. Age calculations capture one browser-local calendar date and display that same date as the reference. Recipe conversion is opt-in and limited to exact metric mass pairs (kg↔g) and volume pairs (L↔mL); unknown units and ingredient text remain intact. No density or cup-size assumptions are inferred. Zero/tiny quantities are preserved, and out-of-range scaling is rejected.

@@ -4,10 +4,10 @@
 
 The 38-tool catalogue is deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/).
 
-- The catalogue shipped in PR #6. [PR #8](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/8) subsequently merged with standing owner authorization on 5 November 2026.
-- Merge commit: `1c34aca81bbdad7a06ea28f663b4313af28c0676`.
-- [Exact-merge build/test run](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42002975308): succeeded.
-- [Exact-merge Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42002975406): succeeded.
+- The catalogue shipped in PR #6. [PR #9](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/9) subsequently merged with standing owner authorization on 5 November 2026.
+- Merge commit: `2c90d7ab3ea28511923fb3763b575f584afe6f64`.
+- [Exact-merge build/test run](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42003919750): succeeded.
+- [Exact-merge Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42003919714): succeeded.
 - Public HTTP 200 and deployed asset paths verified. An agent-operated live browser opened all 38 views and checked the directory, Unicode token reconstruction with both encodings and the bundled currency snapshot. This is functional browser verification, not a human accessibility or translation certification.
 
 The release includes 11 directory categories, four locales, responsive navigation, the original 18 tools and 20 additional tools. Reset/focus, malformed-link, async-result, Unicode QR, lossless JSON and numeric-validation repairs are included. All calculation inputs remain in the browser.
@@ -26,9 +26,13 @@ PR #7 passed **95 tests, 0 failed, 0 skipped**, including Chromium, and the prod
 
 PR #8 passed **102 tests, 0 failed, 0 skipped** and the production build. Exact-merge CI and Pages succeeded. Live checks verified both percentage tools and zero/tiny-interest loan cases. The release implements the remaining engineering percentage operation and displayed loan formula from `MASTER_PROMPT.md` §§4.2 and 4.14. The binary operation explicitly means A × B / 100. The dedicated percentage tool now displays amounts without a percentage suffix and explains each mode. Loan results include the applicable zero/nonzero-rate formula, variable definitions and payment count in all four locales. A cancellation defect at tiny positive interest rates is corrected with a stable equivalent formula.
 
+## Released enhancements — PR #9
+
+PR #9 passed **110 tests, 0 failed, 0 skipped** and the production build. Exact-merge CI and Pages succeeded. Live English/German checks confirmed tiny digital-unit results stay nonzero. The release preserves nonzero unit results that would round to zero, using localized scientific notation with eight significant digits. Ordinary display rounding is unchanged. Conversion uses the factor ratio before multiplication to avoid intermediate overflow; genuinely nonfinite outputs are rejected.
+
 ## Current continuation branch
 
-`codex/unit-result-precision` preserves nonzero unit results that would round to zero, using localized scientific notation with eight significant digits. Ordinary display rounding is unchanged. Conversion uses the factor ratio before multiplication to avoid intermediate overflow; genuinely nonfinite outputs are rejected.
+`codex/complete-required-details` adds weighted GPA calculation details, the captured local age reference date, compatible recipe-unit conversion, and selected empty-file hashing.
 
 The current release PR is the authoritative exact-candidate verification receipt. Local Chromium execution is **NOT TESTED** because the browser binary is unavailable; CI runs the browser suite. Human reviews below are separate from automated checks.
 

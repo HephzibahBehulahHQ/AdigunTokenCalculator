@@ -63,3 +63,7 @@ Unit cases cover defined percentage semantics, decimal/signed/zero operands, fin
 ## Unit output precision
 
 Focused formatter checks cover all four locales, real byte→GB and bit→GiB conversions, signed values, zero, rounding boundaries, the smallest positive JavaScript number and invalid inputs. Browser regressions verify scientific fallback and ordinary decimal output. Unit arithmetic rejects genuine overflow while avoiding intermediate overflow when the final answer is finite.
+
+## Required tool details
+
+Browser regressions cover four-locale grade breakdowns and explicit recipe conversions/reset defaults. An isolated Los Angeles browser at 2026-01-01T00:30Z verifies that age uses and displays the local date 2025-12-31. Selected empty-file hashing is checked against known MD5/SHA-1/SHA-256 digests. Unit tests cover grade validation/aggregation bounds and recipe fractions, unit-token boundaries, unknown units, tiny reusable output and invalid/numeric-range cases.
