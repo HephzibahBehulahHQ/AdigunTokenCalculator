@@ -1,5 +1,14 @@
 # Project status — AdigunTokenCalculator
 
+## Current continuation — accessibility and release checks
+
+- Base: deployed main `e2d581d5c43240ff9e52d32b4f2840ebe8e089d1` (merged PR #16). All 39 tools and the electrical extensions already exist.
+- Branch: `codex/accessibility-release-review`. This continuation addresses the remaining keyboard, localization, responsive and privacy verification work; no new calculator is being introduced.
+- Implemented: the skip link focuses the existing main region without changing its route or losing inputs; navigation labels and engineering action descriptions use all four locales; memory changes have visible status feedback. Overflowing memory addition/subtraction now rejects the result before replacing valid stored memory.
+- Observed checks: baseline 206 passed, 0 failed, 6 browser skips. The new memory-overflow regression failed against the baseline and passes with the fix; both focused memory tests pass. Local Chromium installation failed at the download gateway, so browser behavior is **NOT TESTED locally**.
+- Next: add browser regressions, run the complete test/build gates on the feature branch in GitHub Actions, and reconcile the stale release checklist. Exact synchronized revisions and final CI receipts will be recorded in the continuation PR.
+- Integration: a feature PR will hold this change. The repository's `AGENTS.md` requires explicit authorization before merging or deploying this continuation. Human locale/assistive-technology review and the owner licence decision remain open.
+
 ## Verified deployed release
 
 [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11) added Electrical Load Calculator as tool 39, merged with explicit owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/#/electrical-load). These are the verified release receipts at the start of the continuation below. Final follow-up receipts also belong in its merged pull request, avoiding a self-referential post-deployment commit.

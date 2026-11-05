@@ -12,9 +12,18 @@ import {mountBacGate} from "./bac-gate.js";
 import {errorFields,attachFormError,clearFormError} from "./form-errors.js";
 import {createQr} from "./qr.js";
 import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";
+import {ACCESSIBILITY_COPY} from "./accessibility-i18n.js";
 import "./styles.css";
 
 const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
+const main=$("#main");
+main.tabIndex=-1;
+$("#categories").setAttribute("role","group");
+$(".skip").addEventListener("click",event=>{
+ event.preventDefault();
+ main.focus();
+ main.scrollIntoView({block:"start"});
+});
 let lang="en",active=-1,memoryValue=0,calculationRequest=0,activeCategory="All";
 const keys=["token","math","text","temp","age","bmi","percent","world","demographics","practice","zakat","qibla","units","loan","dates","gpa","fuel","sleep","timezone","currency","inflation","tip","calories","pregnancy","water","bac","roman","bases","password","qr","hash","json","color","discount","recipe","holidays","morse","stats"];
 registerLoadCalculator(keys);
@@ -193,7 +202,22 @@ function renderTool(){
  }
  if(k==="math"){
   const second=inputs.b.closest(".field"),refresh=()=>{const unary=["sqrt","sin","cos","tan","log","ln","factorial"].includes(inputs.op.value);second.hidden=unary;inputs.b.required=!unary;inputs.b.disabled=unary;};inputs.op.addEventListener("change",refresh);refresh();
-  const memoryBar=el("div","actions");addAction(memoryBar,"M+",()=>{try{memoryValue=c.memory(inputs.a.value,"M+",memoryValue);}catch{errorResult(Error("number"));}});addAction(memoryBar,"M−",()=>{try{memoryValue=c.memory(inputs.a.value,"M-",memoryValue);}catch{errorResult(Error("number"));}});addAction(memoryBar,"MR",()=>{inputs.a.value=String(c.memory(0,"MR",memoryValue));inputs.a.dispatchEvent(new Event("input",{bubbles:true}));});addAction(memoryBar,"MC",()=>{memoryValue=c.memory(0,"MC",memoryValue);});addAction(memoryBar,"C",()=>{inputs.a.value="";inputs.b.value="";calculationRequest++;clearFormError(form);panel.querySelector(".result")?.remove();});addAction(memoryBar,"⌫",()=>{inputs.a.value=inputs.a.value.slice(0,-1);inputs.a.dispatchEvent(new Event("input",{bubbles:true}));});form.append(memoryBar);
+  const copy=ACCESSIBILITY_COPY[lang],memoryBar=el("div","actions"),memoryStatus=el("p","muted memory-status");
+  memoryBar.setAttribute("role","group");memoryBar.setAttribute("aria-label",copy.memoryControls);
+  memoryStatus.setAttribute("role","status");memoryStatus.setAttribute("aria-live","polite");memoryStatus.setAttribute("aria-atomic","true");
+  const announceMemory=(recalled=false)=>{memoryStatus.textContent=(recalled?copy.memoryRecalled:copy.memoryValue)+": "+fmt(memoryValue,12,true);};
+  const memoryAction=(symbol,key,fn)=>{const button=addAction(memoryBar,symbol,fn);button.setAttribute("aria-label",copy[key]);button.title=copy[key];};
+  const changeMemory=operation=>{
+   try{memoryValue=c.memory(inputs.a.value,operation,memoryValue);clearFormError(form);panel.querySelector(".result-error")?.remove();announceMemory();}
+   catch{errorResult(Error("number"));}
+  };
+  memoryAction("M+","memoryAdd",()=>changeMemory("M+"));
+  memoryAction("M−","memorySubtract",()=>changeMemory("M-"));
+  memoryAction("MR","memoryRecall",()=>{inputs.a.value=String(c.memory(0,"MR",memoryValue));inputs.a.dispatchEvent(new Event("input",{bubbles:true}));announceMemory(true);});
+  memoryAction("MC","memoryClear",()=>{memoryValue=c.memory(0,"MC",memoryValue);clearFormError(form);panel.querySelector(".result-error")?.remove();announceMemory();});
+  memoryAction("C","clearOperands",()=>{inputs.a.value="";inputs.b.value="";calculationRequest++;clearFormError(form);panel.querySelector(".result")?.remove();});
+  memoryAction("⌫","backspaceOperand",()=>{inputs.a.value=inputs.a.value.slice(0,-1);inputs.a.dispatchEvent(new Event("input",{bubbles:true}));});
+  announceMemory();form.append(memoryBar,memoryStatus);
  }
  if(k==="bmi"){const refresh=()=>{const imp=inputs.unit.value==="imperial";inputs.weight.closest(".field").querySelector(".field-label").textContent=imp?tr().fields.weightImperial:tr().fields.weight;inputs.height.closest(".field").querySelector(".field-label").textContent=imp?tr().fields.heightImperial:tr().fields.height;};inputs.unit.addEventListener("change",refresh);refresh();}
  if(k==="units"){const refresh=()=>{const opts=unitChoices[inputs.group.value]||[];for(const key of ["from","to"]){inputs[key].replaceChildren();opts.forEach(u=>option(inputs[key],u,u));}};inputs.group.addEventListener("change",refresh);refresh();}
@@ -208,7 +232,7 @@ function renderTool(){
  panel.append(form);
  if(bacConsent)mountBacGate({panel,form,...bacConsent,copy:{title:resultText(lang,"bacDialogTitle"),continueLabel:resultText(lang,"bacDialogContinue"),cancelLabel:resultText(lang,"bacDialogCancel")},onCancel:()=>{location.hash="#/";}});
 }
-function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;renderNav();renderTool();}
+function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
 search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
 function routeIndex(){
  try{return keys.indexOf(decodeURIComponent(location.hash.replace(/^#\/?/,"")));}

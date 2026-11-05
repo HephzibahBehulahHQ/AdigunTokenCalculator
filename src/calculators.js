@@ -60,7 +60,16 @@ export function shares(total,s){total=Number(total);const a=String(s).split(",")
 export function demographics(total,entries){total=Number(total);if(!ok(total)||total<0)throw Error("number");const rows=String(entries).split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const i=line.lastIndexOf(",");if(i<1)throw Error("number");const name=line.slice(0,i).trim(),share=Number(line.slice(i+1).trim());if(!name||!ok(share)||share<0||share>100)throw Error("number");return{name,share,count:total*share/100};});if(!rows.length)throw Error("number");return{rows,totalShare:rows.reduce((n,x)=>n+x.share,0)};}
 export function compass(bearing){bearing=Number(bearing);if(!ok(bearing)||bearing<0||bearing>=360)throw Error("number");return ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"][Math.round(bearing/22.5)%16];}
 export function recurringDate(date,today=new Date()){const p=parts(date),t={y:today.getFullYear(),m:today.getMonth()+1,d:today.getDate()};let y=t.y;let candidate={y,m:p.m,d:Math.min(p.d,dim(y,p.m))};if(Date.UTC(candidate.y,candidate.m-1,candidate.d)<Date.UTC(t.y,t.m-1,t.d)){y++;candidate={y,m:p.m,d:Math.min(p.d,dim(y,p.m))};}return{date:[candidate.y,String(candidate.m).padStart(2,"0"),String(candidate.d).padStart(2,"0")].join("-"),days:Math.round((Date.UTC(candidate.y,candidate.m-1,candidate.d)-Date.UTC(t.y,t.m-1,t.d))/86400000)};}
-export function memory(value,operation,stored=0){value=Number(value);stored=Number(stored);if(!ok(value)||!ok(stored))throw Error("number");if(operation==="M+")return stored+value;if(operation==="M-")return stored-value;if(operation==="MC")return 0;if(operation==="MR")return stored;throw Error("operation");}
+export function memory(value,operation,stored=0){
+ value=Number(value);stored=Number(stored);
+ if(!ok(value)||!ok(stored))throw Error("number");
+ if(operation==="MC")return 0;
+ if(operation==="MR")return stored;
+ if(operation!=="M+"&&operation!=="M-")throw Error("operation");
+ const next=operation==="M+"?stored+value:stored-value;
+ if(!Number.isFinite(next))throw Error("number");
+ return next;
+}
 
 export function sleep(time,mode,cycle,buffer){
 cycle=Number(cycle);buffer=Number(buffer);
