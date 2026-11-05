@@ -3,10 +3,27 @@ export function stats(s){return{words:(s.trim().match(/[\p{L}\p{N}]+(?:['’][\p
 export function age(birth,today=new Date()){const b=parts(birth),t={y:today.getFullYear(),m:today.getMonth()+1,d:today.getDate()};if(Date.UTC(b.y,b.m-1,b.d)>Date.UTC(t.y,t.m-1,t.d))throw Error("future");let months=(t.y-b.y)*12+t.m-b.m;const ann=n=>{const y=b.y+Math.floor((b.m-1+n)/12),m=(b.m-1+n)%12+1;return{y,m,d:Math.min(b.d,dim(y,m))};};let a=ann(months);if(Date.UTC(a.y,a.m-1,a.d)>Date.UTC(t.y,t.m-1,t.d)){a=ann(--months);}return{years:Math.floor(months/12),months:months%12,days:Math.round((Date.UTC(t.y,t.m-1,t.d)-Date.UTC(a.y,a.m-1,a.d))/86400000)};}
 export const bmi=(w,h,unit="metric")=>{w=Number(w);h=Number(h);if(!pos(w)||!pos(h))throw Error("number");if(unit==="imperial"){if(w>2204.62||h<12||h>118)throw Error("number");return 703*w/(h*h);}if(unit!=="metric"||w>1000||h<.3||h>3)throw Error("number");return w/(h*h);};
 export function arithmetic(a,b,op){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))throw Error("number");if(op==="divide"&&b===0)throw Error("zero");const v={add:a+b,subtract:a-b,multiply:a*b,divide:a/b,power:a**b}[op];if(!Number.isFinite(v))throw Error("number");return v;}
-export function percent(mode,a,b){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))throw Error("number");if(mode==="of")return a*b/100;if(mode==="as"){if(!b)throw Error("zero");return a/b*100;}if(mode==="change"){if(!a)throw Error("zero");return(b-a)/Math.abs(a)*100;}throw Error("number");}
+export function percent(mode,a,b){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))throw Error("number");if(mode==="of"){
+ const product=a*b,value=Number.isFinite(product)?product/100:(a/100)*b;
+ if(!Number.isFinite(value))throw Error("number");return value;
+}if(mode==="as"){if(!b)throw Error("zero");return a/b*100;}if(mode==="change"){if(!a)throw Error("zero");return(b-a)/Math.abs(a)*100;}throw Error("number");}
 export function temperature(v,dir){v=Number(v);if(!ok(v)||!["c","f"].includes(dir)||v<(dir==="c"?-273.15:-459.67))throw Error("absolute");return dir==="c"?v*9/5+32:(v-32)*5/9;}
 export function bearing(lat,lon){lat=Number(lat);lon=Number(lon);if(!ok(lat)||!ok(lon)||lat< -90||lat>90||lon< -180||lon>180)throw Error("coordinates");const r=x=>x*Math.PI/180,a=r(lat),b=r(21.4225),dl=r(39.8262-lon),y=Math.sin(dl)*Math.cos(b),x=Math.cos(a)*Math.sin(b)-Math.sin(a)*Math.cos(b)*Math.cos(dl);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
-export function loan(p,rate,years){p=Number(p);rate=Number(rate)/1200;const n=Number(years)*12;if(!ok(p)||p<0||!ok(rate)||rate<0||!pos(years)||!Number.isInteger(n))throw Error("number");const payment=rate===0?p/n:p*rate/(1-(1+rate)**-n);return{payment,total:payment*n,interest:payment*n-p};}
+export function loan(p,rate,years){
+ p=Number(p);rate=Number(rate);years=Number(years);const n=years*12;
+ if(!ok(p)||p<0||!ok(rate)||rate<0||!pos(years)||!Number.isSafeInteger(n)||n<=0)throw Error("number");
+ rate/=1200;
+ // log1p/expm1 preserve the denominator when the monthly rate is near zero.
+ const factor=rate===0?1/n:rate/-Math.expm1(-n*Math.log1p(rate));
+ const payment=rate===0?p/n:Math.max(p/n,p*factor);
+ let total=rate===0?p:payment*n;
+ // Retry only on overflow: multiplying a rounded payment can exceed the limit.
+ if(!Number.isFinite(total)&&Number.isFinite(payment))total=p*(factor*n);
+ // Nonnegative rates cannot reduce principal; remove tiny rounding artifacts.
+ total=Math.max(p,total);const interest=total-p;
+ if(![payment,total,interest].every(Number.isFinite))throw Error("number");
+ return{payment,total,interest};
+}
 export function days(a,b){const x=parts(a),y=parts(b);return Math.abs(Date.UTC(y.y,y.m-1,y.d)-Date.UTC(x.y,x.m-1,x.d))/86400000;}
 export function gpa(text){const map={A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0};let p=0,c=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[g,cr,...extra]=line.split(",").map(x=>x.trim()),v=map[g?.toUpperCase()],n=Number(cr);if(extra.length||v===undefined||!pos(n))throw Error("number");p+=v*n;c+=n;}if(!c)throw Error("number");return p/c;}
 export function gpaPercentage(text){let weighted=0,credits=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[p,c,...extra]=line.split(",").map(x=>x.trim()),score=Number(p),credit=Number(c);if(extra.length||!p||!c||!ok(score)||score<0||score>100||!pos(credit))throw Error("number");weighted+=score*credit;credits+=credit;}if(!credits)throw Error("number");return weighted/credits;}
@@ -37,6 +54,7 @@ return Array.from({length:6},(_,i)=>{const offset=((i+1)*cycle+buffer)%1440,minu
 export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;
 switch(op){
 case"add":case"subtract":case"multiply":case"divide":case"power":case"modulo":if(op==="modulo"){if(!ok(b)||b===0)throw Error("zero");v=a%b;}else v=arithmetic(a,b,op);break;
+case"percentOf":v=percent("of",a,b);break;
 case"sqrt":if(a<0)throw Error("number");v=Math.sqrt(a);break;
 case"sin":v=Math.sin(a*Math.PI/180);break;
 case"cos":v=Math.cos(a*Math.PI/180);break;

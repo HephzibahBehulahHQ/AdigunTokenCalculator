@@ -125,3 +125,45 @@ for(const locale of ["en","de","yo","pcm"]){
   I[locale].descriptions[28]=feature.passwordDescription;
   I[locale].descriptions[32]=feature.colorDescription;
 }
+
+
+const formulaFeatures={
+  en:{
+    option:"A% of B",
+    engineeringPercentNotice:"A is the first number (percentage); B is the second number (base). Result = A × B / 100.",
+    loanVariables:"M = monthly payment; P = principal; r = annual rate (%) / 1200; n = term (years) × 12. Payments are due at the end of each month. No fees or extra payments are included.",
+    labels:{LoanFormula:"Payment formula",NumberOfPayments:"Number of monthly payments"}
+  },
+  de:{
+    option:"A % von B",
+    engineeringPercentNotice:"A ist die erste Zahl (Prozentsatz), B die zweite Zahl (Grundwert). Ergebnis = A × B / 100.",
+    loanVariables:"M = Monatsrate; P = Kreditbetrag; r = Jahreszins (%) / 1200; n = Laufzeit (Jahre) × 12. Die Zahlungen erfolgen am Monatsende. Gebühren und Sondertilgungen sind nicht enthalten.",
+    labels:{LoanFormula:"Ratenformel",NumberOfPayments:"Anzahl der Monatsraten"}
+  },
+  yo:{
+    option:"A% nínú B",
+    engineeringPercentNotice:"A ni nọ́ńbà àkọ́kọ́ (ìpín ọgọ́rùn-ún); B ni nọ́ńbà kejì (iye ìpìlẹ̀). Àbájáde = A × B / 100.",
+    loanVariables:"M = ìsanwó oṣooṣù; P = owó awin; r = ìwọ̀n èrè ọdún (%) / 1200; n = àkókò awin (ọdún) × 12. Ìsanwó wá ní òpin oṣù kọ̀ọ̀kan. A kò fi owó iṣẹ́ tàbí àfikún ìsanwó kún un.",
+    labels:{LoanFormula:"Àgbékalẹ̀ ìsanwó",NumberOfPayments:"Iye ìsanwó oṣooṣù"}
+  },
+  pcm:{
+    option:"A% of B",
+    engineeringPercentNotice:"A na first number (percentage); B na second number (base value). Result = A × B / 100.",
+    loanVariables:"M = monthly payment; P = loan amount; r = yearly rate (%) / 1200; n = loan term (years) × 12. Payment dey due for end of each month. E no include fees or extra payments.",
+    labels:{LoanFormula:"Payment formula",NumberOfPayments:"Number of monthly payments"}
+  }
+};
+for(const [locale,feature] of Object.entries(formulaFeatures)){
+  I[locale].options["op:percentOf"]=feature.option;
+  RESULT_COPY[locale].engineeringPercentNotice=feature.engineeringPercentNotice;
+  RESULT_COPY[locale].loanVariables=feature.loanVariables;
+  Object.assign(RESULT_LABELS[locale],feature.labels);
+}
+
+const percentageRatioCopy={
+  "en": "A is the first number (part); B is the second number (whole). Result = A / B × 100%. B must not be zero.",
+  "de": "A ist die erste Zahl (Teil), B die zweite Zahl (Ganzes). Ergebnis = A / B × 100 %. B darf nicht null sein.",
+  "yo": "A ni nọ́ńbà àkọ́kọ́ (apá); B ni nọ́ńbà kejì (àpapọ̀). Àbájáde = A / B × 100%. B kò gbọdọ̀ jẹ́ òdo.",
+  "pcm": "A na first number (part); B na second number (whole). Result = A / B × 100%. B no fit be zero."
+};
+for(const [locale,copy] of Object.entries(percentageRatioCopy))RESULT_COPY[locale].percentageRatioNotice=copy;

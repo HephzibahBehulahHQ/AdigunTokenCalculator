@@ -11,7 +11,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Tool | Category | Purpose and assumptions | Data source / formula |
 |---|---|---|---|
 | OpenAI-compatible token calculator | AI & Text | Plain-text token count, token IDs and reversible visual pieces; not API billing. | OpenAI tiktoken mappings; bundled js-tiktoken. |
-| Engineering calculator | Math & Engineering | Arithmetic, powers, trig, logs, factorial and memory. | Standard arithmetic; degree-based trig. |
+| Engineering calculator | Math & Engineering | Arithmetic, A% of B, powers, trig, logs, factorial and memory. | Standard arithmetic; degree-based trig. |
 | Wordpedometer / text statistics | AI & Text | Unicode-aware word/character/sentence/paragraph counts and reading-time estimate. | Unicode text handling; 200 wpm product heuristic. |
 | Celsius / Fahrenheit | Conversion | Bidirectional temperature conversion with absolute-zero checks. | Standard Celsius/Fahrenheit formulas. |
 | Age calculator | Time & Date | Calendar age from birth date to local today. | Calendar arithmetic in browser. |
@@ -23,7 +23,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Zakat / charity | Finance | User-entered assets and editable rate; not a ruling. | Islamic Relief 2.5% reference; no nisab ruling. |
 | Qibla direction | World & Culture | Great-circle bearing to the Kaaba; location only by explicit action. | Kaaba coordinate from DAI gazetteer; great-circle formula. |
 | Extended unit converter | Conversion | Length, mass, volume, area, speed and digital units. | BIPM SI and NIST SP 811 conversion factors. |
-| Loan / mortgage | Finance | Fixed-rate monthly payment, repayment and interest estimate. | Standard amortization formula; user-supplied rate. |
+| Loan / mortgage | Finance | Fixed-rate monthly payment, repayment and interest with formula and payment count. | Standard amortization formula; user-supplied rate. |
 | Date difference / countdown | Time & Date | Calendar-day difference and recurring event countdown. | Browser calendar arithmetic. |
 | GPA / grade calculator | Finance | Weighted illustrative 4.0 mapping or percentage average. | Explicit product mapping; percentage mode stays separate. |
 | Fuel cost / trip | Finance | Metric, US mpg and Imperial mpg fuel/cost estimate. | NIST unit conversions; user-supplied fuel price. |

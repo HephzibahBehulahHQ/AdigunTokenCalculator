@@ -55,3 +55,7 @@ Automated regressions cover default restoration and conditional form state, BMI 
 ## Post-release feature regressions
 
 Unit and browser checks cover four-locale dynamic results, ambiguous/normal time-zone labels, holiday names, JSON error locations, UTF-8 hash byte counts, demographic/fuel notes, population endpoints, rendered variance, bidirectional HEX/RGB/HSL conversion and password-strength scoring. Browser checks also verify inactive controls cannot block submission, mode/reset behaviour, lazy model loading, masked input and exclusion of checked passwords from results. Source-data verification is reproducible separately with `scripts/audit-population.py`. The current PR records actual CI outcomes.
+
+## Engineering and loan completion
+
+Unit cases cover defined percentage semantics, decimal/signed/zero operands, finite-output boundaries and overflow. Loan checks cover the ordinary reference vector, zero interest, tiny positive rates, zero principal, safe whole payment counts and invalid/non-finite inputs. Chromium exercises percentage mode after a unary operation and both loan formula branches in all four locales. Consult the current PR for actual run results.

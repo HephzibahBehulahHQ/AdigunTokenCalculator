@@ -258,6 +258,46 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       }
       await page.locator("#language").selectOption("en");
     });
+    await t.test("engineering percentages and loan formulas work in every locale",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        await openTool("math");
+        await page.locator('select[name="op"]').selectOption("sqrt");
+        await page.locator('select[name="op"]').selectOption("percentOf");
+        const base=page.locator('input[name="b"]');
+        assert.equal(await base.isVisible(),true);assert.equal(await base.evaluate(input=>input.required),true);
+        await page.locator('input[name="a"]').fill("20");await base.fill("200");await calculate();
+        assert.ok(Object.values(await resultRows()).includes("40"));
+        assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"engineeringPercentNotice")));
+        await openTool("percent");
+        await page.locator('input[name="a"]').fill("20");await page.locator('input[name="b"]').fill("200");
+        await page.locator('select[name="mode"]').selectOption("of");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["40"]);
+        assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"engineeringPercentNotice")));
+        await page.locator('select[name="mode"]').selectOption("as");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["10%"]);
+        assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"percentageRatioNotice")));
+        await page.locator('select[name="mode"]').selectOption("change");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["900%"]);
+        await openTool("loan");
+        await page.locator('input[name="principal"]').fill("1200");
+        await page.locator('input[name="annualRate"]').fill("0");
+        await page.locator('input[name="term"]').fill("1");await calculate();
+        let rows=await resultRows();
+        assert.equal(rows[RESULT_LABELS[locale].LoanFormula],"M = P / n");
+        assert.equal(rows[RESULT_LABELS[locale].NumberOfPayments],"12");
+        assert.ok(Object.values(rows).includes("100"));
+        await page.locator('input[name="principal"]').fill("1000");
+        await page.locator('input[name="annualRate"]').fill("12");await calculate();
+        rows=await resultRows();
+        assert.equal(rows[RESULT_LABELS[locale].LoanFormula],"M = P × r / (1 − (1 + r)^(-n))");
+        const payment=await page.evaluate(locale=>(88.85).toLocaleString(locale),locale);
+        assert.ok(Object.values(rows).includes(payment));
+        assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"loanVariables")));
+      }
+      await page.locator("#language").selectOption("en");
+    });
+
     await t.test("discount modes exclude invalid inactive prices from validation",async()=>{
       await openTool("discount");
       await page.locator('input[name="price"]').fill("-1");
