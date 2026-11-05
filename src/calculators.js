@@ -30,7 +30,7 @@ export function percent(mode,a,b){a=Number(a);b=Number(b);if(!ok(a)||!ok(b))thro
  const ratio=Number.isFinite(difference)?difference/Math.abs(a):b/Math.abs(a)-Math.sign(a);
  const value=ratio*100;if(!Number.isFinite(value))throw Error("number");return value;
 }throw Error("number");}
-export function temperature(v,dir){v=Number(v);if(!ok(v)||!["c","f"].includes(dir)||v<(dir==="c"?-273.15:-459.67))throw Error("absolute");return dir==="c"?v*9/5+32:(v-32)*5/9;}
+export function temperature(v,dir){v=Number(v);if(!ok(v)||!["c","f"].includes(dir)||v<(dir==="c"?-273.15:-459.67))throw Error("absolute");const result=dir==="c"?v*(9/5)+32:(v-32)*(5/9);if(!Number.isFinite(result))throw Error("number");return result;}
 export function bearing(lat,lon){lat=Number(lat);lon=Number(lon);if(!ok(lat)||!ok(lon)||lat< -90||lat>90||lon< -180||lon>180)throw Error("coordinates");const r=x=>x*Math.PI/180,a=r(lat),b=r(21.4225),dl=r(39.8262-lon),y=Math.sin(dl)*Math.cos(b),x=Math.cos(a)*Math.sin(b)-Math.sin(a)*Math.cos(b)*Math.cos(dl);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
 export function loan(p,rate,years){
  p=Number(p);rate=Number(rate);years=Number(years);const n=years*12;
@@ -69,18 +69,53 @@ export function gradeBreakdown(text,mode="gpa"){
 export function gpa(text){return gradeBreakdown(text).average;}
 export function gpaPercentage(text){return gradeBreakdown(text,"percentage").average;}
 
-export function fuel(d,e,p){d=Number(d);e=Number(e);p=Number(p);if(!ok(d)||d<0||!pos(e)||!ok(p)||p<0)throw Error("number");const litres=d*e/100;return{litres,cost:litres*p};}
-export function fuelTrip(distance,efficiency,price,mode="metric",mpgType="us"){distance=Number(distance);efficiency=Number(efficiency);price=Number(price);if(!ok(distance)||distance<0||!pos(efficiency)||!ok(price)||price<0)throw Error("number");let litres,units;
-if(mode==="metric"){litres=distance*efficiency/100;units=litres;}
-else if(mode==="imperial"){if(!["us","uk"].includes(mpgType))throw Error("number");const gallons=distance/efficiency;litres=gallons*(mpgType==="us"?3.785411784:4.54609);units=gallons;}
-else throw Error("number");
-return{litres,fuelUnits:units,cost:units*price,unit:mode==="metric"?"L":"gal",priceUnit:mode==="metric"?"per litre":"per gallon",distanceKm:mode==="metric"?distance:distance*1.609344};}
+export function fuel(d,e,p){
+ d=Number(d);e=Number(e);p=Number(p);if(!ok(d)||d<0||!pos(e)||!ok(p)||p<0)throw Error("number");
+ const litres=percent("of",e,d),cost=litres*p;
+ if(!Number.isFinite(cost))throw Error("number");
+ return{litres,cost};
+}
+export function fuelTrip(distance,efficiency,price,mode="metric",mpgType="us"){
+ distance=Number(distance);efficiency=Number(efficiency);price=Number(price);
+ if(!ok(distance)||distance<0||!pos(efficiency)||!ok(price)||price<0)throw Error("number");
+ let litres,units,cost;
+ if(mode==="metric"){({litres,cost}=fuel(distance,efficiency,price));units=litres;}
+ else if(mode==="imperial"){
+  if(!["us","uk"].includes(mpgType))throw Error("number");
+  units=distance/efficiency;litres=units*(mpgType==="us"?3.785411784:4.54609);cost=units*price;
+ }else throw Error("number");
+ const distanceKm=mode==="metric"?distance:distance*1.609344;
+ if(![litres,units,cost,distanceKm].every(Number.isFinite))throw Error("number");
+ return{litres,fuelUnits:units,cost,unit:mode==="metric"?"L":"gal",priceUnit:mode==="metric"?"per litre":"per gallon",distanceKm};
+}
 
 export function unit(v,from,to,group){const t={length:{m:1,km:1000,mi:1609.344,ft:.3048,in:.0254},mass:{kg:1,g:.001,lb:.45359237,oz:.028349523125},volume:{L:1,mL:.001,"US gal":3.785411784,"US qt":.946352946},area:{"m²":1,"ft²":.09290304,acre:4046.8564224,ha:10000},speed:{"km/h":1,mph:1.609344,"m/s":3.6},digital:{bit:1,byte:8,kB:8000,MB:8e6,GB:8e9,KiB:8192,MiB:8388608,GiB:8589934592}}[group];if(!t||!(from in t)||!(to in t)||!ok(v))throw Error("number");const result=Number(v)*(t[from]/t[to]);if(!Number.isFinite(result))throw Error("number");return result;}
-export function zakat(v,r){const values=["cash","gold","silver","investments"].map(k=>Number(v[k]||0));if(values.some(x=>!ok(x)||x<0))throw Error("number");const sum=values.reduce((a,b)=>a+b,0);r=Number(r);if(!ok(r)||r<0)throw Error("number");return{assets:sum,due:sum*r/100};}
-export function practice(m,s,y){m=Number(m);s=Number(s);y=Number(y);if(!ok(m)||!ok(s)||!ok(y)||m<0||s<0||y<0)throw Error("number");return{day:m*s/7,week:m*s,year:m*s*52,lifetime:m*s*52*y};}
-export function shares(total,s){total=Number(total);const a=String(s).split(",").map(x=>x.trim()===""?NaN:Number(x));if(!ok(total)||total<0||!a.length||a.some(x=>!ok(x)||x<0))throw Error("number");return{total:a.reduce((x,y)=>x+y,0),counts:a.map(x=>total*x/100)};}
+export function zakat(v,r){
+ if(!v||typeof v!=="object")throw Error("number");
+ const values=["cash","gold","silver","investments"].map(k=>Number(v[k]??0));
+ if(values.some(x=>!ok(x)||x<0))throw Error("number");
+ const sum=values.reduce((a,b)=>a+b,0);r=Number(r);
+ if(!Number.isFinite(sum)||!ok(r)||r<0)throw Error("number");
+ return{assets:sum,due:percent("of",r,sum)};
+}
+export function practice(m,s,y){
+ m=Number(m);s=Number(s);y=Number(y);if(!ok(m)||!ok(s)||!ok(y)||m<0||s<0||y<0)throw Error("number");
+ const week=m*s,day=week/7,year=week*52,lifetime=year*y;
+ if(![day,week,year,lifetime].every(Number.isFinite))throw Error("number");
+ return{day,week,year,lifetime};
+}
+export function shares(total,s){
+ total=Number(total);const a=String(s).split(",").map(x=>x.trim()===""?NaN:Number(x));
+ if(!ok(total)||total<0||!a.length||a.some(x=>!ok(x)||x<0))throw Error("number");
+ const sum=a.reduce((x,y)=>x+y,0);if(!Number.isFinite(sum))throw Error("number");
+ return{total:sum,counts:a.map(x=>percent("of",x,total))};
+}
+export const MAX_DEMOGRAPHIC_INPUT_LENGTH=100_000;
+export const MAX_DEMOGRAPHIC_ROWS=1_000;
+export const MAX_DEMOGRAPHIC_SHARE_LENGTH=1_024;
+function demographicsTooLarge(){const error=Error("demographics-too-large");error.code="demographics-too-large";return error;}
 function decimalShare(text) {
+ if(text.length>MAX_DEMOGRAPHIC_SHARE_LENGTH)throw demographicsTooLarge();
  if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text))throw Error("number");
  const value=Number(text);if(!Number.isFinite(value)||value<0||value>100)throw Error("number");
  const [coefficient,exponent="0"]=text.toLowerCase().replace(/^\+/,"").split("e");
@@ -102,8 +137,11 @@ function decimalText(numerator,scale) {
 }
 export function demographics(total,entries){
  total=Number(total);if(!ok(total)||total<0)throw Error("number");
+ const source=String(entries);if(source.length>MAX_DEMOGRAPHIC_INPUT_LENGTH)throw demographicsTooLarge();
  let sum=0n,scale=0;
- const rows=String(entries).split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{
+ const lines=source.split(/\n/).map(x=>x.trim()).filter(Boolean);
+ if(lines.length>MAX_DEMOGRAPHIC_ROWS)throw demographicsTooLarge();
+ const rows=lines.map(line=>{
   const i=line.lastIndexOf(",");if(i<1)throw Error("number");
   const name=line.slice(0,i).trim(),parsed=decimalShare(line.slice(i+1).trim());if(!name)throw Error("number");
   const nextScale=Math.max(scale,parsed.scale);
@@ -134,14 +172,14 @@ const base=time.split(":").reduce((h,x)=>h*60+Number(x),0);
 return Array.from({length:6},(_,i)=>{const offset=((i+1)*cycle+buffer)%1440,minutes=base+(mode==="bed"?offset:-offset),n=((minutes%1440)+1440)%1440;return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");});
 }
 
-export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;
+export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;const angle=(a%360)*(Math.PI/180);
 switch(op){
 case"add":case"subtract":case"multiply":case"divide":case"power":case"modulo":if(op==="modulo"){if(!ok(b)||b===0)throw Error("zero");v=a%b;}else v=arithmetic(a,b,op);break;
 case"percentOf":v=percent("of",a,b);break;
 case"sqrt":if(a<0)throw Error("number");v=Math.sqrt(a);break;
-case"sin":v=Math.sin(a*Math.PI/180);break;
-case"cos":v=Math.cos(a*Math.PI/180);break;
-case"tan":if(Math.abs(Math.cos(a*Math.PI/180))<1e-12)throw Error("number");v=Math.tan(a*Math.PI/180);break;
+case"sin":v=Math.sin(angle);break;
+case"cos":v=Math.cos(angle);break;
+case"tan":if(Math.abs(Math.cos(angle))<1e-12)throw Error("number");v=Math.tan(angle);break;
 case"log":if(a<=0)throw Error("number");v=Math.log10(a);break;
 case"ln":if(a<=0)throw Error("number");v=Math.log(a);break;
 case"factorial":if(a<0||!Number.isInteger(a)||a>170)throw Error("number");v=1;for(let i=2;i<=a;i++)v*=i;break;
@@ -158,7 +196,8 @@ export function populationEstimate(now=new Date()){
 // Audited UN WPP 2024 World/Medium totals; see docs/POPULATION_AUDIT.md.
 const baseline=8300678396,annualNet=baseline-8231613070;
 const daysPerYear=(utc(2026,6,1)-utc(2025,6,1))/86400000;
-const elapsed=(now.getTime()-utc(2026,6,1))/86400000;
+const instant=now?.getTime?.();if(!Number.isFinite(instant))throw Error("date");
+const elapsed=(instant-utc(2026,6,1))/86400000;
 const perDay=annualNet/daysPerYear;
 const estimate=baseline+elapsed*perDay;
 return{estimate,rounded:Math.round(estimate/1000)*1000,baseline,perDay,baselineDate:"2026-07-01",annualNet};

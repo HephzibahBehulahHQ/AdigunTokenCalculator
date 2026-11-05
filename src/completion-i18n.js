@@ -62,6 +62,13 @@ export const COMPLETION_COPY={
 };
 
 for(const [locale,copy] of Object.entries(COMPLETION_COPY)){
+ const context={
+  en:{demographics:"Educational use only; this calculator does not endorse any belief system. Census/survey methods and identity questions differ, estimates have uncertainty, and global shares hide regional variation. Unaffiliated means no stated religious identity. Counts use population × percentage / 100.",qibla:"The calculated bearing is approximate; you may verify it with a trusted local source."},
+  de:{demographics:"Nur zu Bildungszwecken; dieser Rechner unterstützt kein Glaubenssystem. Volkszählungen und Befragungen verwenden unterschiedliche Methoden und Identitätsfragen; Schätzungen sind unsicher und globale Anteile verdecken regionale Unterschiede. Konfessionslos bedeutet ohne angegebene Religionszugehörigkeit. Anzahl = Bevölkerung × Prozentwert / 100.",qibla:"Die berechnete Peilung ist eine Näherung; du kannst sie mit einer vertrauenswürdigen örtlichen Quelle überprüfen."},
+  yo:{demographics:"Fún ẹ̀kọ́ nìkan; ẹrọ ìṣirò yìí kò ń ṣe àtìlẹ́yìn fún ètò ìgbàgbọ́ kankan. Ọ̀nà ìkànìyàn/ìwádìí àti ìbéèrè ìdánimọ̀ yàtọ̀, àfojúsùn ní àìdánilójú, àwọn ìpín àgbáyé sì lè bo ìyàtọ̀ agbègbè mọ́lẹ̀. Ẹni tí kò darapọ̀ mọ́ ẹ̀sìn kò sọ pé ó ní ìdánimọ̀ ẹ̀sìn. Iye = olùgbé × ìdá ọgọ́rùn-ún / 100.",qibla:"Ìtọ́sọ́nà tí a ṣe ìṣirò rẹ̀ jẹ́ àfojúsùn; o lè fi í wé orísun agbègbè kan tí o gbẹ́kẹ̀ lé."},
+  pcm:{demographics:"Na for education only; this calculator no endorse any belief system. Census/survey methods and identity questions fit different, estimates get uncertainty, and world shares fit hide regional differences. Unaffiliated mean say person no state religious identity. Count = population × percentage / 100.",qibla:"Di calculated direction na approximate; you fit confirm am with trusted source for your area."}
+ }[locale];
+ copy.demographicsNotice+=" "+context.demographics;copy.qiblaNotice+=" "+context.qibla;
  Object.assign(I[locale].fields,copy.fields);
  Object.assign(I[locale].notices,{water:copy.waterHelp,demographics:copy.demographicsNotice,qibla:copy.qiblaNotice,holiday:copy.holidayHelp});
 }

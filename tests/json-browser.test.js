@@ -9,20 +9,21 @@ test("JSON worker keeps the browser responsive and discards cancelled/queued wor
   skip:!existsSync(chromium.executablePath()),timeout:60000
 },async()=>{
   const origin="http://127.0.0.1:4197";
+  const appUrl=new URL("/AdigunTokenCalculator/",origin).href;
   const server=spawn(process.execPath,["node_modules/vite/bin/vite.js","--host","127.0.0.1","--port","4197","--strictPort"],{stdio:"ignore"});
   let browser;
   try{
     let ready=false;
     for(let attempt=0;attempt<50;attempt++){
-      try{if((await fetch(origin)).ok){ready=true;break;}}catch{}
+      try{if((await fetch(appUrl)).ok){ready=true;break;}}catch{}
       await delay(200);
     }
     assert.ok(ready,"Vite server must become available");
     browser=await chromium.launch({headless:true});
     const page=await browser.newPage();
-    await page.goto(origin);
-    const result=await page.evaluate(async()=>{
-      const api=await import("/src/json-client.js");
+    await page.goto(appUrl);
+    const result=await page.evaluate(async moduleUrl=>{
+      const api=await import(moduleUrl);
       await api.formatJsonAsync('{"warm":true}',"minify");
       const source="["+Array(120000).fill("9007199254740993").join(",")+"]";
       let ticks=0;
@@ -41,7 +42,7 @@ test("JSON worker keeps the browser responsive and discards cancelled/queued wor
       const newest=await latest;
       api.cancelJsonWork();
       return{ticks,exact:formatted===source,cancelled,fresh,discarded,newest};
-    });
+    },new URL("src/json-client.js",appUrl).href);
     assert.ok(result.ticks>0,"main-thread timer must advance while worker formats large JSON");
     assert.equal(result.exact,true);
     assert.equal(result.cancelled,"AbortError");

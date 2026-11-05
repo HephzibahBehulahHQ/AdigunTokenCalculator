@@ -1,13 +1,13 @@
 # Privacy and data handling
 
-AdigunTokenCalculator is a static, browser-side utility. All 39 tools process calculator inputs in the active page using JavaScript. The application has no backend, account system, database, analytics, telemetry, advertising tags or remote calculation API.
+AdigunTokenCalculator is a static, browser-side utility. All 39 tools process calculator inputs in browser memory, including local background workers for tokenization and JSON formatting. The application has no backend, account system, database, analytics, telemetry, advertising tags or remote calculation API.
 
 ## What is processed locally
 
 - Text, model selection, token IDs and token-piece data in the tokenizer and text-statistics tools.
 - Dates and numeric values in engineering, temperature, age, BMI, percentage, population, religion, practice-time, Zakat, Qibla, unit, loan, date-difference, GPA, fuel, sleep, time-zone, inflation, tip, calorie, pregnancy, water, BAC, base, Roman numeral, discount, recipe, holiday and statistics tools.
 - Currency rates and amounts in the offline converter. Its ECB reference-rate snapshot is bundled in the application and can be edited in the page.
-- Password characters and cryptographic random values in the password generator. The optional strength checker analyses up to 128 Unicode characters locally with a bundled zxcvbn model, loaded only when checking. Checked passwords are masked in the form and excluded from displayed results. Neither generated nor checked passwords are uploaded or intentionally stored.
+- Password characters and cryptographic random values in the password generator. The optional strength checker analyses up to 128 Unicode characters locally with a bundled zxcvbn model, executed only when checking. Offline preparation can download/cache the model script before it is used; this stores the model, not a password. Checked passwords are masked in the form and excluded from displayed results. Neither generated nor checked passwords are uploaded or intentionally stored.
 - QR text/URLs in the local QR generator. QR content is encoded in the browser and is readable by anyone who scans the resulting code.
 - Pasted text or explicitly selected/dropped files in the hash tool. Files are read locally in memory, with a 25 MB limit; their contents are not transmitted.
 - Foreground/background colors in the color and contrast checker.
@@ -20,9 +20,17 @@ The BAC estimator opens a warning dialog and requires an explicit educational-us
 
 ## Network behaviour
 
-The browser downloads the published static HTML, CSS, JavaScript and locally bundled tokenizer/QR/password-strength assets from this GitHub Pages site. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime API or third-party CDN requests. Source links open only when the user deliberately activates them.
+The browser downloads the published static HTML, CSS, JavaScript, worker scripts, WebAssembly, images, notices and locally bundled tokenizer/QR/password-strength assets from this GitHub Pages site. Production offline preparation downloads the complete build manifest, including lazy tool assets, and the browser can request updated application files on later visits. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime calculation API or third-party CDN requests. Source links open only when the user deliberately activates them.
 
 The browser/device handles its own geolocation permission and location service. The application reads the returned coordinates in-page and does not send them to an application server.
+
+## Offline application files
+
+The production service worker uses browser CacheStorage for the known, same-origin files listed by the build. Cache entries use canonical application-asset URLs. Calculator inputs, URL/query history, generated files, customer details and unrelated-origin requests are not written into this cache. The registration and cache contain application code/data only; tokenization and JSON workers exchange input/result messages in browser memory without sending them to the service worker for storage.
+
+The footer declares readiness after the full manifest is cached, verified and controlling the page. Preparation failures offer Retry. New builds are prepared in a separate versioned cache; activation keeps the current build and one previous build while pruning only this application's scope-specific cache namespace. An offered update warns that reloading clears unsaved work and waits for explicit action while the page is open; the application does not reload automatically. The browser may activate a waiting worker after old pages close.
+
+Cached files can survive a browser restart, but site-data clearing, storage restrictions or browser eviction can remove them. Readiness is rechecked on page visibility/connectivity changes. Removing application caches does not itself delete the separate electrical `localStorage` profile; clearing all site data removes both. Offline preparation is not registered in development mode.
 
 ## Storage and clipboard
 

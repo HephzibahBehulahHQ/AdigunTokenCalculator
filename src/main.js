@@ -186,7 +186,7 @@ function renderTool(){
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};let bacConsent=null;(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
  const C=COMPLETION_COPY[lang];
- const helpText={water:C.waterHelp,holidays:C.holidayHelp,qibla:C.qiblaLocation,zakat:C.zakatDefault,json:C.jsonHelp,stats:C.statsHelp}[k];
+ const helpText={water:C.waterHelp,holidays:C.holidayHelp,qibla:C.qiblaLocation,zakat:C.zakatDefault,demographics:tr().demographicsSourceNote,json:C.jsonHelp,stats:C.statsHelp}[k];
  if(helpText){const help=el("p","notice form-help",helpText);help.id=k+"-help";panel.append(help);form.setAttribute("aria-describedby",help.id);}
  if(k==="timezone"){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);inputs.dateTime.value=local;}
  if(k==="inflation"){inputs.annualRate.min="-99.99";for(const key of ["fromYear","toYear"]){inputs[key].min="1800";inputs[key].max="2200";}}

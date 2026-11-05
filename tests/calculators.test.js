@@ -236,3 +236,73 @@ test("published grade mapping matches the supported weighted grade scale",()=>{
  assert.ok(Object.isFrozen(c.GRADE_POINTS));
  assert.deepEqual(c.GRADE_POINTS,{A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0});
 });
+
+test("fuel calculations keep finite divided products and legitimate zero results",()=>{
+ assert.deepEqual(c.fuel(1e308,100,0),{litres:1e308,cost:0});
+ assert.deepEqual(c.fuel(Number.MAX_VALUE,100,1),{litres:Number.MAX_VALUE,cost:Number.MAX_VALUE});
+ assert.deepEqual(c.fuel(0,Number.MAX_VALUE,Number.MAX_VALUE),{litres:0,cost:0});
+ const metric=c.fuelTrip(1e308,100,0);
+ assert.equal(metric.litres,1e308);assert.equal(metric.cost,0);assert.equal(metric.distanceKm,1e308);
+ const imperial=c.fuelTrip(1e308,100,0,"imperial","us");
+ assert.ok(Object.values(imperial).filter(value=>typeof value==="number").every(Number.isFinite));
+ assert.ok(Math.abs(imperial.litres/3.785411784e306-1)<1e-15);
+ const zero=c.fuelTrip(0,Number.MIN_VALUE,Number.MAX_VALUE,"imperial","uk");
+ for(const key of ["litres","fuelUnits","cost","distanceKm"])assert.equal(zero[key],0);
+ for(const args of [[1e308,1e308,0],[1e308,1,1e308],[0,0,1]])assert.throws(()=>c.fuel(...args),/number/);
+ for(const args of [[Number.MAX_VALUE,Number.MAX_VALUE,0,"imperial","us"],[200,100,Number.MAX_VALUE,"imperial","uk"],[1e308,1e308,0]])assert.throws(()=>c.fuelTrip(...args),/number/);
+});
+
+test("zakat keeps valid finite percentages and rejects invalid assets or monetary overflow",()=>{
+ assert.deepEqual(c.zakat({cash:1e308},100),{assets:1e308,due:1e308});
+ assert.deepEqual(c.zakat({},Number.MAX_VALUE),{assets:0,due:0});
+ assert.deepEqual(c.zakat({cash:100},0),{assets:100,due:0});
+ assert.ok(Math.abs(c.zakat({cash:1e308},2.5).due/2.5e306-1)<1e-15);
+ for(const [assets,rate] of [[{cash:NaN},2.5],[{cash:Number.MAX_VALUE,gold:Number.MAX_VALUE},0],[{cash:1e308},Number.MAX_VALUE],[null,0]])
+  assert.throws(()=>c.zakat(assets,rate),/number/);
+});
+
+test("practice rejects nonrepresentable required projections while allowing zero activity or lifetime",()=>{
+ assert.deepEqual(c.practice(0,Number.MAX_VALUE,Number.MAX_VALUE),{day:0,week:0,year:0,lifetime:0});
+ assert.deepEqual(c.practice(Number.MAX_VALUE,0,Number.MAX_VALUE),{day:0,week:0,year:0,lifetime:0});
+ assert.deepEqual(c.practice(30,7,0),{day:30,week:210,year:10920,lifetime:0});
+ assert.ok(Object.values(c.practice(1e300,1,1)).every(Number.isFinite));
+ for(const args of [[Number.MAX_VALUE,Number.MAX_VALUE,0],[1e308,1,0],[1e300,1,1e308]])
+  assert.throws(()=>c.practice(...args),/number/);
+});
+
+test("legacy share counts use stable percentages and validate aggregate overflow",()=>{
+ assert.deepEqual(c.shares(Number.MAX_VALUE,"100"),{total:100,counts:[Number.MAX_VALUE]});
+ assert.deepEqual(c.shares(0,String(Number.MAX_VALUE)),{total:Number.MAX_VALUE,counts:[0]});
+ assert.throws(()=>c.shares(0,`${Number.MAX_VALUE},${Number.MAX_VALUE}`),/number/);
+ assert.throws(()=>c.shares(Number.MAX_VALUE,"200"),/number/);
+});
+
+test("temperature retains finite extreme conversions and rejects only actual result overflow",()=>{
+ assert.ok(Math.abs(c.temperature(1e308,"f")/5.555555555555556e307-1)<1e-15);
+ assert.ok(Math.abs(c.temperature(9e307,"c")/1.62e308-1)<1e-15);
+ assert.equal(c.temperature(32,"f"),0);assert.equal(c.temperature(0,"c"),32);
+ assert.throws(()=>c.temperature(Number.MAX_VALUE,"c"),/number/);
+});
+
+test("degree trigonometry remains periodic without overflowing radians",()=>{
+ assert.ok(Math.abs(c.engineering(36000000000030,0,"sin")-0.5)<1e-12);
+ assert.equal(c.engineering(36000000000000,0,"sin"),0);
+ assert.equal(c.engineering(36000000000000,0,"cos"),1);
+ assert.ok(Math.abs(c.engineering(1e308,0,"sin")-(-0.898794046299167))<1e-12);
+ assert.throws(()=>c.engineering(36000000000090,0,"tan"),/number/);
+});
+
+test("demographic limits bound exact-decimal work before large BigInt allocations",()=>{
+ const precise="1."+"0".repeat(c.MAX_DEMOGRAPHIC_SHARE_LENGTH-3)+"1";
+ assert.equal(precise.length,c.MAX_DEMOGRAPHIC_SHARE_LENGTH);
+ assert.equal(c.demographics(100,"A,"+precise).totalShareExact,precise);
+ const rows=Array.from({length:c.MAX_DEMOGRAPHIC_ROWS},(_,index)=>`Group ${index},0`).join("\n");
+ assert.equal(c.demographics(100,rows).rows.length,c.MAX_DEMOGRAPHIC_ROWS);
+ for(const input of [" ".repeat(c.MAX_DEMOGRAPHIC_INPUT_LENGTH+1),"A,"+precise+"0",rows+"\nExtra,0"])
+  assert.throws(()=>c.demographics(100,input),error=>error.code==="demographics-too-large");
+});
+
+test("population estimation rejects invalid reference instants",()=>{
+ assert.throws(()=>c.populationEstimate(new Date(NaN)),/date/);
+ assert.throws(()=>c.populationEstimate(null),/date/);
+});
