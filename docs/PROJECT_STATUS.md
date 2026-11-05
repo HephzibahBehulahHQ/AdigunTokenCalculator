@@ -58,11 +58,11 @@ No full production/accessibility certification is claimed while human review rem
 
 - Objective: add the owner's browser-only electrical load tool, keeping all existing calculators, shared utilities and tests unchanged.
 - Branch: `codex/electrical-load-calculator`; base/last observed remote main: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`.
-- Stage: pure engine and profile implemented; 20 new tests pass, 0 fail. Includes signed reactive power, vector apparent power, active/standby energy, demand/diversity/growth, costs/carbon, capped renewable offsets, idealized battery duration, phase/current and limits.
+- Stage: all new modules implemented. 22 engine/profile, 3 preset, 5 locale and 4 UI/build tests passed locally. Browser interaction test is pending Actions; local Chromium unavailable.
 - Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
 - Scope gate: connecting the tool requires additions to `src/main.js` and updates to the existing browser test's fixed 38-tool assertions. The owner's instruction requires approval before those existing shared/test files change. Complete the new modules and prepare the exact patch first.
-- Next bounded action: add the editable appliance presets and their validation tests, then implement isolated UI/locales.
-- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `873f3e2f1c5fd9ea1c69927d6a93cd3ed7967535` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
+- Next bounded action: verify browser interactions in Actions, document assumptions and prepare the exact shared-router/test-count approval patch.
+- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `426c64faee14b98d411464625b93b0e6c3656296` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
 
 | Step | File | Observed verification | Next |
 | --- | --- | --- | --- |
@@ -86,3 +86,4 @@ No full production/accessibility certification is claimed while human review rem
 | 18 | `src/tools/loadCalculatorUI.js` | Pure UI/CSV implementation added; test blocked by quoted assertion syntax | Correct new UI test syntax |
 | 19 | `tests/loadUI.test.js` | Parser fixed; CSV numeric formatting assertion fails on floating-point residue | Normalize export display precision |
 | 20 | `src/tools/loadCalculatorUI.js` | 3 pure UI tests pass: registration, isolated memory state, multilingual CSV and formula-injection escaping; DOM mounting NOT IMPLEMENTED yet | Implement DOM renderer |
+| 21 | `src/tools/loadCalculatorUI.js` | 4 UI/unit/build tests passed; 1 browser test skipped locally (no Chromium) | Verify production-preview interactions in Actions |
