@@ -65,6 +65,14 @@ test("load engine: capacitor correction and unity PF avoid division by zero",()=
   assert.throws(()=>c.powerFactorCorrectionKVAR(10,0.8,1.1));
 });
 
+test("load engine: PF correction preserves finite results for very small positive PF",()=>{
+  near(c.powerFactorCorrectionKVAR(1,1e-310,1e-310),0);
+  near(c.powerFactorCorrectionKVAR(1e-200,1e-310,1),1e110);
+  near(c.powerFactorCorrectionKVAR(1e-200,1,1e-310),-1e110);
+  assert.throws(()=>c.powerFactorCorrectionKVAR(1,0,0));
+  assert.throws(()=>c.powerFactorCorrectionKVAR(1,1e-310,1));
+});
+
 test("load engine: daily/monthly/annual costs include standby and carbon uses editable grid factor",()=>{
   near(c.costPerInterval(2,0.3),0.6);near(c.costPerDay([d],0.3),0.2916);
   near(c.costPerMonth([d],0.3),8.748);near(c.costPerYear([d],0.3),106.434);

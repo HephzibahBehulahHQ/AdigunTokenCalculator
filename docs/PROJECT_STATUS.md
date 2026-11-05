@@ -1,13 +1,15 @@
 # Project status — AdigunTokenCalculator
 
-## Latest deployed functional release
+## Verified deployed release
 
-[PR #12](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/12) merged with standing owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/). These receipts identify the latest functional release; later documentation-only commits do not replace them.
+[PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11) added Electrical Load Calculator as tool 39, merged with explicit owner authorization on 5 November 2026 and deployed at [GitHub Pages](https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/#/electrical-load). These are the verified release receipts at the start of the continuation below. Final follow-up receipts also belong in its merged pull request, avoiding a self-referential post-deployment commit.
 
-- Merge commit: `a33c9827a378565068bb0855f682de44ae932195`.
-- [Exact-merge CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691371): succeeded.
-- [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42009691478): succeeded.
-- Candidate `9b6e0`: **134 passed, 0 failed, 0 skipped**, including Chromium; production build passed.
+- Merge commit: `4c0fb20e892cf6e34533160809002a83bed945bb`.
+- [Exact-merge CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42012585549): succeeded.
+- [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42012585660): succeeded.
+- Candidate `661b429`: **169 passed, 0 failed, 0 skipped**, including Chromium; production build passed.
+- Live electrical fixture verified **0.972 kWh/day**, **0.15 kW hourly peak**, **27% load factor** and **0.1 kW / 0.075 kVAR / 0.125 kVA**. Browser checks cover four locales, CSV, print and mobile layout.
+- The following earlier release checks remain preserved from PRs #6–#12:
 - Live BAC checks passed: initial title focus, unchecked consent with Continue disabled, contained/wrapping Tab navigation, acknowledgement followed by input focus, fresh consent after Reset, and Escape back to the directory.
 - Live JSON checks passed: invalid input receives `aria-invalid`, an `aria-describedby` error association and field focus; editing clears the stale message and attributes.
 - Live recipe checks passed: scaling `1.5 kg flour` and `0.25 L water` from 2 to 4 servings produces `3000 g flour` and `500 mL water` on separate lines. Computed `white-space: pre-wrap` and the exact-metric-pairs/no-density notice were verified.
@@ -15,11 +17,11 @@
 
 ## Implemented scope
 
-The application contains 38 tools in 11 searchable categories and four locales. All calculation inputs remain in the browser. Continuation work includes an archived official UN population audit; localized dynamic results; password strength checking; bidirectional color conversion; variance; engineering percentages; stable loan formulas; nonzero unit precision; GPA weighting; local age reference dates; recipe-unit conversion; and empty-file hashing. PR #12 adds the BAC warning dialog, confirmed-input errors with ARIA associations and focus, stale-error prevention after editing, disabled inactive controls, clearer recipe wording and visible multiline output. Sources, privacy, dependency notices and calculation limitations are documented.
+The application contains 39 tools in 11 searchable categories and four locales. All calculation inputs remain in the browser. Continuation work includes an archived official UN population audit; localized dynamic results; password strength checking; bidirectional color conversion; variance; engineering percentages; stable loan formulas; nonzero unit precision; GPA weighting; local age reference dates; recipe-unit conversion; and empty-file hashing. PR #12 adds the BAC warning dialog, confirmed-input errors with ARIA associations and focus, stale-error prevention after editing, disabled inactive controls, clearer recipe wording and visible multiline output. PR #11 adds electrical device presets, power/energy/cost/carbon analysis, community factors, a conserved hourly profile and local exports. Sources, privacy, dependency notices and calculation limitations are documented.
 
-## Separate integration review
+## Electrical load follow-up
 
-Draft [PR #11](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/11), the electrical-load feature, remains an independent workstream awaiting integration review. Its PR body requires separate owner approval before shared-file integration. It is outside this deployed release's 38-tool scope.
+The owner requested continued completion after the verified electrical release. The continuation adds explicit browser-local Save/Load/Delete, complete four-language copy, validated profile recovery, preservation of unfinished edits and the finite tiny-PF correction fix. No changes to the original 38 calculator implementations, shared router, dependencies, branding or AGENTS.md are included. Bounded file/test checkpoints follow below.
 
 ## Remaining human / owner work
 
@@ -33,15 +35,15 @@ Population is simplified interpolation/extrapolation of dated UN projections; bi
 
 No full accessibility or production certification is claimed while required human review remains open.
 
-## Electrical load calculator — current checkpoint
+## Electrical load calculator — initial implementation history
 
 - Objective: add the owner's browser-only electrical load tool, keeping all existing calculators, shared utilities and tests unchanged.
 - Branch: `codex/electrical-load-calculator`; initial base: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`; refreshed upstream: `84dd508075777ccbc230f1db0fd4e1b6068db3be`.
-- Stage: integrated as tool 39 with owner authorization. Full local suite: 149 passed, 0 failed, 2 browser skips; `npm run build` passed. Exact browser candidate verification pending Actions.
+- Stage: integrated, tested in Chromium, merged and deployed as tool 39. Full initial local suite: 149 passed, 0 failed, 2 browser skips; `npm run build` passed. Final Actions/live receipts are above and in merged PR #11.
 - Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
 - Scope authorization: owner explicitly instructed commit, deploy and integrate to main during this turn. Proceed with the previously identified router additions and 38→39 browser assertions, then verified merge/deployment. Existing calculator logic remains unchanged.
-- Next bounded action: push the requested feature commit, verify exact-candidate browser CI, merge to main and verify Pages deployment/live route under the owner's explicit instruction.
-- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. Verified remote checkpoint: `ac165e888a214521a1dfa0e9b97a5041fc956741` on 5 November 2026; new changes after that checkpoint are locally pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
+- Next bounded action: initial implementation complete; see the continuation checkpoint for follow-up work.
+- Synchronization: shell push lacked credentials; authorized GitHub connector writes used expected-head checks. Final initial candidate `661b4297c63ee6c8c3fb584cfdf8cb33bad12eaa` became main squash commit `4c0fb20e892cf6e34533160809002a83bed945bb`. The table below is historical; its intermediate pending checks were resolved by that release.
 
 | Step | File | Observed verification | Next |
 | --- | --- | --- | --- |
@@ -75,3 +77,27 @@ No full accessibility or production certification is claimed while required huma
 | 28 | `README.md` | Required catalogue row appended; count updated to 39; 3 preset tests passed | Add calculation contract documentation |
 | 29 | `docs/ELECTRICAL_LOAD_CALCULATOR.md` | Documented formulas/assumptions; all 22 engine/profile tests passed | Run full build/test and commit release candidate |
 | 30 | `tests/loadUI.test.js` | Removed proposal-only transform after authorization; actual production route builds, 4 tests pass, browser check pending CI | Push exact feature commit and verify Actions |
+
+## Electrical load completion — continuation checkpoint
+
+- Owner instruction: continue building and finish; previous main merge/deployment authorization remains in effect.
+- Base: deployed main `4c0fb20e892cf6e34533160809002a83bed945bb`; branch `codex/electrical-load-profiles`.
+- Scope: explicit local profile save/load/delete, four-language copy, focused numerical correction, tests and release records. Existing 38 calculators remain untouched.
+- Current state: follow-up implementation and documentation complete. Full local `npm test`: 155 passed, 0 failed, 3 browser skips (Chromium unavailable); `npm run build` succeeded. Browser interactions await exact-candidate CI before merge.
+- Next: push the reviewed candidate, verify full Chromium CI, merge to main under standing owner authorization and verify public deployment. Final exact-commit receipts will be recorded in the merged follow-up PR.
+
+| Step | File | Observed verification | Next |
+| --- | --- | --- | --- |
+| 31 | `tests/loadCalculator.test.js` | 14 passed, 1 expected regression failure: finite tiny-PF correction overflows internally | Stabilize correction formula |
+| 32 | `src/calculators/loadCalculator.js` | All 15 engine tests pass, including finite tiny-PF correction and genuine overflow rejection | Specify local profile persistence |
+| 33 | `tests/loadStorage.test.js` | Expected red: persistence module does not exist; round-trip, malformed input, scoped deletion and failed-write cases specified | Implement versioned local storage adapter |
+| 34 | `src/tools/loadProfileStorage.js` | All 5 storage tests pass: complete normalized round-trip, malformed/oversized rejection, one-slot isolation, blocked storage and write preservation | Add four-language persistence copy |
+| 35 | `tests/loadI18n.test.js` | 4 passed, 1 expected red: persistence copy absent (`action.saveProfile` first missing key) | Add explicit four-language profile actions, notices and statuses |
+| 36 | `src/tools/loadCalculator-i18n.js` | All 5 localization tests pass; explicit save/load/delete, shared-browser notice, applied-row semantics and failure/status copy in EN/DE/YO/PCM | Integrate profile controls into the isolated UI |
+| 37 | `tests/loadUI.test.js` | 4 unit/build checks pass; 2 browser checks skipped locally (Chromium unavailable). Added save/load/delete, invalid/blocked storage and blank-name remount workflow specification | Connect UI and verify browser cases in CI |
+| 38 | `tests/loadStorage.test.js` | 4 passed, 1 expected failure: stored engine-valid values may exceed UI limits or have blank names | Enforce editable profile limits before replacing current state |
+| 39 | `src/tools/loadProfileStorage.js` | All 5 storage tests pass; saved data must satisfy UI bounds and nonblank names before restoration, including valid normalized kW ratings | Integrate explicit storage actions in UI |
+| 40 | `src/tools/loadCalculatorUI.js` | 14 focused unit/build/locale/storage checks passed; 2 browser checks skipped locally. Added explicit local actions, full settings restoration, blank-name preservation and editable large kW ratings | Complete browser regressions and documentation |
+| 41 | `tests/loadUI.test.js` | 4 unit/build checks pass; 2 browser checks await CI. Added rejected saved UI bounds and normalized large-kW editing regressions | Update feature documentation |
+| 42 | `docs/ELECTRICAL_LOAD_CALCULATOR.md` | All 10 storage/locale tests pass; documented opt-in persistence, replacement/deletion behavior, browser-local privacy and recovery | Run full test/build, record candidate, push for browser CI |
+| 43 | `docs/PROJECT_STATUS.md` | Corrected stale 38-tool/pending-PR records with verified PR #11 deployment receipts. Full local suite: 155 passed, 0 failed, 3 browser skips; build and diff checks passed | Push candidate and run Chromium CI |
