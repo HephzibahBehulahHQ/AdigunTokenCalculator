@@ -10,6 +10,7 @@ import "../src/copy.js";
 import "../src/additional-i18n.js";
 import {LOAD_COPY} from "../src/tools/loadCalculator-i18n.js";
 import {buildLoadCsv, createLoadState, registerLoadCalculator, LOAD_TOOL_KEY} from "../src/tools/loadCalculatorUI.js";
+import {LOAD_PROFILE_STORAGE_KEY} from "../src/tools/loadProfileStorage.js";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
 const source=()=>readFileSync(path.join(root,"src/main.js"),"utf8");
@@ -125,6 +126,80 @@ test("load UI: production-preview device editing, live calculations, four locale
     await page.evaluate(()=>{location.hash="#/electrical-load";});await waitResult("dailyKWh",7.69824);
     assert.equal(await page.evaluate(()=>localStorage.length),0);assert.equal(await page.evaluate(()=>sessionStorage.length),0);
     await page.reload();await waitResult("dailyKWh",0);
+    assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
+  }finally{if(browser)await browser.close();await new Promise(resolve=>server.httpServer.close(resolve));}
+});
+
+test("load UI: explicit local save/load/delete, recovery and unfinished edit preservation",{skip:!browserAvailable,timeout:120000},async()=>{
+  await previewBuild();
+  const server=await preview({root,logLevel:"silent",build:{outDir:buildDirectory},preview:{host:"127.0.0.1",port:4175,strictPort:true}});
+  let browser;
+  try{
+    browser=await chromium.launch({headless:true});
+    const page=await browser.newPage({locale:"en-US"}),errors=[],external=[];
+    page.on("pageerror",error=>errors.push(error.message));
+    page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});
+    await page.goto("http://127.0.0.1:4175/AdigunTokenCalculator/#/electrical-load");
+    const ui=page.locator(".load-calculator"),field=name=>ui.locator(`[name="${name}"]`),action=name=>ui.locator(`[data-action="${name}"]`);
+    const waitResult=async(key,value)=>page.waitForFunction(({key,value})=>Math.abs(Number(document.querySelector(`[data-result="${key}"]`)?.dataset.value)-value)<1e-8,{key,value});
+    const message=key=>ui.locator("[data-profile-status]").filter({hasText:LOAD_COPY.en[key]}).waitFor();
+    await ui.waitFor();assert.equal(await page.evaluate(()=>localStorage.length),0);
+    await action("load-profile").click();await message("message.noSavedProfile");
+    await field("preset").selectOption("refrigerator");
+    for(const [key,value] of Object.entries({name:"Saved appliance",watts:"100",quantity:"2",hoursPerDay:"6",dutyCycle:"50",standbyW:"2",seasonalFactor:"1.5"}))await field(key).fill(value);
+    await action("add-device").click();await waitResult("dailyKWh",0.972);
+    await field("phase").selectOption("three");await field("currency").selectOption("NGN");await field("measurementInterval").selectOption("second");
+    const savedFields={voltage:"400",households:"10",demandFactor:"0.8",diversityFactor:"0.5",growthMargin:"20",tariff:"225",co2Factor:"0.25",solarKWh:"0.1",windKWh:"0.2",renewableOffsetKWh:"0.3",batteryKWh:"2",gridLimitKW:"0",peakThresholdKW:"0.1",startHour:"22.5",endHour:"4.25"};
+    await field("occupancyEnabled").check();
+    for(const [key,value] of Object.entries(savedFields))await field(key).fill(value);
+    await waitResult("dailyKWh",4.6656);
+    await ui.locator('[data-device-row="0"] [data-action="edit"]').click();await field("quantity").fill("9");
+    await action("save-profile").click();await message("message.profileSaved");
+    const saved=await page.evaluate(key=>localStorage.getItem(key),LOAD_PROFILE_STORAGE_KEY);
+    assert.equal(JSON.parse(saved).devices[0].quantity,2);assert.equal(JSON.parse(saved).draft,undefined);
+    await page.reload();await waitResult("dailyKWh",0);assert.equal(await ui.locator("[data-device-row]").count(),0);
+    await action("load-profile").click();await waitResult("dailyKWh",4.6656);await message("message.profileLoaded");
+    for(const [key,value] of Object.entries(savedFields))assert.equal(await field(key).inputValue(),value,key);
+    assert.equal(await field("occupancyEnabled").isChecked(),true);assert.equal(await field("phase").inputValue(),"three");
+    assert.equal(await field("currency").inputValue(),"NGN");assert.equal(await field("measurementInterval").inputValue(),"second");
+    assert.equal(await action("cancel-edit").isVisible(),false);
+    await ui.locator('[data-device-row="0"] [data-action="edit"]').click();await field("name").fill("");
+    for(const lang of ["de","yo","pcm","en"]){
+      await page.locator("#language").selectOption(lang);
+      await page.waitForFunction(title=>document.querySelector("#panel h2")?.textContent===title,LOAD_COPY[lang].title);
+      assert.equal(await field("name").inputValue(),"");assert.equal(await field("name").getAttribute("aria-invalid"),"true");
+      for(const key of ["saveProfile","loadProfile","deleteProfile"])assert.equal(await ui.getByRole("button",{name:LOAD_COPY[lang]["action."+key],exact:true}).count(),1);
+      await waitResult("dailyKWh",4.6656);
+    }
+    await field("households").fill("4");await waitResult("dailyKWh",1.86624);
+    const corrupted=JSON.parse(saved);corrupted.devices[0].pf=0;
+    const outsideUiRange=JSON.parse(saved);outsideUiRange.settings.voltage=1e9;
+    for(const bad of ["{",'{"version":99}',JSON.stringify(corrupted),JSON.stringify(outsideUiRange)]){
+      await page.evaluate(({key,bad})=>localStorage.setItem(key,bad),{key:LOAD_PROFILE_STORAGE_KEY,bad});
+      await action("load-profile").click();await message("warning.profileInvalid");
+      await waitResult("dailyKWh",1.86624);assert.equal(await field("name").inputValue(),"");
+    }
+    await page.evaluate(({key,saved})=>{localStorage.setItem(key,saved);localStorage.setItem("test.unrelated","keep");},{key:LOAD_PROFILE_STORAGE_KEY,saved});
+    await page.evaluate(()=>{
+      window.__loadStorageDescriptor=Object.getOwnPropertyDescriptor(window,"localStorage");
+      Object.defineProperty(window,"localStorage",{configurable:true,get(){throw new DOMException("Storage blocked","SecurityError");}});
+    });
+    for(const name of ["save-profile","load-profile","delete-profile"]){await action(name).click();await message("warning.storageFailed");}
+    await page.evaluate(()=>{Object.defineProperty(window,"localStorage",window.__loadStorageDescriptor);delete window.__loadStorageDescriptor;});
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key),LOAD_PROFILE_STORAGE_KEY),saved);
+    await action("load-profile").click();await waitResult("dailyKWh",4.6656);
+    await action("delete-profile").click();await message("message.profileDeleted");await waitResult("dailyKWh",4.6656);
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key),LOAD_PROFILE_STORAGE_KEY),null);
+    assert.equal(await page.evaluate(()=>localStorage.getItem("test.unrelated")),"keep");
+    await action("load-profile").click();await message("message.noSavedProfile");await waitResult("dailyKWh",4.6656);
+    await action("clear-all").click();await waitResult("dailyKWh",0);
+    await field("powerUnit").selectOption("kW");await field("watts").fill("1000000000000");await field("hoursPerDay").fill("0");
+    await action("add-device").click();await ui.locator('[data-device-row="0"]').waitFor();
+    await ui.locator('[data-device-row="0"] [data-action="edit"]').click();
+    assert.equal(await field("powerUnit").inputValue(),"kW");assert.equal(await field("watts").inputValue(),"1000000000000");
+    await action("add-device").click();await waitResult("dailyKWh",0);assert.equal(await field("watts").getAttribute("aria-invalid"),"false");
+    await field("voltage").fill("0");await page.waitForFunction(()=>document.querySelector('[data-load-results]')?.hidden);
+    assert.equal(await action("save-profile").isDisabled(),true);assert.equal(await action("load-profile").isEnabled(),true);
     assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.httpServer.close(resolve));}
 });

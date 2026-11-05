@@ -11,12 +11,12 @@ const required=[
   ..."title description category deviceBuilder globalSettings deviceList results profile breakdown assumptions hour loadKW notApplicable unit.hours".split(" "),
   ..."preset name quantity watts powerUnit hoursPerDay dutyCycle standbyW pf type seasonalFactor voltage phase households peakThresholdKW tariff currency diversityFactor demandFactor growthMargin renewableOffsetKWh batteryKWh gridLimitKW measurementInterval co2Factor occupancyEnabled startHour endHour solarKWh windKWh".split(" ").map(key=>`field.${key}`),
   ..."custom single three second minute resistive inductive capacitive".split(" ").map(key=>`option.${key}`),
-  ..."addDevice applyChanges cancelEdit edit remove clearAll exportCsv print showProfileTable".split(" ").map(key=>`action.${key}`),
+  ..."addDevice applyChanges cancelEdit edit remove clearAll exportCsv print showProfileTable saveProfile loadProfile deleteProfile".split(" ").map(key=>`action.${key}`),
   ..."connectedLoadKW projectedConnectedLoadKW demandAdjustedConnectedKW realPowerKW reactivePowerKVAR apparentPowerKVA peakDemandKW averageLoadKW loadFactor dailyKWh weeklyKWh monthlyKWh annualKWh standbyKWh netGridKWh dailyCost monthlyCost annualCost grossDailyCost carbonKgCO2 grossCarbonKgCO2 renewableSavings renewableAvailableKWh renewableAppliedKWh excessRenewableKWh lineCurrentA intervalEnergyWh batteryHours activeKWh".split(" ").map(key=>`result.${key}`),
-  ..."emptyDevices estimates invalidResults added updated removed resultsUpdated".split(" ").map(key=>`message.${key}`),
-  ..."invalidNumber zeroPowerFactor overflow deviceLimit nameRequired peakExceeded gridExceeded exportFailed printFailed".split(" ").map(key=>`warning.${key}`),
+  ..."emptyDevices estimates invalidResults added updated removed resultsUpdated profileSaved profileLoaded profileDeleted noSavedProfile".split(" ").map(key=>`message.${key}`),
+  ..."invalidNumber zeroPowerFactor overflow deviceLimit nameRequired peakExceeded gridExceeded exportFailed printFailed profileInvalid storageFailed".split(" ").map(key=>`warning.${key}`),
   ..."summary settings devices profile".split(" ").map(key=>`csv.${key}`),
-  ..."factors schedule profile battery renewables power voltage periods localOnly currency standby editing".split(" ").map(key=>`help.${key}`)
+  ..."factors schedule profile battery renewables power voltage periods localOnly currency standby editing savedProfile profileActions".split(" ").map(key=>`help.${key}`)
 ];
 const placeholders=text=>[...text.matchAll(/\{(\w+)\}/g)].map(match=>match[1]).sort();
 

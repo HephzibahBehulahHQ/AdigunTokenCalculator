@@ -3,6 +3,7 @@ import {LOAD_PRESETS, RENEWABLE_PRESETS} from "../data/loadPresets.js";
 import {calculateLoadSummary} from "../calculators/loadCalculator.js";
 import {MAX_LOAD_DEVICES, normalizeLoadDevice, normalizeLoadSettings, invalidLoadInput} from "../calculators/loadProfile.js";
 import {LOAD_COPY, loadText} from "./loadCalculator-i18n.js";
+import {saveLoadProfile, readLoadProfile, deleteLoadProfile} from "./loadProfileStorage.js";
 
 export const LOAD_TOOL_KEY = "electrical-load";
 const CURRENCIES = ["EUR", "NGN", "USD", "GBP"];
@@ -37,7 +38,7 @@ export function createLoadState() {
   return {
     devices: [], editing: null,
     settings: {...normalizeLoadSettings({tariff:0.3}), currency:"EUR", occupancyEnabled:false, startHour:18, endHour:22},
-    draft: {...LOAD_PRESETS[0], preset:LOAD_PRESETS[0].id, name:"", powerUnit:"W", quantity:1, hoursPerDay:8, dutyCycle:100, seasonalFactor:1}
+    draft: {...LOAD_PRESETS[0], preset:LOAD_PRESETS[0].id, name:null, powerUnit:"W", quantity:1, hoursPerDay:8, dutyCycle:100, seasonalFactor:1}
   };
 }
 let sessionState = createLoadState();
@@ -172,7 +173,14 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
   const exportActions = node("div", undefined, "load-actions");
   const exportButton = button("exportCsv", "export-csv"), printButton = button("print", "print");
   exportActions.append(exportButton, printButton);
-  root.append(node("p", t("message.estimates"), "notice"), node("p", t("help.localOnly"), "load-help"), form, status, invalid, exportActions, results);
+  const profileControls = node("section", undefined, "load-screen-only");
+  const profileActions = node("div", undefined, "load-actions");
+  const saveProfileButton = button("saveProfile", "save-profile");
+  const loadProfileButton = button("loadProfile", "load-profile"), deleteProfileButton = button("deleteProfile", "delete-profile");
+  const profileStatus = node("p", "", "load-help");profileStatus.dataset.profileStatus = "";profileStatus.setAttribute("role", "status");
+  profileActions.append(saveProfileButton, loadProfileButton, deleteProfileButton);
+  profileControls.append(node("p", t("help.savedProfile"), "load-help"), node("p", t("help.profileActions"), "load-help"), profileActions, profileStatus);
+  root.append(node("p", t("message.estimates"), "notice"), node("p", t("help.localOnly"), "load-help"), form, status, invalid, profileControls, exportActions, results);
   container.append(root);
   let timer, disposed = false, current = null;
   let previousUnit = state.draft.powerUnit ?? "W", previousPhase = state.settings.phase ?? "single";
@@ -211,7 +219,7 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     preset.append(group);
   }
   preset.value = state.draft.preset;
-  if (!state.draft.name) state.draft.name = t("preset." + LOAD_PRESETS[0].id);
+  if (state.draft.name === null) state.draft.name = t("preset." + LOAD_PRESETS[0].id);
   makeField(builderFields, controls, "name", state.draft.name, {type:"text", wide:true});
   for (const [key, options] of [
     ["quantity",{integer:true,max:1e6}], ["watts",{}], ["powerUnit",{choices:[["W","W"],["kW","kW"]]}],
@@ -303,7 +311,8 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     status.textContent = t("message." + (editing ? "updated" : "added"));refreshEditing();renderDevices();schedule();
   }
   function editDevice(index) {
-    state.editing = index;state.draft = {...state.devices[index],preset:"custom",powerUnit:"W"};previousUnit = "W";
+    const device = state.devices[index], powerUnit = device.watts > 1e12 ? "kW" : "W";
+    state.editing = index;state.draft = {...device,preset:"custom",powerUnit,watts:device.watts/(powerUnit==="kW"?1000:1)};previousUnit = powerUnit;
     for (const [key, control] of Object.entries(controls)) {control.input.value = state.draft[key] ?? "";setError(control);}
     refreshEditing();controls.name.input.focus();
   }
@@ -384,16 +393,16 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
   function recalculate() {
     clearTimeout(timer);if(disposed||!root.isConnected)return null;
     captureSettings();const settings=readSettings();
-    current=null;exportButton.disabled=true;printButton.disabled=true;
+    current=null;exportButton.disabled=true;printButton.disabled=true;saveProfileButton.disabled=true;
     if(!settings){invalid.hidden=false;invalid.textContent=t("message.invalidResults");results.hidden=true;return null;}
     try{
       const summary=calculateLoadSummary(state.devices,settings);renderResults(summary,settings);
-      results.hidden=false;invalid.hidden=true;exportButton.disabled=false;printButton.disabled=false;
+      results.hidden=false;invalid.hidden=true;exportButton.disabled=false;printButton.disabled=false;saveProfileButton.disabled=false;
       current={summary,settings};status.textContent=t("message.resultsUpdated");return current;
     }catch(error){invalid.hidden=false;invalid.textContent=errorText(error);results.hidden=true;return null;}
   }
   function schedule() {
-    clearTimeout(timer);exportButton.disabled=true;printButton.disabled=true;
+    clearTimeout(timer);exportButton.disabled=true;printButton.disabled=true;saveProfileButton.disabled=true;
     timer=view.setTimeout(recalculate,150);
   }
   preset.addEventListener("change",()=>{
@@ -418,6 +427,40 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     if(globalControls[key]){refreshSchedule();captureSettings();schedule();}
   };
   form.addEventListener("input",changed);form.addEventListener("change",changed);
+  function profileMessage(key) {
+    profileStatus.textContent=t(key);profileStatus.className=key.startsWith("warning.")?"load-error":"load-help";
+  }
+  function profileFailure(error) {
+    profileMessage(error?.code==="profileInvalid"?"warning.profileInvalid":"warning.storageFailed");
+  }
+  saveProfileButton.addEventListener("click",()=>{
+    const result=recalculate();if(!result)return;
+    try{saveLoadProfile(view.localStorage,state.devices,result.settings);profileMessage("message.profileSaved");}
+    catch(error){profileFailure(error);}
+  });
+  loadProfileButton.addEventListener("click",()=>{
+    try{
+      const saved=readLoadProfile(view.localStorage);
+      if(!saved){profileMessage("message.noSavedProfile");return;}
+      // Validate the entire stored profile before replacing current work.
+      const defaults=createLoadState(), schedule=saved.settings.occupancySchedule;
+      state.devices=saved.devices;state.editing=null;
+      state.settings={...defaults.settings,...saved.settings,occupancyEnabled:Boolean(schedule),startHour:schedule?.startHour??18,endHour:schedule?.endHour??22};
+      state.draft={...defaults.draft,name:t("preset."+LOAD_PRESETS[0].id)};
+      for(const [collection,values] of [[globalControls,state.settings],[controls,state.draft]]){
+        for(const [key,control] of Object.entries(collection)){
+          if(control.input.type==="checkbox")control.input.checked=Boolean(values[key]);else control.input.value=values[key]??"";
+          setError(control);
+        }
+      }
+      previousUnit="W";previousPhase=state.settings.phase;
+      refreshSchedule();refreshEditing();renderDevices();recalculate();profileMessage("message.profileLoaded");
+    }catch(error){profileFailure(error);}
+  });
+  deleteProfileButton.addEventListener("click",()=>{
+    try{deleteLoadProfile(view.localStorage);profileMessage("message.profileDeleted");}
+    catch(error){profileFailure(error);}
+  });
   exportButton.addEventListener("click",()=>{
     const result=recalculate();if(!result)return;
     let url;
@@ -433,6 +476,6 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     details.forEach(item=>item.open=true);
     try{view.print();}catch{status.textContent=t("warning.printFailed");}finally{details.forEach((item,index)=>item.open=wasOpen[index]);}
   });
-  refreshSchedule();refreshEditing();renderDevices();recalculate();
+  refreshSchedule();refreshEditing();renderDevices();draftDevice();recalculate();
   return {destroy(){disposed=true;clearTimeout(timer);root.remove();},getSummary(){return current?.summary??null;}};
 }

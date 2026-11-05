@@ -69,9 +69,17 @@ A 100 W device with quantity 2, duty 50%, 6 hours/day, seasonal factor 1.5, stan
 
 CSV downloads include normalized input watts, settings, all summary results, the ranked device breakdown, all 24 hourly values and the assumptions. Numeric cells use decimal dots and up to 15 significant digits; Unicode names/labels use UTF-8. User text beginning with spreadsheet formula markers is escaped. Print/PDF uses the browser print dialog and scoped print CSS, including device inputs, settings, results, chart and profile table.
 
-Input state is retained only in memory while navigating the app or changing language. Reloading clears it. There is no localStorage/sessionStorage persistence; export before leaving.
+Input state stays in memory while navigating the app or changing language. A deliberately blank name remains blank, with its validation warning, until corrected. Reloading starts an empty device list; a saved profile is never loaded automatically.
 
-Tests are additive in `tests/loadCalculator.test.js`, `loadProfile.test.js`, `loadPresets.test.js`, `loadI18n.test.js` and `loadUI.test.js`. They cover formula fixtures, invalid and boundary inputs, signed Q, factor scaling, profile conservation, tiny PF, immutable inputs, all four locales, CSV injection handling, production build, device editing, keyboard activation, debounced validation, print styling, mobile overflow and absence of third-party requests. Browser checks require the already-pinned Playwright Chromium installation. Exact verification/deployment receipts belong in `PROJECT_STATUS.md`.
+### Optional local profile
+
+**Save profile** stores one copy of the added/applied device rows and current valid global settings in this browser's localStorage. It replaces the previous saved copy. Unapplied builder edits, cached results and unrelated metadata are excluded. **Load saved profile** explicitly replaces the current list and settings, restores the preferred-hours window and resets the builder's editing state. **Delete saved profile** removes only this calculator's saved copy; it does not clear the current list or other app data. There is no automatic saving, loading, upload or account.
+
+The UI warns that anyone using the same browser can read the saved copy. Use generic device labels without personal names, addresses or sensitive details. Browser clearing/private-mode policies can remove the saved copy; CSV export is a separate way to retain a report.
+
+The versioned record uses the namespaced key `adigun.electrical-load.profile.v1`. Loading validates the whole record, calculation results, UI ranges and required device names before replacing current work. Corrupt, oversized, incomplete or unsupported records produce a localized warning while preserving the current list and settings. Storage access/quota failures are caught, including browsers whose localStorage getter throws. No sessionStorage is used.
+
+Tests are additive in `tests/loadCalculator.test.js`, `loadProfile.test.js`, `loadPresets.test.js`, `loadI18n.test.js`, `loadStorage.test.js` and `loadUI.test.js`. They cover formula fixtures, invalid and boundary inputs, signed Q, factor scaling, profile conservation, tiny PF and PF correction, immutable inputs, all four locales, CSV injection handling, production build, device editing, keyboard activation, debounced validation, print styling, mobile overflow and absence of third-party requests. Storage tests cover complete round-trips, explicit save/reload/load/delete, invalid records, failed writes, scoped deletion, schedule restoration and preservation of unfinished edits across language changes. Browser checks require the already-pinned Playwright Chromium installation. Verification/deployment checkpoints are in `PROJECT_STATUS.md`; final exact-commit CI and Pages receipts are also recorded in the merged pull request.
 
 ## Formula references
 

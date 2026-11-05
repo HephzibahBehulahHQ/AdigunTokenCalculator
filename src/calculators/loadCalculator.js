@@ -6,8 +6,6 @@ import {
 const sum = values => finite(values.reduce((total, value) => finite(total + value), 0));
 const factor = value => loadNumber(value, "factor", 0, 1);
 const activeW = d => finite(d.watts * d.quantity * (d.dutyCycle / 100));
-// Equivalent to tan(acos(pf)); the product is more stable near unity PF.
-const tangent = pf => pf === 1 ? 0 : Math.sqrt((1 - pf) * (1 + pf)) / pf;
 
 export function instantaneousPowerW(device) { return activeW(normalizeLoadDevice(device)); }
 export function realPowerKW(device, demandFactor = 1) { return finite(instantaneousPowerW(device) / 1000 * factor(demandFactor)); }
@@ -67,7 +65,14 @@ export function powerFactorCorrectionKVAR(kW, pfOld, pfNew) {
   loadNumber(kW, "kW");factor(pfOld);factor(pfNew);
   if (kW === 0) return 0;
   if (pfOld === 0 || pfNew === 0) throw invalidLoadInput("pf", "zeroPowerFactor");
-  return finite(kW * (tangent(pfOld) - tangent(pfNew)));
+  if (pfOld === pfNew) return 0;
+  const reactive = pf => {
+    const sine = Math.sqrt((1 - pf) * (1 + pf)), tangent = sine / pf;
+    // Scale before the otherwise overflowing division for subnormal PF values.
+    // For ordinary PF, multiplying by tangent also preserves large finite Q.
+    return Number.isFinite(tangent) ? kW * tangent : (kW / pf) * sine;
+  };
+  return finite(reactive(pfOld) - reactive(pfNew));
 }
 export function costPerInterval(kWh, tariff) { return finite(loadNumber(kWh, "kWh") * loadNumber(tariff, "tariff")); }
 /** Gross costs: renewable-adjusted costs are explicitly named in the summary. */
