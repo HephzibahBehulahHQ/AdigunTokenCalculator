@@ -1,8 +1,8 @@
 # Next tasks
 
-The current objective, branch, verification state and release receipts are maintained in [PROJECT_STATUS.md](PROJECT_STATUS.md#current-continuation--accessibility-and-release-checks).
+The current objective, branch, verification state and release receipts are maintained in [PROJECT_STATUS.md](PROJECT_STATUS.md#current-continuation--tip-rounding-precision).
 
-1. Review the accessibility/release-check continuation in [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17). Verify its final exact-candidate browser/build receipt, then obtain the explicit merge/deployment authorization required by `AGENTS.md`.
+1. Complete the tip-rounding repair's exact-candidate Chromium/build verification, then its authorized merge and deployment. [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17) is already merged and deployed.
 2. **Human locale review:** Fluent speakers review German, Yoruba and Nigerian Pidgin labels, dynamic results, navigation/action descriptions and health/safety notices.
 3. **Human accessibility review:** Complete the outstanding human checklist in [TEST_PLAN.md](TEST_PLAN.md), including assistive technology, complete keyboard workflows, target devices, browser zoom and visual contrast. Automated checks are recorded separately.
 4. **Owner licence decision:** Select and authorize a project-wide licence before adding a root `LICENSE`. Dependency notices are complete and published separately.

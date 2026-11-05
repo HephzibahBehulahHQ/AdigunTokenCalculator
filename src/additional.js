@@ -59,11 +59,35 @@ export function inflationValue(amount,fromYear,toYear,annualRate) {
   if(!finite(amount)||!Number.isInteger(fromYear)||!Number.isInteger(toYear)||fromYear<1800||fromYear>2200||toYear<1800||toYear>2200||!finite(annualRate)||annualRate<=-100||annualRate>1000) throw Error("number");
   return amount*Math.pow(1+annualRate/100,toYear-fromYear);
 }
+// Treat a validated Number's decimal spelling exactly, including exponent notation.
+// Keeping these ratios as integers avoids binary residues at cent boundaries.
+function decimalFraction(value) {
+  const [coefficient,exponent="0"]=String(value).split("e");
+  const decimals=coefficient.split(".")[1]?.length||0;
+  const numerator=BigInt(coefficient.replace(".","")),scale=decimals-Number(exponent);
+  return scale>0?[numerator,10n**BigInt(scale)]:[numerator*10n**BigInt(-scale),1n];
+}
+// All money denominators below are powers of ten, so decimal parsing avoids
+// separately converting large integer numerators/denominators to Infinity.
+const decimalAmount=(numerator,denominator)=>Number(`${numerator}e-${String(denominator).length-1}`);
+
 export function splitTip(bill,tipRate,taxRate,people,tipBasis="subtotal",rounding="nearest") {
   bill=Number(bill);tipRate=Number(tipRate);taxRate=Number(taxRate);people=Number(people);
   if(!finite(bill)||bill<0||!finite(tipRate)||tipRate<0||tipRate>100||!finite(taxRate)||taxRate<0||taxRate>100||!Number.isInteger(people)||people<1||people>10000||!["subtotal","with-tax"].includes(tipBasis)||!["nearest","up","down"].includes(rounding)) throw Error("number");
-  const tax=bill*taxRate/100,tip=(bill+(tipBasis==="with-tax"?tax:0))*tipRate/100,total=bill+tax+tip,raw=total/people;
-  const perPerson=(rounding==="up"?Math.ceil(raw*100):rounding==="down"?Math.floor(raw*100):Math.round(raw*100))/100;
+  const [billN,billD]=decimalFraction(bill),[tipN,tipD]=decimalFraction(tipRate),[taxN,taxD]=decimalFraction(taxRate);
+  const tipPercentD=tipD*100n,taxPercentD=taxD*100n,taxedMultiplier=taxPercentD+taxN;
+  const denominator=billD*taxPercentD*tipPercentD;
+  const tipNumerator=billN*(tipBasis==="with-tax"?taxedMultiplier:taxPercentD)*tipN;
+  const totalNumerator=billN*taxedMultiplier*tipPercentD+tipNumerator;
+  const centsNumerator=totalNumerator*100n,shareDenominator=denominator*BigInt(people);
+  const wholeCents=centsNumerator/shareDenominator,remainder=centsNumerator%shareDenominator;
+  const increment=rounding==="up"?remainder>0n:rounding==="nearest"&&remainder*2n>=shareDenominator;
+  const roundedCents=wholeCents+(increment?1n:0n);
+  const tax=decimalAmount(billN*taxN,billD*taxPercentD),tip=decimalAmount(tipNumerator,denominator);
+  const total=decimalAmount(totalNumerator,denominator),perPerson=decimalAmount(roundedCents,100n);
+  if(![tax,tip,total,perPerson].every(Number.isFinite))throw Error("number");
+  const [shareN,shareD]=decimalFraction(perPerson);
+  if(shareN*100n!==roundedCents*shareD)throw Error("number");
   return {subtotal:bill,tax,tip,total,perPerson,people};
 }
 export function calorieTargets(weightKg,heightCm,age,sex,activity,proteinPct=25,carbPct=45,fatPct=30) {

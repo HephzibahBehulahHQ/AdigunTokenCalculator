@@ -5,6 +5,10 @@ Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. See the current r
 
 Unit coverage includes Unicode text statistics; age/date-only calendar arithmetic; arithmetic, percentages, temperature limits, BMI metric/imperial; Qibla bearing and compass validation; zero-rate loans; GPA and percentage averages; metric and imperial fuel; unit conversion; Zakat; practice projections; named demographic shares; sleep rollover; scientific operations; calculator memory; annual countdowns; population estimate baseline; four-locale tool catalogues, fields, options and results; tokenizer whitespace, newlines, emoji, non-Latin text, special-token literals, token IDs and UTF-8 reconstruction.
 
+## Tip rounding regressions
+
+`tests/tip.test.js` checks exact cents, half-cent ties, all three rounding modes, real values just above/below boundaries, exponent notation, fractional tip/tax rates, both tip bases, zero and invalid party sizes, and unrepresentable results. The browser suite exercises these rounding controls and localized results in EN/DE/YO/PCM, plus range-error recovery and reset. Test presence is not an execution receipt; see the current status and continuation PR for observed results.
+
 ## Manual release checklist
 - [ ] Open all 39 tools and submit valid and invalid examples (automated unit coverage is separate).
 - [ ] Keyboard-only directory navigation, form submission, reset and memory controls.
