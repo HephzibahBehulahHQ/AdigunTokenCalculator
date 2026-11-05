@@ -1,9 +1,8 @@
 # Next tasks
 
-The single current execution state is [PROJECT_STATUS.md](PROJECT_STATUS.md). [SPEC_COMPLIANCE.md](SPEC_COMPLIANCE.md) maps the full master prompt to implementation and acceptance evidence.
+The current scope is [PROJECT_STATUS.md](PROJECT_STATUS.md); [SPEC_COMPLIANCE.md](SPEC_COMPLIANCE.md) maps the full specification to implementation and evidence. The identified technical gaps are implemented in [PR #19](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/19).
 
-1. Complete and verify the technical gaps identified by the full-specification audit; preserve all 39 existing tools and the approved branding/privacy architecture.
-2. Run full exact-candidate Chromium/build gates, merge under standing authorization, verify the exact main/deployed revision and record the final receipt.
-3. Obtain human fluent-speaker and assistive-technology/target-device reviews and the owner's explicit project licence choice. Automated checks do not replace those decisions/reviews.
-
-PR #18 is already merged and deployed. Do not repeat that release or infer full specification completion from its passing tests.
+1. Read PR #19's latest verification receipt before resuming. Complete any candidate/main/Pages/live gate that its receipt still marks pending; do not repeat an already verified release or treat a historical test total as evidence for new code.
+2. Obtain human accessibility/assistive-technology and target-browser review, plus fluent-speaker review of German, Yoruba and Nigerian Pidgin and sensitive notices described in the manual/source checklists. Fix concrete findings in a scoped, tested follow-up.
+3. Obtain the owner's explicit project-wide licence choice before adding a root `LICENSE`. Third-party notices are separate from that decision.
+4. Maintain dated sources, dependencies and the full regression suite. Features beyond the approved specification require their own scope; do not invent missing requirements from optional examples.

@@ -1,15 +1,14 @@
 # Project status — AdigunTokenCalculator
 
-## Current continuation — complete master-prompt coverage
+## Master-prompt completion
 
-- Objective: audit and complete every technical requirement in [MASTER_PROMPT.md](../MASTER_PROMPT.md), including the additional 20 tools. The full [requirement-to-evidence checklist](SPEC_COMPLIANCE.md) records each acceptance item; tool count is not a completion claim.
-- Base: verified deployed main `1ea5f1ad3519c32e609087725087a1d2a7d226bc`, [PR #18](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/18). Exact-main CI passed 242 tests without skips, production build and Pages deployment passed, and live rounding/assets were verified.
-- Branch: `codex/master-prompt-completion`; latest verified remote starting point is the base above. The owner has instructed completion of the full specification; standing merge/deployment authorization remains in effect after required gates.
-- Stage: requirement audit completed; confirmed numerical, UI-explanation, water/time-zone, tokenizer API, offline, release-gate and documentation gaps are being repaired. The new work is not yet release-verified.
-- Current verification: baseline receipts above apply only to the deployed base. Focused and full-candidate results will be recorded in the continuation PR; unrun checks remain NOT TESTED.
-- Next: complete the audited gaps, verify focused regressions and the full browser/build gates, then verify the exact merged revision and deployed behavior.
-- Remaining human/owner dependencies: fluent locale review, human accessibility/target-device review and explicit project licence selection. These are not silently marked complete.
+- Scope: all original 18 calculators, the 20-tool addendum and shared implementation/documentation requirements in [MASTER_PROMPT.md](../MASTER_PROMPT.md). The owner-authorized electrical-load tool is preserved, bringing the application to 39 tools.
+- Implementation: the full requirement audit's identified technical gaps are implemented. [SPEC_COMPLIANCE.md](SPEC_COMPLIANCE.md) maps each requirement to code, tests and deliberate scope limits. Source coverage and release verification are separate gates.
+- Current continuation: [PR #19](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/19), branch `codex/master-prompt-completion`. The PR is the authoritative receipt for its exact candidate, full Chromium/build outcome, merged revision, Pages deployment and live asset/behavior checks. A local pass with skipped browser checks does not establish full verification.
+- Release rule: merge under the owner's standing authorization only after the exact candidate passes the full gate. Pages independently requires Chromium, tests and build before publication. Verify the actual deployed revision; do not infer publication from a passing pull-request test.
+- Human/owner work remains: assistive-technology/accessibility and target-browser review; fluent-speaker review of German, Yoruba and Nigerian Pidgin, including sensitive explanatory content; the owner's project-wide licence choice. Manual and source/content review notes remain explicit in [TEST_PLAN.md](TEST_PLAN.md) and [SOURCES.md](../SOURCES.md).
+- Previous verified deployment: main `1ea5f1ad3519c32e609087725087a1d2a7d226bc`, [PR #18](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/18). Its 242 passing tests and deployment receipts verify that earlier tip-rounding release only.
 
 ## Historical records
 
-Earlier checkpoints are preserved in [PROJECT_HISTORY.md](archive/PROJECT_HISTORY.md). They are historical snapshots and do not override the current state or later PR release receipts.
+Earlier checkpoints are preserved in [PROJECT_HISTORY.md](archive/PROJECT_HISTORY.md). They are historical snapshots and do not override later release receipts.

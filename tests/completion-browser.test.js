@@ -23,7 +23,7 @@ test("completion controls, explanations, exact totals and responsive workflows w
   page.on("pageerror",error=>pageErrors.push(error.message));
   await page.addInitScript(()=>{window.__geoCalls=0;Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(){window.__geoCalls++;}}});window.__copied=[];Object.defineProperty(navigator,"clipboard",{configurable:true,value:{async writeText(text){window.__copied.push(text);}}});});
   await page.goto(origin+"/AdigunTokenCalculator/#/water");
-  const open=async key=>{await page.evaluate(value=>{location.hash="#/"+value;},key);await page.waitForFunction(value=>document.querySelector("#panel")?.dataset.toolKey===value,key);};
+  const open=async key=>{await page.evaluate(value=>{location.hash="#/"+value;},key);await page.waitForFunction(value=>value?document.querySelector("#panel")?.dataset.toolKey===value:document.querySelector("#panel")?.hidden&&!document.querySelector("aside")?.hidden,key);};
   const fill=async values=>{for(const [name,value] of Object.entries(values))await page.locator('[name="'+name+'"]').fill(String(value));};
   const calculate=async()=>{await page.locator('#panel button[type="submit"]').click();await page.locator("#panel .result").waitFor({timeout:30000});await page.waitForFunction(()=>document.querySelector("#panel form")?.getAttribute("aria-busy")==="false");};
   const rows=()=>page.locator(".result-row").evaluateAll(nodes=>Object.fromEntries(nodes.map(node=>[node.firstElementChild.textContent,node.lastElementChild.textContent])));
@@ -77,7 +77,7 @@ test("completion controls, explanations, exact totals and responsive workflows w
   });
 
   await t.test("large token results paginate while full copy preserves every token and code point",async()=>{
-   await open("token");const source="Hello, world! Yorùbá 😊\n".repeat(900);await fill({text:source});await calculate();
+   await open("token");await page.locator('[name="encoding"]').selectOption("cl100k_base");const source="Hello, world! Yorùbá 😊\n".repeat(900);await fill({text:source});await calculate();
    assert.equal((await rows())[COMPLETION_COPY.en.encoding],"cl100k_base");assert.equal(await page.locator(".piece").count(),2000);assert.ok(await page.locator(".token-preview").isVisible());
    await page.getByRole("button",{name:COMPLETION_COPY.en.next,exact:true}).click();assert.match(await page.locator(".token-preview").innerText(),/2001–4000/);
    await page.getByRole("button",{name:"Copy reconstructed text",exact:true}).click();assert.equal(await page.evaluate(()=>window.__copied.at(-1)),source);
