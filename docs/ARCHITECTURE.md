@@ -31,3 +31,7 @@ Production output is `dist/`; GitHub Actions deploys only that directory after t
 - Password generation uses `crypto.getRandomValues`. Checking strength explicitly imports a separate local `zxcvbn@4.4.2` chunk; the model is not loaded for viewing the tool or generating a password. The wrapper accepts up to 128 Unicode code points and returns only score/pattern metadata; inputs are never persisted or transmitted. Hashes use `crypto.subtle.digest` for SHA-1/SHA-256 and a local MD5 compatibility implementation.
 - QR code generation is bundled with `qrcode-generator` and creates a local data URL for preview/download.
 - Hashing reads an explicitly selected file fully into memory (25 MB limit) or text. No file contents are transmitted.
+
+## Interaction state
+
+`src/bac-gate.js` uses a native modal dialog to gate the educational BAC form. `src/form-errors.js` maps confirmed validation failures to inputs and manages ARIA description links without overwriting existing help IDs; ambiguous/runtime failures remain form-level. Editing input invalidates pending calculation requests so stale errors cannot attach to newer values. Form replacement on reset, routing or language change discards the previous UI state. The shared formatter in `src/format.js` offers an explicit scientific fallback for nonzero values that would otherwise round to zero.

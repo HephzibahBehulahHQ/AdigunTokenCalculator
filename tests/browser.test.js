@@ -7,6 +7,7 @@ import {setTimeout as delay} from "node:timers/promises";
 import {chromium} from "playwright-core";
 import {RESULT_COPY,RESULT_LABELS,resultText} from "../src/result-i18n.js";
 import "../src/feature-i18n.js";
+import {I} from "../src/i18n.js";
 
 const browserAvailable=existsSync(chromium.executablePath());
 
@@ -56,9 +57,15 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     await page.locator('.tool-card[data-tool-key="bac"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="Blood alcohol estimate (educational)");
+    await page.locator("dialog.bac-dialog[open]").waitFor();
+    assert.equal(await page.locator('[data-bac-action="continue"]').isDisabled(),true);
+    assert.equal(await page.locator("#panel form").isVisible(),false);
+    await page.locator('dialog input[name="acknowledge"]').check();
+    await page.locator('[data-bac-action="continue"]').click();
     await page.locator('input[name="weightKg"]').fill("70");
     await page.locator('input[name="drinks"]').fill("2");
     const bacForm=page.locator("#panel form");
+    await page.locator('input[name="acknowledge"]').uncheck();
     assert.equal(await bacForm.evaluate(f=>f.checkValidity()),false,"BAC consent must be required before calculation");
     await page.locator('input[name="acknowledge"]').check();
     assert.equal(await bacForm.evaluate(f=>f.checkValidity()),true);
@@ -79,7 +86,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       else assert.equal(await page.locator("#panel form").count(),1,card.key+" should render a form");
       const width=await page.evaluate(()=>({viewport:document.documentElement.clientWidth,content:document.documentElement.scrollWidth}));
       assert.ok(width.content<=width.viewport,card.key+" panel overflows mobile viewport: "+JSON.stringify(width));
-      await page.locator(".back-directory").click();
+      if(card.key==="bac"){
+        assert.equal(await page.locator("dialog.bac-dialog[open]").count(),1);
+        await page.locator('[data-bac-action="cancel"]').click();
+      }else await page.locator(".back-directory").click();
       await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     }
     await page.setViewportSize({width:375,height:812});
@@ -315,6 +325,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         await page.locator('input[name="fromServings"]').fill("2");await page.locator('input[name="toServings"]').fill("4");
         await page.locator('select[name="recipeUnits"]').selectOption("small");await calculate();
         assert.deepEqual(Object.values(await resultRows()),["3000 g flour\n500 mL milk\n4 tsp salt"]);
+        assert.equal(await page.locator(".result-row strong").innerText(),"3000 g flour\n500 mL milk\n4 tsp salt");
         assert.ok((await page.locator(".result").innerText()).includes(resultText(locale,"recipeUnitsNotice")));
         await page.locator('textarea[name="text"]').fill("750 g flour\n250 mL milk");
         await page.locator('select[name="recipeUnits"]').selectOption("large");await calculate();
@@ -349,6 +360,70 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         assert.ok(Object.values(rows).includes(createHash(nodeAlgorithm).update("").digest("hex")));
         assert.equal(rows[RESULT_LABELS.en.Input],"empty.txt");
       }
+    });
+
+    await t.test("custom validation errors identify relevant inputs and clear on correction",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);await openTool("json");
+        await page.locator('textarea[name="text"]').fill('{"x":}');await calculate();
+        const text=page.locator('textarea[name="text"]');
+        assert.equal(await text.getAttribute("aria-invalid"),"true");
+        let id=await text.getAttribute("aria-describedby");assert.ok(id);
+        assert.equal(await page.locator("#"+id).count(),1);
+        assert.equal(await page.evaluate(()=>document.activeElement.name),"text");
+        assert.equal(await page.locator('select[name="mode"]').getAttribute("aria-invalid"),null);
+        await text.fill('{"x":1}');assert.equal(await text.getAttribute("aria-invalid"),null);
+        assert.equal(await page.locator(".result-error").count(),0);
+        await openTool("gpa");await page.locator('textarea[name="grades"]').fill("Z,3");await calculate();
+        assert.equal(await page.locator('textarea[name="grades"]').getAttribute("aria-invalid"),"true");
+        await page.locator('select[name="mode"]').selectOption("percentage");
+        assert.equal(await page.locator('textarea[name="grades"]').getAttribute("aria-invalid"),null);
+        assert.equal(await page.locator(".result-error").count(),0);
+        await openTool("percent");await page.locator('select[name="mode"]').selectOption("as");
+        await page.locator('input[name="a"]').fill("20");await page.locator('input[name="b"]').fill("0");
+        await page.evaluate(()=>{const b=document.querySelector('input[name="b"]'),help=document.createElement("p");help.id="existing-help";help.textContent="Existing help";b.after(help);b.setAttribute("aria-describedby",help.id);});
+        await calculate();const b=page.locator('input[name="b"]');
+        assert.equal(await b.getAttribute("aria-invalid"),"true");
+        assert.equal(await page.locator('input[name="a"]').getAttribute("aria-invalid"),null);
+        assert.ok((await b.getAttribute("aria-describedby")).split(/\s+/).includes("existing-help"));
+        assert.equal(await page.evaluate(()=>document.activeElement.name),"b");
+        await page.locator('input[name="a"]').fill("30");assert.equal(await b.getAttribute("aria-invalid"),"true");
+        await b.fill("2");assert.equal(await b.getAttribute("aria-invalid"),null);
+        assert.equal(await b.getAttribute("aria-describedby"),"existing-help");
+        assert.equal(await page.locator(".result-error").count(),0);
+        await page.locator('select[name="mode"]').selectOption("change");
+        await page.locator('input[name="a"]').fill("0");await calculate();
+        assert.equal(await page.locator('input[name="a"]').getAttribute("aria-invalid"),"true");
+        assert.equal(await b.getAttribute("aria-invalid"),null);await reset();
+        assert.equal(await page.locator('[aria-invalid="true"]').count(),0);
+      }
+      await page.locator("#language").selectOption("en");await openTool("age");
+      await page.locator('input[name="birth"]').fill("2099-01-01");await calculate();
+      assert.equal(await page.locator('input[name="birth"]').getAttribute("aria-invalid"),"true");
+      await openTool("math");assert.equal(await page.locator('[aria-invalid="true"]').count(),0);
+      await page.locator('select[name="op"]').selectOption("sqrt");
+      assert.equal(await page.locator('input[name="b"]').isDisabled(),true);
+      await openTool("dates");await page.locator('select[name="mode"]').selectOption("annual");
+      assert.equal(await page.locator('input[name="start"]').isDisabled(),true);
+    });
+    await t.test("editing cancels pending errors and unexpected failures stay form-level",async()=>{
+      await openTool("hash");
+      await page.evaluate(()=>{const original=crypto.subtle.digest.bind(crypto.subtle);window.__restoreErrorDigest=()=>{crypto.subtle.digest=original;};window.__errorRejectors=[];crypto.subtle.digest=()=>new Promise((resolve,reject)=>window.__errorRejectors.push(reject));});
+      try{
+        await page.locator('textarea[name="text"]').fill("before editing");
+        await page.locator('button[type="submit"]').click();await page.waitForFunction(()=>window.__errorRejectors.length===1);
+        await page.locator('textarea[name="text"]').fill("after editing");
+        await page.evaluate(()=>window.__errorRejectors[0](new Error("unavailable")));
+        assert.equal(await page.locator(".result-error").count(),0);
+        await page.locator('button[type="submit"]').click();await page.waitForFunction(()=>window.__errorRejectors.length===2);
+        await page.evaluate(()=>window.__errorRejectors[1](new Error("unavailable")));
+        await page.locator(".result-error").waitFor();
+        assert.equal(await page.locator('[aria-invalid="true"]').count(),0);
+        const id=await page.locator('#panel form').getAttribute("aria-describedby");assert.ok(id);assert.equal(await page.locator("#"+id).count(),1);
+        await page.locator('textarea[name="text"]').fill("corrected");
+        assert.equal(await page.locator(".result-error").count(),0);
+        assert.equal(await page.locator('#panel form').getAttribute("aria-describedby"),null);
+      }finally{await page.evaluate(()=>window.__restoreErrorDigest());}
     });
 
     await t.test("small unit results remain nonzero and localized",async()=>{
@@ -471,6 +546,75 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       assert.equal(await page.locator('input[name="length"]').isDisabled(),false);
       assert.equal(await page.locator(".result").count(),0);
       await page.locator("#language").selectOption("en");
+    });
+    await t.test("BAC modal requires fresh educational consent and supports four-locale cancellation and focus",async()=>{
+      const dialog=page.locator("dialog.bac-dialog"),form=page.locator("#panel form");
+      const accept=page.locator('[data-bac-action="continue"]'),cancel=page.locator('[data-bac-action="cancel"]');
+      const assertDirectory=async()=>{
+        await page.waitForFunction(()=>!document.querySelector("aside").hidden);
+        assert.equal(await dialog.count(),0);
+        assert.equal(await page.evaluate(()=>document.activeElement?.dataset.toolKey),"bac");
+      };
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        await openTool("bac");await dialog.waitFor();
+        assert.equal(await dialog.getAttribute("open"),"");
+        assert.equal(await page.locator("#bac-gate-title").innerText(),RESULT_COPY[locale].bacDialogTitle);
+        assert.equal(await accept.innerText(),RESULT_COPY[locale].bacDialogContinue);
+        assert.equal(await cancel.innerText(),RESULT_COPY[locale].bacDialogCancel);
+        assert.equal(await dialog.locator(".warning-text").innerText(),I[locale].bacConsentWarning);
+        assert.ok((await dialog.locator(".consent-label").innerText()).includes(I[locale].bacConsent));
+        assert.equal(await dialog.getAttribute("aria-labelledby"),"bac-gate-title");
+        assert.equal(await dialog.getAttribute("aria-describedby"),"bac-gate-warning");
+        assert.equal(await page.evaluate(()=>document.activeElement?.id),"bac-gate-title");
+        assert.equal(await form.isVisible(),false);
+        assert.equal(await form.getAttribute("data-bac-approved"),"false");
+        assert.equal(await accept.isDisabled(),true);
+        assert.equal(await dialog.locator('input[name="acknowledge"]').isChecked(),false);
+        assert.equal(await dialog.locator('input[name="acknowledge"]').evaluate(input=>input.required),true);
+        await form.evaluate(node=>node.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true})));
+        assert.equal(await page.locator(".result").count(),0,"pre-consent submission must not calculate");
+        if(locale==="en"){
+          for(const key of ["Tab","Tab","Tab","Shift+Tab","Shift+Tab"]){
+            await page.keyboard.press(key);
+            assert.equal(await dialog.evaluate(node=>node.contains(document.activeElement)),true,"keyboard focus stays inside modal");
+          }
+        }
+        await cancel.click();await assertDirectory();
+
+        await openTool("bac");await dialog.waitFor();
+        await page.keyboard.press("Escape");await assertDirectory();
+
+        await openTool("bac");await dialog.waitFor();
+        await dialog.locator('input[name="acknowledge"]').check();
+        assert.equal(await accept.isEnabled(),true);
+        await accept.click();
+        assert.equal(await dialog.count(),0);
+        assert.equal(await form.isVisible(),true);
+        assert.equal(await form.getAttribute("data-bac-approved"),"true");
+        assert.equal(await page.evaluate(()=>document.activeElement?.name),"weightKg");
+        assert.equal(await form.locator('input[name="acknowledge"]').count(),1);
+        assert.equal(await form.locator('input[name="acknowledge"]').isChecked(),true);
+        await form.locator('input[name="weightKg"]').fill("70");
+        await form.locator('input[name="drinks"]').fill("2");
+        await form.locator('input[name="acknowledge"]').uncheck();
+        assert.equal(await form.evaluate(node=>node.checkValidity()),false);
+        await form.locator('input[name="acknowledge"]').check();
+        await calculate();
+        assert.ok((await page.locator(".result").innerText()).includes(I[locale].notices.bac));
+        assert.equal(await form.locator(".warning-text").isVisible(),true);
+        await reset();await dialog.waitFor();
+        assert.equal(await dialog.locator('input[name="acknowledge"]').isChecked(),false);
+        assert.equal(await accept.isDisabled(),true);
+        assert.equal(await page.locator(".result").count(),0);
+        assert.equal(await page.evaluate(()=>document.activeElement?.id),"bac-gate-title");
+        await cancel.click();await assertDirectory();
+      }
+      await page.locator("#language").selectOption("en");
+      await page.goto("http://127.0.0.1:4173/#/bac");
+      await dialog.waitFor();
+      assert.equal(await accept.isDisabled(),true,"direct links require fresh consent");
+      await page.keyboard.press("Escape");await assertDirectory();
     });
     await t.test("malformed and unknown fragments recover to the directory",async()=>{
       for(const hash of ["#/%","#/%E0%A4%A","#/missing"]){
