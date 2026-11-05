@@ -53,3 +53,18 @@ The current release PR is the authoritative exact-candidate verification receipt
 - Demographic shares are dated editable aggregates, not individual beliefs.
 
 No full production/accessibility certification is claimed while human review remains open.
+
+## Electrical load calculator — current checkpoint
+
+- Objective: add the owner's browser-only electrical load tool, keeping all existing calculators, shared utilities and tests unchanged.
+- Branch: `codex/electrical-load-calculator`; base/last observed remote main: `2af80960933250c6bc8b2a03f020d44ad5e9dc1f`.
+- Stage: 24-hour profile and validation implemented. `npm test -- tests/loadProfile.test.js`: 7 passed, 0 failed.
+- Baseline: `npm test` passed 106 tests, failed 0, skipped 1 browser test. Local Chromium installation failed at the network download; browser behavior is NOT TESTED locally.
+- Scope gate: connecting the tool requires additions to `src/main.js` and updates to the existing browser test's fixed 38-tool assertions. The owner's instruction requires approval before those existing shared/test files change. Complete the new modules and prepare the exact patch first.
+- Next bounded action: specify and implement the isolated electrical calculation engine, then test/checkpoint.
+- Synchronization: shell push lacked credentials; use the authorized GitHub connector for commit/ref writes with expected-head checks. First verified connector checkpoint pending. Preserve this section as the single current checkpoint; earlier continuation notes above describe the pre-feature release.
+
+| Step | File | Observed verification | Next |
+| --- | --- | --- | --- |
+| 1 | `tests/loadProfile.test.js` | Expected red: missing implementation | Implement profile and input validation |
+| 2 | `src/calculators/loadProfile.js` | 7 profile tests passed | Specify calculation engine |
