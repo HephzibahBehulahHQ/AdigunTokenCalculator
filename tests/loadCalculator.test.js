@@ -115,3 +115,11 @@ test("load engine: repeated calculations do not mutate inputs",()=>{
   assert.deepEqual(c.calculateLoadSummary(devices,settings),c.calculateLoadSummary(devices,settings));
   assert.equal(devices[0].quantity,2);assert.deepEqual(settings,{households:2});
 });
+
+test("load engine: full-day factor is bounded and tiny positive PF avoids intermediate overflow",()=>{
+  const full=[{watts:7/17,hoursPerDay:24,pf:1}];
+  assert.equal(c.loadFactor(full),1);assert.equal(c.calculateLoadSummary(full).loadFactor,1);
+  const tiny={watts:1e-200,pf:1e-310};
+  near(c.reactivePowerKVAR(tiny),c.apparentPowerKVA(tiny));
+  for(const fn of [c.totalDailyConsumptionKWh,c.totalConnectedLoadKW,c.calculateLoadSummary])assert.throws(()=>fn(new Array(1)),{name:"RangeError"});
+});

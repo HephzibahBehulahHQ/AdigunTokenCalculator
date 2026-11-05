@@ -77,3 +77,8 @@ No full production/accessibility certification is claimed while human review rem
 | 9 | `tests/loadI18n.test.js` | Expected red for newly requested CSV/status/export-failure keys | Supply those four-locale keys |
 | 10 | `src/tools/loadCalculator-i18n.js` | 5 localization tests passed including CSV/status/export-failure keys | Add editable CO₂ assumption notice |
 | 11 | `src/tools/loadCalculator-i18n.js` | 5 localization tests passed; illustrative CO₂ default explained in four locales | Implement isolated UI with these translation keys |
+| 12 | `tests/loadProfile.test.js` | New null/sparse-array regression fails as expected | Reject malformed explicit values |
+| 13 | `src/calculators/loadProfile.js` | First validation fix still failed: remaining null default identified | Repair remaining default then rerun |
+| 14 | `src/calculators/loadProfile.js` | All 8 profile tests passed after remaining CO2 null default fix | Align power/factor numerical boundaries |
+| 15 | `tests/loadCalculator.test.js` | New full-day factor regression fails as expected | Fix roundoff and tiny PF evaluation |
+| 16 | `src/calculators/loadCalculator.js` | 22 engine/profile tests passed after numerical fixes | Build UI and interaction checks |

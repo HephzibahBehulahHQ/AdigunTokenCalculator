@@ -1,5 +1,6 @@
 /** Hourly average kW, not measured instantaneous peaks. All computation is local. */
 export const MAX_LOAD_DEVICES = 500;
+const supplied = (value, fallback) => value === undefined ? fallback : value;
 
 export function invalidLoadInput(field, code = "invalidNumber") {
   const error = new RangeError(`${code}: ${field}`);
@@ -23,27 +24,27 @@ export function finiteLoadResult(value) {
 /** watts is the entered rating; powerUnit may be W or kW. Output is canonical W. */
 export function normalizeLoadDevice(device) {
   if (!device || typeof device !== "object" || Array.isArray(device)) throw invalidLoadInput("device");
-  const unit = device.powerUnit ?? "W";
+  const unit = supplied(device.powerUnit, "W");
   if (!["W", "kW"].includes(unit)) throw invalidLoadInput("powerUnit");
-  const watts = finiteLoadResult(loadNumber(device.watts ?? 0, "watts") * (unit === "kW" ? 1000 : 1));
-  const quantity = loadNumber(device.quantity ?? 1, "quantity", 0, Number.MAX_SAFE_INTEGER, true);
-  const hoursPerDay = loadNumber(device.hoursPerDay ?? 0, "hoursPerDay", 0, 24);
-  const dutyCycle = loadNumber(device.dutyCycle ?? 100, "dutyCycle", 0, 100);
-  const standbyW = loadNumber(device.standbyW ?? 0, "standbyW");
-  const seasonalFactor = loadNumber(device.seasonalFactor ?? 1, "seasonalFactor");
-  const pf = loadNumber(device.pf ?? 1, "pf", 0, 1);
-  const type = device.type ?? "resistive";
+  const watts = finiteLoadResult(loadNumber(supplied(device.watts, 0), "watts") * (unit === "kW" ? 1000 : 1));
+  const quantity = loadNumber(supplied(device.quantity, 1), "quantity", 0, Number.MAX_SAFE_INTEGER, true);
+  const hoursPerDay = loadNumber(supplied(device.hoursPerDay, 0), "hoursPerDay", 0, 24);
+  const dutyCycle = loadNumber(supplied(device.dutyCycle, 100), "dutyCycle", 0, 100);
+  const standbyW = loadNumber(supplied(device.standbyW, 0), "standbyW");
+  const seasonalFactor = loadNumber(supplied(device.seasonalFactor, 1), "seasonalFactor");
+  const pf = loadNumber(supplied(device.pf, 1), "pf", 0, 1);
+  const type = supplied(device.type, "resistive");
   if (!["resistive", "inductive", "capacitive"].includes(type)) throw invalidLoadInput("type");
   const activeW = finiteLoadResult(watts * quantity * (dutyCycle / 100));
   if (pf === 0 && activeW > 0) throw invalidLoadInput("pf", "zeroPowerFactor");
   finiteLoadResult(standbyW * quantity);
   if (device.name !== undefined && (typeof device.name !== "string" || device.name.length > 120)) throw invalidLoadInput("name");
-  return {name: device.name ?? "", watts, powerUnit: "W", quantity, hoursPerDay, dutyCycle, standbyW, seasonalFactor, pf, type};
+  return {name: supplied(device.name, ""), watts, powerUnit: "W", quantity, hoursPerDay, dutyCycle, standbyW, seasonalFactor, pf, type};
 }
 
 export function normalizeLoadDevices(devices) {
   if (!Array.isArray(devices) || devices.length > MAX_LOAD_DEVICES) throw invalidLoadInput("devices", "deviceLimit");
-  return devices.map(normalizeLoadDevice);
+  return Array.from(devices, normalizeLoadDevice);
 }
 
 export function normalizeOccupancySchedule(schedule) {
@@ -57,24 +58,24 @@ export function normalizeOccupancySchedule(schedule) {
 
 export function normalizeLoadSettings(settings = {}) {
   if (!settings || typeof settings !== "object" || Array.isArray(settings)) throw invalidLoadInput("settings");
-  const phase = settings.phase ?? "single";
+  const phase = supplied(settings.phase, "single");
   if (!["single", "three"].includes(phase)) throw invalidLoadInput("phase");
-  const voltage = loadNumber(settings.voltage ?? (phase === "three" ? 400 : 230), "voltage", Number.MIN_VALUE);
-  const measurementInterval = settings.measurementInterval ?? "minute";
+  const voltage = loadNumber(supplied(settings.voltage, phase === "three" ? 400 : 230), "voltage", Number.MIN_VALUE);
+  const measurementInterval = supplied(settings.measurementInterval, "minute");
   if (!["second", "minute"].includes(measurementInterval)) throw invalidLoadInput("measurementInterval");
   const optional = field => settings[field] === undefined || settings[field] === null ? null : loadNumber(settings[field], field);
   return {
     phase, voltage, measurementInterval,
-    households: loadNumber(settings.households ?? 1, "households", 0, Number.MAX_SAFE_INTEGER, true),
-    diversityFactor: loadNumber(settings.diversityFactor ?? 1, "diversityFactor", 0, 1),
-    demandFactor: loadNumber(settings.demandFactor ?? 1, "demandFactor", 0, 1),
-    growthMargin: loadNumber(settings.growthMargin ?? 0, "growthMargin"),
-    tariff: loadNumber(settings.tariff ?? 0, "tariff"),
-    co2Factor: loadNumber(settings.co2Factor ?? 0.4, "co2Factor"),
-    renewableOffsetKWh: loadNumber(settings.renewableOffsetKWh ?? 0, "renewableOffsetKWh"),
-    solarKWh: loadNumber(settings.solarKWh ?? 0, "solarKWh"),
-    windKWh: loadNumber(settings.windKWh ?? 0, "windKWh"),
-    batteryKWh: loadNumber(settings.batteryKWh ?? 0, "batteryKWh"),
+    households: loadNumber(supplied(settings.households, 1), "households", 0, Number.MAX_SAFE_INTEGER, true),
+    diversityFactor: loadNumber(supplied(settings.diversityFactor, 1), "diversityFactor", 0, 1),
+    demandFactor: loadNumber(supplied(settings.demandFactor, 1), "demandFactor", 0, 1),
+    growthMargin: loadNumber(supplied(settings.growthMargin, 0), "growthMargin"),
+    tariff: loadNumber(supplied(settings.tariff, 0), "tariff"),
+    co2Factor: loadNumber(supplied(settings.co2Factor, 0.4), "co2Factor"),
+    renewableOffsetKWh: loadNumber(supplied(settings.renewableOffsetKWh, 0), "renewableOffsetKWh"),
+    solarKWh: loadNumber(supplied(settings.solarKWh, 0), "solarKWh"),
+    windKWh: loadNumber(supplied(settings.windKWh, 0), "windKWh"),
+    batteryKWh: loadNumber(supplied(settings.batteryKWh, 0), "batteryKWh"),
     gridLimitKW: optional("gridLimitKW"),
     peakThresholdKW: optional("peakThresholdKW"),
     occupancySchedule: normalizeOccupancySchedule(settings.occupancySchedule)

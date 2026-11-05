@@ -13,7 +13,7 @@ export function instantaneousPowerW(device) { return activeW(normalizeLoadDevice
 export function realPowerKW(device, demandFactor = 1) { return finite(instantaneousPowerW(device) / 1000 * factor(demandFactor)); }
 export function reactivePowerKVAR(device, demandFactor = 1) {
   const d = normalizeLoadDevice(device), p = realPowerKW(d, demandFactor);
-  return p === 0 ? 0 : finite(p * tangent(d.pf) * (d.type === "capacitive" ? -1 : 1));
+  return p === 0 ? 0 : finite((p / d.pf) * Math.sqrt((1 - d.pf) * (1 + d.pf)) * (d.type === "capacitive" ? -1 : 1));
 }
 export function apparentPowerKVA(device, demandFactor = 1) {
   const d = normalizeLoadDevice(device), p = realPowerKW(d, demandFactor);
@@ -59,7 +59,7 @@ export function peakDemandKW(devices, settings = {}) {
 export function averageLoadKW(devices, settings = {}) { return finite(totalDailyConsumptionKWh(devices, settings) / 24); }
 export function loadFactor(devices, settings = {}) {
   const peak = peakDemandKW(devices, settings);
-  return peak === 0 ? 0 : finite(averageLoadKW(devices, settings) / peak);
+  return peak === 0 ? 0 : Math.min(1, finite(averageLoadKW(devices, settings) / peak));
 }
 export function applyDiversityFactor(peakKW, diversityFactor) { return finite(loadNumber(peakKW, "peakKW") * factor(diversityFactor)); }
 export function applyDemandFactor(connectedKW, demandFactor) { return finite(loadNumber(connectedKW, "connectedKW") * factor(demandFactor)); }

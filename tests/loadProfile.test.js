@@ -68,3 +68,10 @@ test("load profile: normalization supports kW and preserves zero optional limits
   assert.equal(normalizeLoadSettings({}).gridLimitKW,null);
   assert.equal(normalizeLoadSettings({gridLimitKW:0}).gridLimitKW,0);
 });
+
+test("load profile: explicit nulls and sparse device arrays cannot silently become defaults",()=>{
+  for(const field of ["watts","quantity","hoursPerDay","dutyCycle","standbyW","seasonalFactor","pf","type","powerUnit"])assert.throws(()=>normalizeLoadDevice({...device,[field]:null}),{name:"RangeError"},field);
+  for(const field of ["voltage","phase","measurementInterval","households","diversityFactor","demandFactor","growthMargin","tariff","co2Factor","renewableOffsetKWh","solarKWh","windKWh","batteryKWh"])assert.throws(()=>normalizeLoadSettings({[field]:null}),{name:"RangeError"},field);
+  assert.equal(normalizeLoadSettings({gridLimitKW:null,peakThresholdKW:null,occupancySchedule:null}).gridLimitKW,null);
+  assert.throws(()=>generate24hProfile(new Array(1)),{name:"RangeError"});
+});
