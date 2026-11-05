@@ -514,7 +514,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.locator('input[name="discountPct"]').fill("99.999");
       await page.locator('input[name="taxRate"]').fill("0");
       await calculate();
-      assert.deepEqual(Object.values(await resultRows()),["8000000"]);
+      assert.deepEqual(Object.values(await resultRows()),["8,000,000"]);
       assert.equal(await page.locator('.result[role="alert"]').count(),0);
       await page.locator('input[name="discountPct"]').fill("20");
       await calculate();
