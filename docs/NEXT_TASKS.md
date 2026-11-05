@@ -1,10 +1,8 @@
 # Next tasks
 
-The current objective, branch, verification state and release receipts are maintained in [PROJECT_STATUS.md](PROJECT_STATUS.md#current-continuation--tip-rounding-precision).
+The current scope is [PROJECT_STATUS.md](PROJECT_STATUS.md); [SPEC_COMPLIANCE.md](SPEC_COMPLIANCE.md) maps the full specification to implementation and evidence. The identified technical gaps are implemented in [PR #19](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/19).
 
-1. Complete the tip-rounding repair's exact-candidate Chromium/build verification, then its authorized merge and deployment. [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17) is already merged and deployed.
-2. **Human locale review:** Fluent speakers review German, Yoruba and Nigerian Pidgin labels, dynamic results, navigation/action descriptions and health/safety notices.
-3. **Human accessibility review:** Complete the outstanding human checklist in [TEST_PLAN.md](TEST_PLAN.md), including assistive technology, complete keyboard workflows, target devices, browser zoom and visual contrast. Automated checks are recorded separately.
-4. **Owner licence decision:** Select and authorize a project-wide licence before adding a root `LICENSE`. Dependency notices are complete and published separately.
-
-The application already contains 39 tools. Electrical-load PRs #11, #14, #15 and #16 are merged; they are not a pending separate feature workstream. No additional calculator feature remains in the recorded implementation backlog.
+1. Read PR #19's latest verification receipt before resuming. Complete any candidate/main/Pages/live gate that its receipt still marks pending; do not repeat an already verified release or treat a historical test total as evidence for new code.
+2. Obtain human accessibility/assistive-technology and target-browser review, plus fluent-speaker review of German, Yoruba and Nigerian Pidgin and sensitive notices described in the manual/source checklists. Fix concrete findings in a scoped, tested follow-up.
+3. Obtain the owner's explicit project-wide licence choice before adding a root `LICENSE`. Third-party notices are separate from that decision.
+4. Maintain dated sources, dependencies and the full regression suite. Features beyond the approved specification require their own scope; do not invent missing requirements from optional examples.

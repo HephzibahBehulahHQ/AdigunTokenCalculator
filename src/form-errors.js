@@ -1,4 +1,4 @@
-import {days,gradeBreakdown} from "./calculators.js";
+import {days,gradeBreakdown,demographics} from "./calculators.js";
 import {normalizeHexColor} from "./colors.js";
 
 const states=new WeakMap();
@@ -22,7 +22,22 @@ function invalidGrades(text,mode){
 export function errorFields(tool,error,data={}){
  data=data&&typeof data==="object"?data:{};
  const code=String(error?.message||"");
- if(tool==="json")return code==="empty"||syntaxError.test(code)?["text"]:[];
+ if(tool==="json")return code==="empty"||syntaxError.test(code)||error?.code==="json-too-large"?["text"]:[];
+ if(tool==="stats"&&error?.code==="statistics-too-large")return ["numbers"];
+ if(tool==="demographics"&&(code==="demographics-too-large"||error?.code==="demographics-too-large"))return ["shares"];
+ if(tool==="demographics"&&code==="number"){
+  const fields=[];
+  if(has(data,"total")&&(!numeric(data.total)||Number(data.total)<0))fields.push("total");
+  if(has(data,"shares")){try{demographics(0,data.shares);}catch{fields.push("shares");}}
+  return fields;
+ }
+ if(tool==="water"&&code==="number"){
+  const fields=["weightKg","lowMlPerKg","highMlPerKg","activityFactor","climateFactor"].filter(key=>has(data,key)&&(!numeric(data[key])||Number(data[key])<=0));
+  if(numeric(data.weightKg)&&Number(data.weightKg)>500)fields.push("weightKg");
+  if(has(data,"extraMl")&&(!numeric(data.extraMl)||Number(data.extraMl)<-2000||Number(data.extraMl)>5000))fields.push("extraMl");
+  if(numeric(data.lowMlPerKg)&&numeric(data.highMlPerKg)&&Number(data.lowMlPerKg)>Number(data.highMlPerKg))fields.push("lowMlPerKg","highMlPerKg");
+  return [...new Set(fields)];
+ }
  if(tool==="gpa")return code==="number"&&["scale4","percentage"].includes(data.mode)&&has(data,"grades")&&invalidGrades(data.grades,data.mode)?["grades"]:[];
  if(tool==="percent"){
   if(code==="zero")return data.mode==="as"?["b"]:data.mode==="change"?["a"]:[];
@@ -68,7 +83,7 @@ export function errorFields(tool,error,data={}){
  if(tool==="qibla"&&code==="coordinates")return ["lat","lon"].filter(key=>has(data,key)&&(!numeric(data[key])||Math.abs(Number(data[key]))>(key==="lat"?90:180)));
  if(tool==="morse"&&code==="morse"&&["text","morse"].includes(data.direction))return ["text"];
  if(tool==="roman"&&code==="number"&&["toRoman","fromRoman"].includes(data.mode))return ["value"];
- if(tool==="stats"&&code==="number"&&has(data,"numbers"))return String(data.numbers).trim().split(/[\s,]+/).filter(Boolean).some(value=>!numeric(value))?["numbers"]:[];
+ if(tool==="stats"&&code==="number"&&has(data,"numbers"))return String(data.numbers).trim().split(/[\s,;]+/).filter(Boolean).some(value=>!numeric(value))?["numbers"]:[];
  if(tool==="recipe"&&code==="recipe")return ["text"];
  if(code==="empty"){
   if(["token","text","qr","morse","recipe"].includes(tool))return ["text"];

@@ -1,4 +1,5 @@
 import test from "node:test";import assert from "node:assert/strict";import * as c from "../src/calculators.js";
+import {utcDateMilliseconds as utc} from "../src/calendar.js";
 test("Unicode text statistics",()=>{const r=c.stats("Hello, world!\n\nYorùbá 😊");assert.equal(r.words,3);assert.equal(r.paragraphs,2);assert.equal(r.chars,[..."Hello, world!\n\nYorùbá 😊"].length);});
 test("calendar age handles month ends",()=>{assert.deepEqual(c.age("2000-01-31",new Date(2024,2,1)),{years:24,months:1,days:1});assert.throws(()=>c.age("2030-01-01",new Date(2024,0,1)));});
 test("math and percentage edge cases",()=>{assert.equal(c.arithmetic(8,2,"divide"),4);assert.throws(()=>c.arithmetic(1,0,"divide"));assert.equal(c.percent("change",100,125),25);assert.throws(()=>c.percent("as",1,0));});
@@ -147,4 +148,161 @@ test("unit conversion avoids intermediate overflow and rejects genuine overflow"
  assert.ok(Number.isFinite(result));assert.ok(Math.abs(result/1e299-1)<1e-15);
  assert.equal(c.unit(0,"byte","GB","digital"),0);
  assert.throws(()=>c.unit(1e308,"GB","byte","digital"),/number/);
+});
+
+test("imperial BMI uses the same exact SI conversions as metric BMI",()=>{
+ for(const [pounds,inches] of [[100,70],[176.37,70],[180.5,69.25],[2204.62,118]]){
+  const expected=c.bmi(pounds*0.45359237,inches*0.0254);
+  assert.equal(c.bmi(pounds,inches,"imperial"),expected);
+ }
+ assert.ok(Math.abs(c.bmi(100,70,"imperial")-14.348358768146106)<1e-12);
+});
+
+test("demographic source shares total exactly 100 without changing their values",()=>{
+ const shares="Christianity,28.8\nIslam,25.6\nHinduism,14.9\nBuddhism,4.1\nJudaism,0.2\nOther religions,2.2\nUnaffiliated,24.2";
+ const result=c.demographics(1000,shares);
+ assert.equal(result.totalShare,100);
+ assert.equal(result.totalShareExact,"100");
+ assert.equal(result.shareStatus,"equal");
+ assert.deepEqual(result.rows.map(row=>row.share),[28.8,25.6,14.9,4.1,0.2,2.2,24.2]);
+ assert.deepEqual(result.rows.map(row=>row.count),[288,256,149,41,2,22,242]);
+});
+
+test("demographic exact totals distinguish genuine values either side of 100",()=>{
+ for(const [entries,exact,status] of [
+  ["A,99.999999999999999999","99.999999999999999999","below"],
+  ["A,100\nB,0.000000000000000001","100.000000000000000001","above"],
+  ["A,99.999999999999999999\nB,0.000000000000000001","100","equal"],
+  ["A,3.333e1\nB,33.33\nC,33.34","100","equal"],
+  ["A,1e-7\nB,.125","0.1250001","below"],
+  ["A,0\nB,-0","0","below"]
+ ]){
+  const result=c.demographics(100,entries);
+  assert.equal(result.totalShareExact,exact);
+  assert.equal(result.shareStatus,status);
+ }
+});
+
+test("demographics reject missing or invalid shares and preserve finite large counts",()=>{
+ for(const entries of ["A,","A,   ","A,NaN","A,Infinity","A,-1","A,100.000000000000000001","A,1e-10000","A,0x10"])
+  assert.throws(()=>c.demographics(100,entries),/number/);
+ const result=c.demographics(Number.MAX_VALUE,"A,100");
+ assert.equal(result.rows[0].count,Number.MAX_VALUE);
+ assert.equal(c.demographics(100,"A,0").rows[0].count,0);
+});
+
+test("signed percentage changes avoid intermediate overflow and reject actual overflow",()=>{
+ for(const [start,end,expected] of [
+  [-1e308,1e308,200],[1e308,-1e308,-200],
+  [-Number.MAX_VALUE,Number.MAX_VALUE,200],
+  [-100,-50,50],[-100,-150,-50],[100,100,0],[100,125,25]
+ ])assert.equal(c.percent("change",start,end),expected);
+ assert.ok(c.percent("change",1,1.0000000000000002)>0);
+ assert.throws(()=>c.percent("change",0,100),/zero/);
+ assert.throws(()=>c.percent("change",Number.MIN_VALUE,Number.MAX_VALUE),/number/);
+ assert.throws(()=>c.percent("as",Number.MAX_VALUE,Number.MIN_VALUE),/number/);
+});
+
+test("date differences and ages retain early years and Gregorian leap rules",()=>{
+ assert.equal(c.days("0099-01-01","0100-01-01"),365);
+ assert.equal(c.days("0004-02-28","0004-03-01"),2);
+ assert.equal(c.days("0100-02-28","0100-03-01"),1);
+ assert.throws(()=>c.days("0100-02-29","0100-03-01"),/date/);
+ assert.throws(()=>c.days("0099-02-29","0099-03-01"),/date/);
+ const today=new Date(2000,0,1,12);today.setFullYear(100,0,1);
+ assert.deepEqual(c.age("0099-01-01",today),{years:1,months:0,days:0});
+ assert.deepEqual(c.dateDifference("0099-12-31","0100-01-02",today),{days:2,direction:"upcoming",fromToday:1});
+ const early=new Date(2000,0,1,12);early.setFullYear(99,0,1);
+ assert.deepEqual(c.recurringDate("0004-02-29",early),{date:"0099-02-28",days:58});
+ assert.equal(utc(100,0,1)-utc(99,0,1),365*86400000);
+});
+
+test("text statistics recognize mixed-language sentence punctuation and abbreviations",()=>{
+ for(const [text,expected] of [
+  ["你好。再见。",2],["元気ですか？はい！",2],
+  ["Dr. Smith left.",1],["Prof. Adigun arrived. Mr. Smith left.",2],
+  ["J. R. R. Tolkien wrote. Really?",2],
+  ["Use e.g. apples. Then stop.",2],["Das ist z. B. ein Beispiel. Weiter!",2],
+  ['She said, "Hello!" Then left.',2],["Value 3.14 is pi. Next.",2],
+  ["Hello 😊! Bawo ni?",2],["No final punctuation",1],["First paragraph\n\nSecond paragraph",2],
+  [" \t\n",0],["😊?!",0]
+ ])assert.equal(c.stats(text).sentences,expected,text);
+ const decomposed="Yoru\u0300ba\u0301";
+ assert.equal(c.stats(decomposed).words,1);
+ assert.equal(c.stats(decomposed).chars,[...decomposed].length);
+});
+
+test("published grade mapping matches the supported weighted grade scale",()=>{
+ assert.ok(Object.isFrozen(c.GRADE_POINTS));
+ assert.deepEqual(c.GRADE_POINTS,{A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0});
+});
+
+test("fuel calculations keep finite divided products and legitimate zero results",()=>{
+ assert.deepEqual(c.fuel(1e308,100,0),{litres:1e308,cost:0});
+ assert.deepEqual(c.fuel(Number.MAX_VALUE,100,1),{litres:Number.MAX_VALUE,cost:Number.MAX_VALUE});
+ assert.deepEqual(c.fuel(0,Number.MAX_VALUE,Number.MAX_VALUE),{litres:0,cost:0});
+ const metric=c.fuelTrip(1e308,100,0);
+ assert.equal(metric.litres,1e308);assert.equal(metric.cost,0);assert.equal(metric.distanceKm,1e308);
+ const imperial=c.fuelTrip(1e308,100,0,"imperial","us");
+ assert.ok(Object.values(imperial).filter(value=>typeof value==="number").every(Number.isFinite));
+ assert.ok(Math.abs(imperial.litres/3.785411784e306-1)<1e-15);
+ const zero=c.fuelTrip(0,Number.MIN_VALUE,Number.MAX_VALUE,"imperial","uk");
+ for(const key of ["litres","fuelUnits","cost","distanceKm"])assert.equal(zero[key],0);
+ for(const args of [[1e308,1e308,0],[1e308,1,1e308],[0,0,1]])assert.throws(()=>c.fuel(...args),/number/);
+ for(const args of [[Number.MAX_VALUE,Number.MAX_VALUE,0,"imperial","us"],[200,100,Number.MAX_VALUE,"imperial","uk"],[1e308,1e308,0]])assert.throws(()=>c.fuelTrip(...args),/number/);
+});
+
+test("zakat keeps valid finite percentages and rejects invalid assets or monetary overflow",()=>{
+ assert.deepEqual(c.zakat({cash:1e308},100),{assets:1e308,due:1e308});
+ assert.deepEqual(c.zakat({},Number.MAX_VALUE),{assets:0,due:0});
+ assert.deepEqual(c.zakat({cash:100},0),{assets:100,due:0});
+ assert.ok(Math.abs(c.zakat({cash:1e308},2.5).due/2.5e306-1)<1e-15);
+ for(const [assets,rate] of [[{cash:NaN},2.5],[{cash:Number.MAX_VALUE,gold:Number.MAX_VALUE},0],[{cash:1e308},Number.MAX_VALUE],[null,0]])
+  assert.throws(()=>c.zakat(assets,rate),/number/);
+});
+
+test("practice rejects nonrepresentable required projections while allowing zero activity or lifetime",()=>{
+ assert.deepEqual(c.practice(0,Number.MAX_VALUE,Number.MAX_VALUE),{day:0,week:0,year:0,lifetime:0});
+ assert.deepEqual(c.practice(Number.MAX_VALUE,0,Number.MAX_VALUE),{day:0,week:0,year:0,lifetime:0});
+ assert.deepEqual(c.practice(30,7,0),{day:30,week:210,year:10920,lifetime:0});
+ assert.ok(Object.values(c.practice(1e300,1,1)).every(Number.isFinite));
+ for(const args of [[Number.MAX_VALUE,Number.MAX_VALUE,0],[1e308,1,0],[1e300,1,1e308]])
+  assert.throws(()=>c.practice(...args),/number/);
+});
+
+test("legacy share counts use stable percentages and validate aggregate overflow",()=>{
+ assert.deepEqual(c.shares(Number.MAX_VALUE,"100"),{total:100,counts:[Number.MAX_VALUE]});
+ assert.deepEqual(c.shares(0,String(Number.MAX_VALUE)),{total:Number.MAX_VALUE,counts:[0]});
+ assert.throws(()=>c.shares(0,`${Number.MAX_VALUE},${Number.MAX_VALUE}`),/number/);
+ assert.throws(()=>c.shares(Number.MAX_VALUE,"200"),/number/);
+});
+
+test("temperature retains finite extreme conversions and rejects only actual result overflow",()=>{
+ assert.ok(Math.abs(c.temperature(1e308,"f")/5.555555555555556e307-1)<1e-15);
+ assert.ok(Math.abs(c.temperature(9e307,"c")/1.62e308-1)<1e-15);
+ assert.equal(c.temperature(32,"f"),0);assert.equal(c.temperature(0,"c"),32);
+ assert.throws(()=>c.temperature(Number.MAX_VALUE,"c"),/number/);
+});
+
+test("degree trigonometry remains periodic without overflowing radians",()=>{
+ assert.ok(Math.abs(c.engineering(36000000000030,0,"sin")-0.5)<1e-12);
+ assert.equal(c.engineering(36000000000000,0,"sin"),0);
+ assert.equal(c.engineering(36000000000000,0,"cos"),1);
+ assert.ok(Math.abs(c.engineering(1e308,0,"sin")-(-0.898794046299167))<1e-12);
+ assert.throws(()=>c.engineering(36000000000090,0,"tan"),/number/);
+});
+
+test("demographic limits bound exact-decimal work before large BigInt allocations",()=>{
+ const precise="1."+"0".repeat(c.MAX_DEMOGRAPHIC_SHARE_LENGTH-3)+"1";
+ assert.equal(precise.length,c.MAX_DEMOGRAPHIC_SHARE_LENGTH);
+ assert.equal(c.demographics(100,"A,"+precise).totalShareExact,precise);
+ const rows=Array.from({length:c.MAX_DEMOGRAPHIC_ROWS},(_,index)=>`Group ${index},0`).join("\n");
+ assert.equal(c.demographics(100,rows).rows.length,c.MAX_DEMOGRAPHIC_ROWS);
+ for(const input of [" ".repeat(c.MAX_DEMOGRAPHIC_INPUT_LENGTH+1),"A,"+precise+"0",rows+"\nExtra,0"])
+  assert.throws(()=>c.demographics(100,input),error=>error.code==="demographics-too-large");
+});
+
+test("population estimation rejects invalid reference instants",()=>{
+ assert.throws(()=>c.populationEstimate(new Date(NaN)),/date/);
+ assert.throws(()=>c.populationEstimate(null),/date/);
 });

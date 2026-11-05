@@ -22,6 +22,8 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: Install Chromium for browser integration tests
         run: npx playwright-core install --with-deps chromium
+      - name: Require the browser test executable
+        run: node --input-type=module -e 'import {chromium} from "playwright-core"; import {accessSync} from "node:fs"; accessSync(chromium.executablePath());'
       - run: npm test
       - run: npm run build
   lockfile:

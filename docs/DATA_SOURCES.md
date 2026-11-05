@@ -43,13 +43,28 @@ The expanded calculator suite's full source register is maintained in the root [
 - WCAG 2.2 contrast criteria, ITU-R M.1677-1 Morse code, and Web Crypto digest API documentation.
 - IANA time-zone database through the browser's native Intl implementation; the app does not fetch time-zone services.
 
-The water range is explicitly a project-selected editable heuristic (30–35 mL/kg plus user-entered adjustment), not an official health recommendation. Inflation uses a user-supplied annual rate rather than an unverified CPI series. Holiday outputs are rule-based calendar dates, not legal confirmation of public-holiday status.
+The water range is an editable illustrative formula, with the starting 30–35 mL/kg/day range identified as coming from an adult clinical nutrition-support context. It is not a personalized drinking target. Inflation uses a user-supplied annual rate rather than an unverified CPI series. Holiday outputs are rule-based calendar dates, not legal confirmation of public-holiday status.
+
+## Water range and holiday reference dates
+
+Water output in mL/day is `weightKg × baseMlPerKg × activityFactor × climateFactor + extraMl`, evaluated at the lower and upper base values. The starting base range is 30–35, both factors start at 1 (no adjustment), and the additional adjustment starts at 0. The UI exposes every assumption and displays the applied formula. Factors are user choices rather than validated activity/climate prescriptions. The range describes total fluid, including water in food and drinks; it is not a personal drink-only requirement. Source context and health limitations are recorded in [SOURCES.md](../SOURCES.md).
+
+The implementation requires positive finite base values/factors with lower ≤ upper, weight greater than 0 and no more than 500 kg, and an additive adjustment between −2,000 and 5,000 mL. The resulting range must remain finite and positive. These validation bounds protect the calculation; they are not clinical safety thresholds.
+
+Holiday lists cover selected US, GB, DE, NG and CA rules for years 1583–4099. The reference zone defaults to the browser's reported IANA zone, with UTC as fallback, and can be changed. A single current instant supplies the calendar date in that zone; the output shows the date and zone alongside whole calendar-day differences excluding the reference day. Dates are compared as calendar dates, so daylight-saving transitions do not create fractional-day countdowns. Upcoming dates are shown first, then past dates. Regional lists, observed/substitute days, lunar dates and state/province exceptions remain incomplete; the year range does not certify historical or future legal observance.
+
+## Tokenizer and large local inputs
+
+The application uses `tiktoken@1.0.22`, local Lite WebAssembly and the `cl100k_base`/`o200k_base` encoder data. The public token-byte API plus streaming UTF-8 reconstruction replaces the earlier internal byte-map adapter. Model labels and plain-text-only scope are listed in the [README](../README.md); upstream mapping/source attribution is recorded in [SOURCES.md](../SOURCES.md). Worker processing does not send inputs to a server. A 2,000-token preview page does not truncate the total count or copied result; available browser resources still limit very large input.
+
+JSON's 5,000,000-code-unit input and 10,000,000-code-unit output limits are UTF-16 lengths, not bytes or Unicode code-point counts. A conservative expansion check can reject deeply nested pretty-print output before it is generated. Statistics accepts at most 250,000 finite values in 5,000,000 UTF-16 code units and rejects unrepresentable results rather than showing infinity. These are implementation limits, not source-data guarantees.
 
 
-The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.md). Exact 2025/2026 numeric rows still require a direct downloadable WPP file comparison and recorded checksum; the values have not been certified against an archived source file.
+The [README](../README.md) contains the full 39-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in [SOURCES.md](../SOURCES.md). The population file/checksum verification is complete and linked above; it does not independently certify the simplified extrapolation model.
 
+## Electrical planning and customer estimates
 
-The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.
+The [electrical calculation contract](ELECTRICAL_LOAD_CALCULATOR.md) records device-preset assumptions, units, power/energy/current formulas, tariffs, time profiles, correction/planning estimates and customer-estimate tax arithmetic. Presets are editable illustrative values rather than manufacturer-specific ratings. Software and numerical tests do not establish hardware testing or certified electrical-design compliance.
 
 ## Tip and bill splitting
 

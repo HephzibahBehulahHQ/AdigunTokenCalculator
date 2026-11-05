@@ -1,4 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
+import {utcDateMilliseconds as utc} from "./calendar.js";
 
 const finite = n => Number.isFinite(Number(n));
 const positive = n => finite(n) && Number(n) > 0;
@@ -7,12 +8,12 @@ const dateParts = s => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s));
   if (!m) throw Error("date");
   const p = { y:+m[1], m:+m[2], d:+m[3] };
-  const d = new Date(Date.UTC(p.y,p.m-1,p.d));
+  const d = new Date(utc(p.y,p.m-1,p.d));
   if (d.getUTCFullYear()!==p.y || d.getUTCMonth()!==p.m-1 || d.getUTCDate()!==p.d) throw Error("date");
   return p;
 };
-const isoDate = (y,m,d) => [y,String(m).padStart(2,"0"),String(d).padStart(2,"0")].join("-");
-const addDays = (s,n) => { const p=dateParts(s),d=new Date(Date.UTC(p.y,p.m-1,p.d+n)); return isoDate(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate()); };
+const isoDate = (y,m,d) => [String(y).padStart(4,"0"),String(m).padStart(2,"0"),String(d).padStart(2,"0")].join("-");
+const addDays = (s,n) => { const p=dateParts(s),d=new Date(utc(p.y,p.m-1,p.d+n)); return isoDate(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate()); };
 
 function wallParts(ms, zone) {
   const parts = new Intl.DateTimeFormat("en-GB",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(ms));
@@ -99,18 +100,22 @@ export function calorieTargets(weightKg,heightCm,age,sex,activity,proteinPct=25,
   return {bmr,tdee,proteinGrams:tdee*proteinPct/100/4,carbGrams:tdee*carbPct/100/4,fatGrams:tdee*fatPct/100/9};
 }
 export function pregnancyEstimate(method,inputDate,today=new Date()) {
-  const p=dateParts(inputDate),date=Date.UTC(p.y,p.m-1,p.d),now=Date.UTC(today.getFullYear(),today.getMonth(),today.getDate());
+  const p=dateParts(inputDate),date=utc(p.y,p.m-1,p.d),now=utc(today.getFullYear(),today.getMonth(),today.getDate());
   if(date>now) throw Error("future");
   const lmp=method==="lmp"?inputDate:method==="conception"?addDays(inputDate,-14):null;
   if(!lmp) throw Error("number");
-  const due=addDays(lmp,280),elapsed=Math.floor((now-Date.UTC(...Object.values(dateParts(lmp)).map((v,i)=>i===1?v-1:v)))/86400000);
+  const due=addDays(lmp,280),elapsed=Math.floor((now-utc(...Object.values(dateParts(lmp)).map((v,i)=>i===1?v-1:v)))/86400000);
   const weeks=Math.floor(elapsed/7),days=elapsed%7;
   return {dueDate:due,gestationalWeeks:weeks,gestationalDays:days,trimester:weeks<14?1:weeks<28?2:3,overdue:elapsed>280};
 }
-export function waterRange(weightKg,extraMl=0) {
+export function waterRange(weightKg,extraMl=0,{lowMlPerKg=30,highMlPerKg=35,activityFactor=1,climateFactor=1}={}) {
   weightKg=Number(weightKg);extraMl=Number(extraMl);
   if(!positive(weightKg)||weightKg>500||!finite(extraMl)||extraMl< -2000||extraMl>5000) throw Error("number");
-  const lowMl=weightKg*30+extraMl,highMl=weightKg*35+extraMl;if(lowMl<=0)throw Error("number");
+  [lowMlPerKg,highMlPerKg,activityFactor,climateFactor]=[lowMlPerKg,highMlPerKg,activityFactor,climateFactor].map(Number);
+  if(![lowMlPerKg,highMlPerKg,activityFactor,climateFactor].every(positive)||lowMlPerKg>highMlPerKg)throw Error("number");
+  const lowMl=weightKg*lowMlPerKg*activityFactor*climateFactor+extraMl;
+  const highMl=weightKg*highMlPerKg*activityFactor*climateFactor+extraMl;
+  if(![lowMl,highMl].every(Number.isFinite)||lowMl<=0)throw Error("number");
   return {lowMl,highMl};
 }
 export function bloodAlcohol(weightKg,sex,drinks,drinkMl,abv,hours) {
@@ -234,6 +239,21 @@ export function holidayDates(year,region="US") {
   if(region==="CA")fixed.push(["Canada Day",isoDate(year,7,1)],["Labour Day",nthWeekday(year,9,1,1)],["Thanksgiving",nthWeekday(year,10,2,1)],["Good Friday",addDays(easter,-2)]);
   return fixed.sort((a,b)=>a[1].localeCompare(b[1]));
 }
+const fallbackZones=["UTC","Europe/Berlin","Europe/London","Africa/Lagos","America/New_York","America/Los_Angeles","Asia/Tokyo","Australia/Sydney","Pacific/Auckland"];
+export const TIME_ZONES=Object.freeze([...new Set(["UTC",...(()=>{
+  try{return Intl.supportedValuesOf("timeZone");}catch{return fallbackZones;}
+})()])]);
+export function holidayCountdowns(year,region,timeZone,now=new Date()) {
+  if(!(now instanceof Date)||!Number.isFinite(now.getTime())||typeof timeZone!=="string"||!timeZone.trim())throw Error("zone");
+  let fields;
+  try{fields=Object.fromEntries(new Intl.DateTimeFormat("en",{timeZone,calendar:"iso8601",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(now).map(part=>[part.type,part.value]));}
+  catch{throw Error("zone");}
+  const y=Number(fields.year),m=Number(fields.month),d=Number(fields.day),today=utc(y,m-1,d);
+  const holidays=holidayDates(year,region).map(([name,date])=>{
+    const target=dateParts(date);return{name,date,days:Math.round((utc(target.y,target.m-1,target.d)-today)/86400000)};
+  }).sort((a,b)=>a.days>=0&&b.days<0?-1:a.days<0&&b.days>=0?1:a.days>=0?a.days-b.days:b.days-a.days);
+  return{timeZone,referenceDate:isoDate(y,m,d),holidays};
+}
 function nthWeekday(y,m,n,weekday) {const first=new Date(Date.UTC(y,m-1,1)).getUTCDay();return isoDate(y,m,1+((weekday-first+7)%7)+(n-1)*7);}
 function lastWeekday(y,m,weekday){const last=new Date(Date.UTC(y,m,0)).getUTCDate(),day=new Date(Date.UTC(y,m-1,last)).getUTCDay();return isoDate(y,m,last-((day-weekday+7)%7));}
 const MORSE={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.",".":".-.-.-",",":"--..--","?":"..--..","'":".----.", "!":"-.-.--","/":"-..-.","(":"-.--.",")":"-.--.-","&":".-...",":":"---...",";":"-.-.-.","=":"-...-","+":".-.-.","-":"-....-","_":"..--.-",'"':".-..-.","$":"...-..-","@":".--.-."};
@@ -243,15 +263,7 @@ export function translateMorse(text,direction="text") {
   if(direction==="morse")return String(text).trim().split(/\s*\/\s*/).map(word=>word.trim().split(/\s+/).map(code=>{if(!MORSE_REVERSE[code])throw Error("morse");return MORSE_REVERSE[code];}).join("")).join(" ");
   throw Error("morse");
 }
-export function summarizeNumbers(text) {
-  const values=String(text).trim().split(/[\s,;]+/).filter(Boolean).map(Number);
-  if(!values.length||values.some(x=>!Number.isFinite(x)))throw Error("number");
-  const sorted=[...values].sort((a,b)=>a-b),sum=values.reduce((a,b)=>a+b,0),mean=sum/values.length,mid=Math.floor(sorted.length/2);
-  const counts=new Map();values.forEach(x=>counts.set(x,(counts.get(x)||0)+1));const maxCount=Math.max(...counts.values()),modes=maxCount===1?[]:[...counts].filter(([,n])=>n===maxCount).map(([x])=>x).sort((a,b)=>a-b);
-  const variance=values.reduce((a,x)=>a+(x-mean)**2,0)/values.length;
-  const sampleVariance=values.length>1?values.reduce((a,x)=>a+(x-mean)**2,0)/(values.length-1):null;
-  return {count:values.length,mean,median:values.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2,mode:modes,min:sorted[0],max:sorted.at(-1),range:sorted.at(-1)-sorted[0],populationVariance:variance,populationStdDev:Math.sqrt(variance),sampleVariance,sampleStdDev:sampleVariance===null?null:Math.sqrt(sampleVariance)};
-}
+export {summarizeNumbers} from "./statistics.js";
 
 export function parseCurrencyRates(text) {
   const rates={};

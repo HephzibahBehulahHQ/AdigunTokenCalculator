@@ -1,6 +1,12 @@
 # Third-party notices
 
-## js-tiktoken 1.0.21
+## tiktoken 1.0.22
+
+The bundled Lite WebAssembly tokenizer and the `cl100k_base` and `o200k_base`
+encoder data come from `tiktoken@1.0.22`. Its npm metadata declares MIT and
+identifies upstream revision `4c8b748e07992c00386f3180af5c574b27b65139`.
+The published package omits a licence file; the following text is taken from
+the [upstream licence at that pinned revision](https://github.com/dqbd/tiktoken/blob/4c8b748e07992c00386f3180af5c574b27b65139/LICENSE).
 
 Copyright (c) 2022 OpenAI, Shantanu Jain
 
@@ -354,11 +360,9 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `@rollup/rollup-win32-x64-gnu` | `4.67.5` | `MIT` |
 | `@rollup/rollup-win32-x64-msvc` | `4.67.5` | `MIT` |
 | `@types/estree` | `1.0.10` | `MIT` |
-| `base64-js` | `1.5.1` | `MIT` |
 | `esbuild` | `0.25.12` | `MIT` |
 | `fdir` | `6.5.0` | `MIT` |
 | `fsevents` | `2.3.3` | `MIT` |
-| `js-tiktoken` | `1.0.21` | `MIT` |
 | `jsbi` | `4.3.2` | `Apache-2.0` |
 | `nanoid` | `3.3.20` | `MIT` |
 | `picocolors` | `1.1.1` | `ISC` |
@@ -368,9 +372,11 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `qrcode-generator` | `2.0.4` | `MIT` |
 | `rollup` | `4.67.5` | `MIT` |
 | `source-map-js` | `1.2.2` | `BSD-3-Clause` |
+| `tiktoken` | `1.0.22` | `MIT` |
 | `tinyglobby` | `0.2.17` | `MIT` |
 | `vite` | `6.4.5` | `MIT` |
 | `zxcvbn` | `4.4.2` | `MIT` |
+
 
 ## ISC License — standard text
 
