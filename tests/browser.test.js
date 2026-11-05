@@ -28,7 +28,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     page.on("request",request=>{if(/password-strength|zxcvbn/.test(request.url()))strengthRequests.push(request.url());});
     await page.addInitScript(()=>{window.__geoCalls=0;window.__geoRequests=[];Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(success,error){window.__geoCalls++;window.__geoRequests.push({success,error});}}});});
     await page.goto("http://127.0.0.1:4173/");
-    assert.equal(await page.locator(".tool-card").count(),38);
+    assert.equal(await page.locator(".tool-card").count(),39);
     assert.equal(await page.locator(".category-chip").count(),11);
     await page.locator(".category-chip").nth(5).click();
     assert.ok(await page.locator(".tool-card").count()>0);
@@ -74,10 +74,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/Do NOT use this to decide whether to drive/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
-    assert.equal(await page.locator(".tool-card").count(),38);
+    assert.equal(await page.locator(".tool-card").count(),39);
     await page.setViewportSize({width:375,height:812});
     const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
-    assert.equal(new Set(cardData.map(card=>card.key)).size,38,"tool keys must be unique");
+    assert.equal(new Set(cardData.map(card=>card.key)).size,39,"tool keys must be unique");
     for(const card of cardData){
       await page.locator('.tool-card[data-tool-key="'+card.key+'"]').click();
       await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,card.key);
@@ -621,13 +621,13 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         await page.goto("http://127.0.0.1:4173/"+hash);
         await page.reload();
         await page.locator(".tool-card").first().waitFor();
-        assert.equal(await page.locator(".tool-card").count(),38);
+        assert.equal(await page.locator(".tool-card").count(),39);
         assert.equal(await page.locator("#panel").isVisible(),false);
       }
       await openTool("bmi");
       await page.evaluate(()=>{location.hash="#/%";});
       await page.waitForFunction(()=>!document.querySelector("aside").hidden);
-      assert.equal(await page.locator(".tool-card").count(),38);
+      assert.equal(await page.locator(".tool-card").count(),39);
     });
 
     assert.deepEqual(pageErrors,[]);

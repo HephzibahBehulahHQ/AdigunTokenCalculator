@@ -11,11 +11,13 @@ import {formatNumber} from "./format.js";
 import {mountBacGate} from "./bac-gate.js";
 import {errorFields,attachFormError,clearFormError} from "./form-errors.js";
 import {createQr} from "./qr.js";
+import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";
 import "./styles.css";
 
 const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
 let lang="en",active=-1,memoryValue=0,calculationRequest=0,activeCategory="All";
 const keys=["token","math","text","temp","age","bmi","percent","world","demographics","practice","zakat","qibla","units","loan","dates","gpa","fuel","sleep","timezone","currency","inflation","tip","calories","pregnancy","water","bac","roman","bases","password","qr","hash","json","color","discount","recipe","holidays","morse","stats"];
+registerLoadCalculator(keys);
 const schema={
  token:[["text","textarea"],["encoding","select",encodings]],
  math:[["a","number"],["b","number"],["op","select",[["add","Add"],["subtract","Subtract"],["multiply","Multiply"],["divide","Divide"],["power","Power"],["percentOf","A% of B"],["modulo","Remainder"],["sqrt","Square root"],["sin","Sine (degrees)"],["cos","Cosine (degrees)"],["tan","Tangent (degrees)"],["log","Base-10 logarithm"],["ln","Natural logarithm"],["factorial","Factorial"]]]],
@@ -154,6 +156,7 @@ function renderTool(){
  const i=active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
  const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});panel.append(back);
  const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);head.querySelector("h2").tabIndex=-1;
+ if(k==="electrical-load"){mountLoadCalculator(panel,{lang});return;}
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};let bacConsent=null;(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
  if(k==="timezone"){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);inputs.dateTime.value=local;}
