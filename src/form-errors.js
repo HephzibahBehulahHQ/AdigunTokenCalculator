@@ -49,6 +49,10 @@ export function errorFields(tool,error,data={}){
   if(has(data,"term")&&(!numeric(data.term)||Number(data.term)<=0||!Number.isSafeInteger(Number(data.term)*12)))fields.push("term");
   return fields;
  }
+ if(tool==="discount"&&code==="number"&&["forward","reverse"].includes(data.mode)&&has(data,"discountPct")){
+  const value=Number(data.discountPct);
+  return !numeric(data.discountPct)||value<0||value>100||data.mode==="reverse"&&value===100?["discountPct"]:[];
+ }
  if(tool==="recipe"&&code==="number"&&["keep","small","large"].includes(data.recipeUnits))return ["fromServings","toServings"].filter(key=>has(data,key)&&(!numeric(data[key])||Number(data[key])<=0));
  if(tool==="color"&&code==="number"&&data.colorMode==="hex"&&has(data,"foreground")){
   try{normalizeHexColor(data.foreground);}catch{return ["foreground"];}

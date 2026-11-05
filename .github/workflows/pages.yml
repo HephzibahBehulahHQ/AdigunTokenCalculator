@@ -53,6 +53,8 @@ jobs:
         with:
           path: dist
   deploy:
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -62,3 +64,31 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+  verify-live:
+    name: Verify published artifact and calculator workflows
+    needs: [build, deploy]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --no-audit --no-fund
+      - name: Install Chromium for live verification
+        run: npx playwright-core install --with-deps chromium
+      - name: Download the exact artifact published by this run
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .pages-verification
+      - name: Extract the published site
+        run: |
+          mkdir -p .pages-verification/site
+          tar -xf .pages-verification/artifact.tar -C .pages-verification/site
+      - name: Verify live bytes, tool workflows, localization and browser errors
+        env:
+          DEPLOYED_SITE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: node scripts/verify-deployment.mjs --url "$DEPLOYED_SITE_URL" --artifact .pages-verification/site

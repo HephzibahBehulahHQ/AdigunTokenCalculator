@@ -71,6 +71,7 @@ test("color conversion and WCAG contrast calculations",()=>{
 });
 test("discount calculation and reverse original price",()=>{
  const r=a.discountPrice(100,20,10);assert.equal(r.total,88);assert.equal(r.saved,20);
+ assert.deepEqual(a.discountPrice(100,100,19),{discounted:0,tax:0,total:0,saved:100});
  assert.ok(Math.abs(a.originalPriceFromSale(88,20,10)-100)<1e-9);
  assert.throws(()=>a.originalPriceFromSale(10,100));
 });

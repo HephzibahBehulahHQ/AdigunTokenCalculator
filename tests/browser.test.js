@@ -498,6 +498,29 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await calculate();assert.match(await page.locator(".result").innerText(),/80/);
     });
 
+    await t.test("100 percent discounts work forward and reject an undefined reverse price",async()=>{
+      await openTool("discount");
+      await page.locator('input[name="price"]').fill("100");
+      await page.locator('input[name="discountPct"]').fill("100");
+      await page.locator('input[name="taxRate"]').fill("19");
+      await calculate();
+      assert.deepEqual(Object.values(await resultRows()),["0","0","0","100"]);
+      await page.locator('select[name="mode"]').selectOption("reverse");
+      await page.locator('input[name="salePrice"]').fill("80");
+      await calculate();
+      assert.equal(await page.locator('.result[role="alert"]').count(),1);
+      assert.equal(await page.locator('input[name="discountPct"]').getAttribute("aria-invalid"),"true");
+      assert.equal(await page.evaluate(()=>document.activeElement?.name),"discountPct");
+      await page.locator('input[name="discountPct"]').fill("99.999");
+      await page.locator('input[name="taxRate"]').fill("0");
+      await calculate();
+      assert.deepEqual(Object.values(await resultRows()),["8,000,000"]);
+      assert.equal(await page.locator('.result[role="alert"]').count(),0);
+      await page.locator('input[name="discountPct"]').fill("20");
+      await calculate();
+      assert.deepEqual(Object.values(await resultRows()),["100"]);
+    });
+
     await t.test("color modes accept HEX RGB and HSL and reset conditional controls",async()=>{
       await openTool("color");
       const mode=page.locator('select[name="colorMode"]');
