@@ -25,3 +25,14 @@ test("load presets: solar and wind are daily generation offsets, never consuming
   assert.deepEqual(RENEWABLE_PRESETS.map(p=>p.field),["solarKWh","windKWh"]);
   for(const p of RENEWABLE_PRESETS){assert.equal(p.unit,"kWh/day");assert.equal(p.category,"renewable");assert.equal(p.kWhPerDay,0);assert.equal(Object.hasOwn(p,"watts"),false);}
 });
+
+test("load presets: editable starting-current assumptions distinguish AC, motors and unmodelled surge",()=>{
+  const multipliers={"led-bulb":1,fluorescent:1,halogen:1,"ceiling-fan":6,"split-ac-1hp":5,
+    "split-ac-1-5hp":5,"window-ac":5,refrigerator:6,freezer:6,microwave:1,kettle:1,
+    "washing-machine":6,tv:1,laptop:1,desktop:1,router:1,"water-pump":6,"borehole-pump":6,iron:1};
+  assert.equal(Object.keys(multipliers).length,LOAD_PRESETS.length);
+  for(const preset of LOAD_PRESETS)assert.equal(preset.inrushMultiplier,multipliers[preset.id],preset.id);
+  const refrigerator=LOAD_PRESETS.find(preset=>preset.id==="refrigerator");
+  const edited={...refrigerator,inrushMultiplier:3};
+  assert.equal(edited.inrushMultiplier,3);assert.equal(refrigerator.inrushMultiplier,6);
+});

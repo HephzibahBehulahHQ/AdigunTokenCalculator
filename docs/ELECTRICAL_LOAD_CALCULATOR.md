@@ -87,3 +87,195 @@ The appliance values come from the owner's requested editable engineering estima
 
 - Schneider Electric, [Theoretical principles to improve power factor](https://www.electrical-installation.org/enwiki/Theoretical_principles_to_improve_power_factor).
 - Schneider Electric, [Estimation of actual maximum kVA demand](https://www.electrical-installation.org/enwiki/Estimation_of_actual_maximum_kVA_demand).
+
+
+## V2 extensions
+
+The existing route and original exports remain available. The added UI uses
+`calculateLoadV2Summary(devices, settings, extensions)`; default options retain
+the existing numerical scenario. The original `buildLoadCsv` export remains
+available to callers, while the page's CSV button now uses `buildLoadV2Csv`.
+No new dependency, service, account or telemetry is introduced.
+
+### Starting current, PF correction and protection estimates
+
+Each preset adds an editable `inrushMultiplier` between 1 and 10: motor
+presets use 6, AC presets use 5, and the other presets use 1. A factor of 1 means
+that no additional surge is modelled; it is not a verified absence of inrush.
+
+- Rated current uses nameplate W × quantity, divided by voltage × PF for
+  single phase, or √3 × line-to-line voltage × PF for balanced three phase.
+- Starting current multiplies that rated current by the entered multiplier.
+  Aggregate starting estimates include household and growth scaling, without
+  reducing them by duty, demand or diversity. They assume simultaneous starting.
+- Inductive/motor starting kW is nameplate kW × quantity × multiplier. This is
+  a same-PF approximation and also applies to the broad inductive-labelled
+  category; it is not a measured motor starting characteristic.
+- An existing zero-duty device with PF = 0 can still produce its valid standby
+  and energy results. Its uncomputable rated/surge estimates are N/A. Unknown
+  contributions make the aggregate surge and entered-limit comparisons unknown,
+  rather than silently treating them as zero. Zero households or quantity are
+  known zero contributions. Standalone rated-current helpers remain strict.
+- Design current is the existing aggregate operating apparent power divided by
+  voltage (and √3 for three phase). The breaker suggestion selects the next
+  rating at or above 1.25 × design current from 6, 10, 16, 20, 25, 32, 40, 50,
+  63, 80, 100 and 125 A. Above the supplied list it reports N/A. The 125% margin
+  is the requested planning assumption, not a universal wiring-code rule.
+- Connected capacity including household/growth scaling is checked against the
+  kW grid limit. Starting current is separately checked against user-entered
+  breaker and grid-current limits in A.
+
+PF correction reuses `powerFactorCorrectionKVAR`:
+
+`Qc = P × [tan(acos(PF_old)) − tan(acos(PF_new))]`.
+
+The µF result is **per capacitor element**, at the selected 50 or 60 Hz.
+With Qc in kVAR and V in volts, single phase uses
+`C = Qc × 10^9 / (2π f V²)`. A three-phase wye bank uses the same expression
+with line-to-line V for each of three elements; a delta bank divides that
+per-element result by three. The UI displays the element count, connection,
+frequency and element voltage. A lower target PF produces a negative correction
+and no capacitor suggestion. Reduced kVA and the assumed daily charge avoided
+are shown separately. They do not reduce energy consumption or the energy bill.
+
+Cable voltage drop uses one-way length and the selected standard conductor
+cross-section. It is a resistance-only longitudinal estimate, with fixed guide
+values ρ = 0.0237 Ω·mm²/m for copper and 0.0376 for aluminium:
+
+`R = ρL/A; ΔV = 2 I R PF` for single phase, or
+`ΔV = √3 I R PF` for balanced three phase.
+
+The 5% alert is a planning threshold. Conductor temperature, reactance,
+installation method, cable ampacity, fault current, earthing, breaker curves and
+coordination require separate verification against applicable local rules.
+The chosen cross-section is an input, not a certified ampacity selection.
+
+### Device windows, tariffs and profile resolution
+
+A device can opt into its own preferred operating window. This overrides the
+global schedule for that device only. Hours are distributed inside the preferred
+window first and outside it when necessary, preserving the entered daily hours
+and energy. Windows may cross midnight; equal device-window endpoints mean a
+full day. Disabled windows retain the original global/default schedule behavior.
+
+The hourly profile has 24 average-kW bins; the 15-minute profile has 96 native
+bins. It is calculated from exact overlap with operating windows, rather than
+repeating hourly values. The chart, peak, load factor and peak-to-average ratio
+use the selected interval. Top-three peak hours always rank hourly averages,
+with ties ordered by earlier hour. Cumulative energy starts at 0 kWh at 00:00 and
+ends at the daily total at 24:00. These are modelled interval averages, not
+instantaneous starting peaks.
+
+TOU pricing is optional. Peak, off-peak and standard windows use 15-minute
+boundaries and must cover all 96 quarter-hours exactly once. Gaps and overlaps
+are rejected. Equal tariff-window endpoints disable that band; 0–24 denotes a
+full-day band. Rates are editable in the selected currency per kWh. TOU costing
+uses the native quarter-hour profile regardless of the chart interval, and the
+daily cost is the sum of the band costs. Disabling TOU preserves flat pricing.
+
+Daily renewable generation is capped at daily use and allocated proportionally
+across devices and tariff bands as bookkeeping. This does not model generation
+timing, self-consumption or battery dispatch. Per-device net costs and CO₂
+reconcile with the aggregate; gross CO₂ is also shown. PF penalty savings are an
+independent estimate and are not deducted from these energy costs.
+
+### Monthly factors and annual projections
+
+All 12 active-energy factors are editable, defaulting to 1. Standby energy
+remains unchanged. The base daily and weekly scenario and profile remain the
+daily scenario; the selected month projects its own seasonal daily result over
+30 days. Annual results weight all 12 factors over a fixed 365-day year using
+31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30 and 31 days. Each monthly scenario
+recomputes its own capped renewable credit, so a low-use month cannot receive a
+credit greater than its use.
+
+The seasonal table shows each month's factor and **daily** scenario. Annual
+totals already include their day weights and must not be multiplied again.
+
+### Customer bill / estimate
+
+**Print customer estimate / PDF** builds a distinct customer-facing document.
+The original engineer print action remains separate. The company identity is
+inherited from the approved templates:
+
+- Company: **Hephzibah Behulah**; division: **HB Artificial Intelligence**;
+  product: **AdigunTokenCalculator**.
+- Unchanged local artwork: `assets/hephzibah-behulah-official.jpg`.
+- Approved contact: **https://hephzibahbehulah.com/**. No company postal address,
+  telephone or email has been invented.
+- Global source: [README at bd116504412b37105166805018f64a6e7bbe3cde](https://github.com/HephzibahBehulahHQ/HephzibahBehulahHQ.github.io/blob/bd116504412b37105166805018f64a6e7bbe3cde/README.md).
+- Corporate naming/contact source: [brand-and-product-naming.md at 52f01f9986d97088413ca9785bc7a2d3f2967123](https://github.com/HephzibahBehulahHQ/hb-design-system/blob/52f01f9986d97088413ca9785bc7a2d3f2967123/docs/brand-and-product-naming.md).
+- AI identity source: [README at 4d4eb7e9108f88f6a406cec52e3e9a551eb09bdd](https://github.com/HephzibahBehulahHQ/hb-artificial-intelligence/blob/4d4eb7e9108f88f6a406cec52e3e9a551eb09bdd/README.md).
+
+Customer name, separate phone number, multiline address, reference and date are
+required. Email is optional and validated when supplied. Defaults use the
+browser's local calendar date and an `EST-YYYYMMDD-####` reference; the suffix
+is a convenient local reference, not a globally unique identifier. Dates must
+be real calendar dates. An edited estimate date may differ from its original
+reference date. Text remains text, including any entered markup.
+
+Choose day, selected month, year or 1–3650 custom days as the estimate basis.
+Line items retain entry order and show quantity, rated W, daily hours, base-day
+energy and cost, plus the charge for the selected period. Month/year period
+charges use the entered seasonal factors; custom days use the base daily
+scenario. Community/demand/diversity/growth assumptions are printed.
+
+Tax defaults to 0%, accepts 0–100%, and has an editable label. Each net period
+line is calculated at full precision and rounded to two decimal places before
+the subtotal is summed. Tax is rounded once from that subtotal, and grand total
+is the sum of their integer cents. Monetary values outside safe integer-cent
+arithmetic are rejected. For example, a 27.00 subtotal with 15% tax produces
+4.05 tax and 31.05 total. Renewable credit is already reflected in the line
+charges and is never subtracted a second time. Daily/monthly/yearly projections
+are before tax; the emphasized grand total applies to the chosen period.
+
+Invalid required fields, date/reference, tax or calculation inputs block the
+print view and `window.print()`. The current calculation is refreshed at the
+click, so a pending 150 ms update cannot print stale totals. The approved logo
+must load successfully. Print mode is cleared after printing, on failure,
+on close and on route destruction. Customer details stay in memory and are
+excluded from both CSV builders and saved profiles; reloading clears them.
+
+A dedicated named A4 stylesheet sets page margins, a logo/customer header,
+repeating table headings, readable tax/grand-total rows, and company-contact
+page footers with page counters. The footer states **“This is an estimate, not a
+final invoice.”** Save as PDF through the browser's normal print dialog. Browser
+paper, margin and automatic-header settings can override the requested layout;
+page-margin counters depend on browser support. See [Chrome's page-margin
+documentation](https://developer.chrome.com/blog/print-margins). Engineer print
+also expands its assumptions/details and excludes customer fields.
+
+### Extended export and profile storage
+
+The page's CSV contains current v2 summary costs, device inrush/windows and
+rated/surge/start values, PF correction, TOU bands, monthly factors, per-device
+cost/CO₂, the selected 24/96-point profile and cumulative energy. It is a
+sectioned report: global PF correction is reported once, rather than falsely
+attributing the same capacitor bank to every device. Text-cell formula escaping
+and decimal-dot numeric output remain in place. CSV and bill printing are
+separate actions.
+
+The v2 profile format keeps the established storage key and adds only normalized
+calculation inputs. It stores all new device and global options, but no bill,
+customer, draft, cached result or arbitrary metadata. Version-1 profiles load
+through an in-memory migration with multiplier 1 and no device window, without
+rewriting storage. Explicit Save writes version 2. Invalid or unavailable
+storage cannot replace a valid current/saved profile. The original v1 storage
+exports remain available for v1 callers.
+
+### V2 verification and formula sources
+
+New unit tests cover interval conservation, default compatibility, independent
+TOU/seasonal totals, surge/current/capacitor/drop formulas, unavailable PF=0
+starting estimates, v1/v2 persistence, all four locales, customer validation,
+tax boundaries and currency rounding. Browser tests exercise the production
+Vite bundle, input/output wiring, privacy, print cleanup and a real multi-page
+A4 PDF. Local browser checks are skipped when Chromium is unavailable; the
+existing CI Chromium job must pass before release. This does not claim a manual
+screen-reader review or universal printer/browser compatibility.
+
+Additional primary references:
+
+- Schneider Electric, [Calculation of voltage drop in steady load conditions](https://www.electrical-installation.org/enwiki/Calculation_of_voltage_drop_in_steady_load_conditions): conductor resistance and phase-dependent drop equations.
+- Schneider Electric, [Selection of a circuit-breaker](https://www.electrical-installation.org/enwiki/Selection_of_a_circuit-breaker): installation conditions and protection coordination.
+- ABB, [Power factor correction and harmonic filtering in electrical plants](https://library.e.abb.com/public/4ffab4cf79db502fc12574ef004deed3/1SDC007107G0201.pdf), tables 9.1–9.2: three-phase capacitor connections.

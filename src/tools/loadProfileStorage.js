@@ -1,5 +1,6 @@
-import {calculateLoadSummary} from "../calculators/loadCalculator.js";
-import {invalidLoadInput, normalizeLoadDevice, normalizeLoadDevices, normalizeLoadSettings} from "../calculators/loadProfile.js";
+import {calculateLoadSummary, calculateLoadV2Summary, normalizeLoadV2Settings, normalizeTariffBands} from "../calculators/loadCalculator.js";
+import {invalidLoadInput, normalizeLoadDevice, normalizeLoadDevices, normalizeLoadSettings,
+  normalizeLoadV2Device, normalizeLoadV2Devices} from "../calculators/loadProfile.js";
 
 // One opt-in slot. This module never accesses window or storage on import.
 export const LOAD_PROFILE_STORAGE_KEY = "adigun.electrical-load.profile.v1";
@@ -78,4 +79,69 @@ export function readLoadProfile(storage) {
 
 export function deleteLoadProfile(storage) {
   storageOperation(() => storage.removeItem(LOAD_PROFILE_STORAGE_KEY));
+}
+
+// Version two shares the explicit one-slot controls. Existing version-one APIs
+// keep their original schema and behavior; reading v1 never rewrites the slot.
+const V2_DEVICE_FIELDS = Object.keys(normalizeLoadV2Device({}));
+const V2_EXTENSION_FIELDS = Object.keys(normalizeLoadV2Settings());
+const V2_BAND_FIELDS = ["id", "startHour", "endHour", "rate"];
+
+function normalizedV2Profile(devices, settings, extensions) {
+  const normalizedDevices = normalizeLoadV2Devices(devices);
+  // Reuse the established currency, editable-input bounds and v1 validation.
+  const base = normalizedProfile(normalizedDevices, settings);
+  const normalizedExtensions = normalizeLoadV2Settings(extensions, base.settings.tariff);
+  for (const device of normalizedDevices) {
+    if (device.operatingWindow && device.operatingWindow.startHour > 23.999999) throw invalidProfile();
+  }
+  const profile = {devices:normalizedDevices, settings:base.settings, extensions:normalizedExtensions};
+  // Validate all derived v2 results before an explicit save or state replacement.
+  // Normalizers whitelist calculation fields; customer/billing/draft data is absent.
+  calculateLoadV2Summary(profile.devices, profile.settings, profile.extensions);
+  return profile;
+}
+
+export function serializeLoadV2Profile(devices, settings = {}, extensions = {}) {
+  try {
+    const profile = normalizedV2Profile(devices, settings, extensions);
+    const serialized = JSON.stringify({format:FORMAT, version:2, ...profile});
+    if (serialized.length > MAX_SAVED_PROFILE_CHARS) throw invalidProfile();
+    return serialized;
+  } catch {
+    throw invalidProfile();
+  }
+}
+
+export function parseLoadV2Profile(serialized) {
+  try {
+    if (typeof serialized !== "string" || serialized.length > MAX_SAVED_PROFILE_CHARS) throw invalidProfile();
+    const payload = JSON.parse(serialized);
+    if (record(payload) && payload.version === 1) {
+      const legacy = parseLoadProfile(serialized);
+      return normalizedV2Profile(legacy.devices, legacy.settings, {});
+    }
+    if (!record(payload) || payload.format !== FORMAT || payload.version !== 2 ||
+        !Array.isArray(payload.devices) || !hasFields(payload.settings, SETTING_FIELDS) ||
+        !hasFields(payload.extensions, V2_EXTENSION_FIELDS) ||
+        !payload.devices.every(device => hasFields(device, V2_DEVICE_FIELDS) && device.powerUnit === "W") ||
+        !Array.isArray(payload.extensions.tariffBands) ||
+        !payload.extensions.tariffBands.every(band => hasFields(band, V2_BAND_FIELDS))) throw invalidProfile();
+    // A persisted schema is stricter than a disabled draft TOU form: corrupt
+    // stored bands must not silently turn into defaults during restoration.
+    normalizeTariffBands(payload.extensions.tariffBands);
+    return normalizedV2Profile(payload.devices, payload.settings, payload.extensions);
+  } catch {
+    throw invalidProfile();
+  }
+}
+
+export function saveLoadV2Profile(storage, devices, settings = {}, extensions = {}) {
+  const serialized = serializeLoadV2Profile(devices, settings, extensions);
+  storageOperation(() => storage.setItem(LOAD_PROFILE_STORAGE_KEY, serialized));
+}
+
+export function readLoadV2Profile(storage) {
+  const serialized = storageOperation(() => storage.getItem(LOAD_PROFILE_STORAGE_KEY));
+  return serialized === null ? null : parseLoadV2Profile(serialized);
 }

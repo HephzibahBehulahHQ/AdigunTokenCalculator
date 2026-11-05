@@ -104,6 +104,11 @@ function preferredFraction(hour, schedule) {
  * Daily renewable energy/battery capacity do not invent an hourly dispatch curve.
  */
 export function generate24hProfile(devices, occupancySchedule, settings = {}) {
+  // Opt-in extension only: retain the original path for all existing inputs.
+  if (Array.isArray(devices) && devices.some(device => device?.operatingWindow != null)) {
+    const suppliedSettings = normalizeLoadSettings(settings);
+    return generateIntervalProfile(devices, {...suppliedSettings, occupancySchedule:occupancySchedule === undefined ? suppliedSettings.occupancySchedule : occupancySchedule}, 60);
+  }
   const normalized = normalizeLoadDevices(devices);
   const s = normalizeLoadSettings(settings);
   const schedule = normalizeOccupancySchedule(occupancySchedule === undefined ? s.occupancySchedule : occupancySchedule);
@@ -124,4 +129,71 @@ export function generate24hProfile(devices, occupancySchedule, settings = {}) {
     }
   }
   return profile;
+}
+
+/** v2 fields are deliberately separate from the stable v1 device schema. */
+export function normalizeLoadV2Device(device) {
+  const base = normalizeLoadDevice(device);
+  return {...base,
+    inrushMultiplier:loadNumber(supplied(device.inrushMultiplier, 1), "inrushMultiplier", 1, 10),
+    operatingWindow:normalizeOccupancySchedule(device.operatingWindow)
+  };
+}
+
+export function normalizeLoadV2Devices(devices) {
+  if (!Array.isArray(devices) || devices.length > MAX_LOAD_DEVICES) throw invalidLoadInput("devices", "deviceLimit");
+  return Array.from(devices, normalizeLoadV2Device);
+}
+
+function intervalOverlap(from, to, schedule) {
+  const {startHour:start, endHour:end} = schedule;
+  if (start === end || (start === 0 && end === 24)) return to - from;
+  const overlap = (a, b) => Math.max(0, Math.min(to, b) - Math.max(from, a));
+  return end > start ? overlap(start, end) : overlap(start, 24) + overlap(0, end);
+}
+
+/** Native interval averages, with per-device preference taking precedence. */
+export function generateIntervalProfile(devices, settings = {}, intervalMinutes = 60) {
+  if (![15, 60].includes(intervalMinutes)) throw invalidLoadInput("resolutionMinutes");
+  const ds = normalizeLoadV2Devices(devices), s = normalizeLoadSettings(settings), scale = loadScenarioScale(s);
+  const duration = intervalMinutes / 60;
+  const profile = Array.from({length:24 / duration}, (_, index) => ({hour:index * duration, kW:0}));
+  for (const device of ds) {
+    const schedule = device.operatingWindow ?? s.occupancySchedule;
+    const windowHours = schedule ? intervalOverlap(0, 24, schedule) : 0;
+    const inside = windowHours ? Math.min(device.hoursPerDay, windowHours) / windowHours : 0;
+    const outside = windowHours < 24 ? Math.max(0, device.hoursPerDay - windowHours) / (24 - windowHours) : 0;
+    const activeKW = finiteLoadResult(device.watts / 1000 * device.quantity * device.dutyCycle / 100 * device.seasonalFactor);
+    const standbyKW = finiteLoadResult(device.standbyW / 1000 * device.quantity);
+    for (const point of profile) {
+      const preferred = schedule ? intervalOverlap(point.hour, point.hour + duration, schedule) / duration : 0;
+      const fraction = schedule ? preferred * inside + (1 - preferred) * outside : (Math.max(0, Math.min(point.hour + duration, device.hoursPerDay) - point.hour) / duration);
+      const activeFraction = Math.min(1, Math.max(0, fraction));
+      const contribution = finiteLoadResult((activeKW * activeFraction + standbyKW * (1 - activeFraction)) * scale);
+      point.kW = finiteLoadResult(point.kW + contribution);
+    }
+  }
+  return profile;
+}
+
+export function generate15minProfile(devices, settings = {}) {
+  return generateIntervalProfile(devices, settings, 15);
+}
+
+/** Hourly ranking remains hourly even when the selected chart uses 15 minutes. */
+export function profileStatistics(profile) {
+  if (!Array.isArray(profile) || ![24, 96].includes(profile.length)) throw invalidLoadInput("profile");
+  const duration = 24 / profile.length, hourly = Array.from({length:24}, (_, hour) => ({hour,kW:0}));
+  const cumulative = [{hour:0,kWh:0}];let dailyKWh = 0, peakKW = 0;
+  for (let index = 0; index < profile.length; index++) {
+    const point = profile[index];
+    if (!point || point.hour !== index * duration) throw invalidLoadInput("profile");
+    const kW = loadNumber(point.kW, "profile");
+    dailyKWh = finiteLoadResult(dailyKWh + kW * duration);peakKW = Math.max(peakKW,kW);
+    hourly[Math.floor(point.hour)].kW = finiteLoadResult(hourly[Math.floor(point.hour)].kW + kW * duration);
+    cumulative.push({hour:(index + 1) * duration,kWh:dailyKWh});
+  }
+  const averageKW = dailyKWh / 24;
+  return {dailyKWh,peakKW,averageKW,peakAverageRatio:averageKW ? finiteLoadResult(peakKW / averageKW) : 0,
+    topHours:dailyKWh ? hourly.sort((a,b) => b.kW-a.kW || a.hour-b.hour).slice(0,3) : [], cumulative};
 }

@@ -48,7 +48,7 @@ A static, browser-side suite of 39 token, everyday, health-estimate and develope
 | Holiday countdown | Time & Date | Common rule-based dates by region; incomplete calendar coverage. | Gregorian computus and selected official holiday references. |
 | Morse code translator | Text & Language | Bidirectional International Morse mapping. | ITU-R M.1677-1. |
 | Statistics calculator | Math & Engineering | Mean, median, mode, range, variance and standard deviation. | Standard descriptive statistics. |
-| Electrical Load Calculator | Math & Engineering | Building/community load, real/reactive/apparent power, peak demand, load factor, cost, CO₂, 24h profile. | Typical appliance wattage/PF engineering estimates; user-editable; no live data. Presets are editable estimates, not manufacturer-specific. [Calculation assumptions](docs/ELECTRICAL_LOAD_CALCULATOR.md). |
+| Electrical Load Calculator | Math & Engineering | Building/community real/reactive/apparent power, surge current, PF correction, time-of-use tariffs, cable sizing and voltage drop, seasonal cost/CO₂, hourly/15-min profiles, and customer bill/estimate printout with validated contact fields, tax and grand total. | Typical appliance wattage/PF/inrush engineering estimates; user-editable; no live data. Presets are editable estimates, not manufacturer-specific. [Calculation assumptions](docs/ELECTRICAL_LOAD_CALCULATOR.md). |
 
 ## Privacy and architecture
 
