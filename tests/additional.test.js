@@ -119,3 +119,22 @@ test("regional holiday calendars include common fixed and weekday rules",()=>{
  assert.ok(gb.some(x=>x[0]==="Summer bank holiday"&&x[1]==="2026-08-31"));
  assert.ok(ca.some(x=>x[0]==="Thanksgiving"&&x[1]==="2026-10-12"));
 });
+
+test("JSON formatting preserves large numeric tokens and duplicate members",()=>{
+ const source='{ "account": 9007199254740993, "large": 1e400, "small": 1e-400, "signedZero": -0, "same": 1, "same": 2 }';
+ const compact='{"account":9007199254740993,"large":1e400,"small":1e-400,"signedZero":-0,"same":1,"same":2}';
+ assert.equal(a.jsonTransform(source,"minify"),compact);
+ assert.equal(a.jsonTransform(a.jsonTransform(source,"pretty"),"minify"),compact);
+});
+test("JSON formatting preserves escapes and string whitespace",()=>{
+ const source=String.raw`{"message":" a , : { [ \"quoted\" ] } b ","path":"C:\\tmp\\file","unicode":"\u0041","items":[{},[],true,null]}`;
+ const pretty=a.jsonTransform(source,"pretty");
+ assert.equal(a.jsonTransform(pretty,"minify"),source);
+ assert.deepEqual(JSON.parse(pretty),JSON.parse(source));
+ assert.equal(a.jsonTransform("9007199254740993","pretty"),"9007199254740993");
+ assert.equal(a.jsonTransform(" [ ] ","pretty"),"[]");
+ assert.throws(()=>a.jsonTransform('{"broken":}',"minify"),/JSON syntax error/);
+});
+test("JSON pretty output retains ordinary nested formatting",()=>{
+ assert.equal(a.jsonTransform('{"a":[1,{"b":true}],"c":null}',"pretty"),'{\n  "a": [\n    1,\n    {\n      "b": true\n    }\n  ],\n  "c": null\n}');
+});

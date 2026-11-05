@@ -20,14 +20,25 @@
 - Exact approved corporate logo artwork copied byte-for-byte from the design-system repository; provenance and reference revisions are recorded.
 - Root `SOURCES.md`, architecture, privacy, licensing, third-party notices, test plan and Pages configuration records updated.
 
+## Continuation repairs — 5 November 2026
+
+- Restore declared form defaults, conditional fields and units on Reset, including the seeded currency/demographic text.
+- Preserve keyboard focus through category filtering, tool entry and back navigation; recover safely from malformed URL fragments.
+- Ignore stale asynchronous token/hash/geolocation results after Reset, Clear, navigation, language changes or a newer calculation.
+- Preserve UTF-8 input in generated QR codes and original numeric tokens when formatting JSON.
+- Return the population reference baseline, reject missing GPA grades, and keep sleep times valid across multi-day rollover.
+- Wrap calculator action rows on narrow screens. Regression coverage checks all 38 calculator panels at 375 px.
+
 ## Automated verification
 
-Latest successful CI run: [#190](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930582052), commit `e43c0d309be7640be37bb27a07631eaf6f7b73cb`.
-- `npm ci`: PASS.
-- Chromium installation on Ubuntu 24.04: PASS.
-- `npm test`: **58 passed, 0 failed**, including Playwright Chromium browser smoke test.
-- `npm run build`: PASS.
-- Lockfile inventory: 70 dependency packages; all have declared licence metadata (MIT, ISC, BSD-2-Clause, BSD-3-Clause, Apache-2.0).
+The last verified pre-repair candidate is commit `2f3543250a4507448d77aadd8e7191eace9a2024`: [CI run 41930814702](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930814702) passed dependency installation, Chromium integration, tests and production build.
+
+The continuation repairs require a new CI result. Their exact candidate SHA and latest verification receipt are maintained in the [PR #6 verification section](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/6), avoiding a self-referential documentation/CI commit cycle. A prior green run does not verify later changes.
+
+- Initial repair checks: changed JavaScript syntax and focused isolated JavaScript regressions passed.
+- Full repaired-candidate npm/browser/build verification: pending branch CI when this checkpoint was authored.
+- Local browser and build execution: **NOT TESTED**; the execution environment is unavailable.
+- Manual human checks listed below remain separate from automated CI.
 
 Earlier deployment run #6 succeeded for commit `862ca832609d8e6dd80e616c37ad75b9c237ff06` after the owner changed GitHub Pages source to **GitHub Actions**. That deployment contains the earlier 18-tool release, not this 38-tool feature branch. PR #6 must merge and its own Pages workflow must pass before the live site contains the expanded catalogue.
 
@@ -51,4 +62,4 @@ Earlier deployment run #6 succeeded for commit `862ca832609d8e6dd80e616c37ad75b9
 - Holiday dates are rule-based calendar references, not legal confirmation of statutory-holiday entitlement.
 - Pew's 2020 “other religions” aggregate includes folk/traditional and smaller traditions; no unsupported separate folk percentage is inferred.
 
-**Release status:** implementation and automated verification are complete on the feature branch. The 38-tool version is not yet merged or deployed, and the human/owner/data-audit gates above remain open.
+**Release status:** the expanded implementation and continuation repairs are on the feature branch; use PR #6 for the latest exact-candidate automated verification receipt. The 38-tool version is not yet merged or deployed, and the human/owner/data-audit gates above remain open.

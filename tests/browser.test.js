@@ -1,13 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {existsSync} from "node:fs";
+import {createHash} from "node:crypto";
 import {spawn} from "node:child_process";
 import {setTimeout as delay} from "node:timers/promises";
 import {chromium} from "playwright-core";
 
 const browserAvailable=existsSync(chromium.executablePath());
 
-test("browser directory, filters, deep links and calculator workflow", {skip:!browserAvailable}, async()=>{
+test("browser directory, filters, deep links and calculator workflow", {skip:!browserAvailable,timeout:120000}, async(t)=>{
   const server=spawn(process.execPath,["node_modules/vite/bin/vite.js","--host","127.0.0.1","--port","4173","--strictPort"],{stdio:"ignore"});
   let browser;
   try{
@@ -21,7 +22,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     const page=await browser.newPage(),pageErrors=[],externalRequests=[];
     page.on("pageerror",e=>pageErrors.push(e.message));
     page.on("request",request=>{try{if(new URL(request.url()).host!=="127.0.0.1:4173")externalRequests.push(request.url());}catch{externalRequests.push(request.url());}});
-    await page.addInitScript(()=>{window.__geoCalls=0;Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(){window.__geoCalls++;}}});});
+    await page.addInitScript(()=>{window.__geoCalls=0;window.__geoRequests=[];Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(success,error){window.__geoCalls++;window.__geoRequests.push({success,error});}}});});
     await page.goto("http://127.0.0.1:4173/");
     assert.equal(await page.locator(".tool-card").count(),38);
     assert.equal(await page.locator(".category-chip").count(),11);
@@ -64,14 +65,17 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     assert.equal(await page.locator(".tool-card").count(),38);
+    await page.setViewportSize({width:375,height:812});
     const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
     assert.equal(new Set(cardData.map(card=>card.key)).size,38,"tool keys must be unique");
     for(const card of cardData){
       await page.locator('.tool-card[data-tool-key="'+card.key+'"]').click();
       await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,card.key);
       await page.waitForFunction(name=>document.querySelector("#panel h2")?.textContent===name,card.name);
-      if(card.key==="world")assert.equal(await page.locator("#panel .result").count(),1);
+      if(card.key==="world"){assert.equal(await page.locator("#panel .result").count(),1);assert.doesNotMatch(await page.locator("#panel .result").innerText(),/NaN|undefined/);}
       else assert.equal(await page.locator("#panel form").count(),1,card.key+" should render a form");
+      const width=await page.evaluate(()=>({viewport:document.documentElement.clientWidth,content:document.documentElement.scrollWidth}));
+      assert.ok(width.content<=width.viewport,card.key+" panel overflows mobile viewport: "+JSON.stringify(width));
       await page.locator(".back-directory").click();
       await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
     }
@@ -85,6 +89,110 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.goto("http://127.0.0.1:4173/#/timezone");
     assert.match(await page.locator("#panel h2").innerText(),/Time zone converter/);
     assert.equal(await page.locator("#panel form").count(),1);
+
+    const openTool=async key=>{
+      await page.evaluate(key=>{location.hash="#/"+key;},key);
+      await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,key);
+    };
+    const reset=()=>page.locator('#panel button[type="reset"]').click();
+    await t.test("reset restores defaults, conditional fields and BMI unit labels",async()=>{
+      await openTool("bmi");
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        const options=await page.locator('select[name="unit"] option').allTextContents();
+        assert.match(options[0],/kg, m/);assert.match(options[1],/lb, in/);
+        assert.doesNotMatch(options.join(" "),/mpg|L\/100/);
+      }
+      await page.locator("#language").selectOption("en");
+      await page.locator('select[name="unit"]').selectOption("imperial");
+      await reset();
+      assert.equal(await page.locator('select[name="unit"]').inputValue(),"metric");
+      assert.match(await page.locator('input[name="weight"]').locator("..").innerText(),/kg/);
+      assert.match(await page.locator('input[name="height"]').locator("..").innerText(),/\(m\)/);
+      await page.locator('input[name="weight"]').fill("80");await page.locator('input[name="height"]').fill("2");
+      await page.locator('#panel button[type="submit"]').click();
+      assert.match(await page.locator(".result").innerText(),/20/);
+      for(const [key,mode,field] of [["math","sqrt","b"],["dates","annual","start"],["discount","reverse","price"]]){
+        await openTool(key);
+        await page.locator('select[name="'+(key==="math"?"op":"mode")+'"]').selectOption(mode);
+        await reset();
+        const input=page.locator('input[name="'+field+'"]');
+        assert.equal(await input.isVisible(),true,key+" dependent field must be visible after reset");
+        assert.equal(await input.evaluate(node=>node.required),true);
+      }
+      await openTool("units");await page.locator('select[name="group"]').selectOption("mass");await reset();
+      assert.equal(await page.locator('select[name="group"]').inputValue(),"length");
+      assert.equal(await page.locator('select[name="from"] option[value="m"]').count(),1);
+      assert.equal(await page.locator('select[name="from"] option[value="kg"]').count(),0);
+      await openTool("fuel");await page.locator('select[name="mode"]').selectOption("imperial");await reset();
+      assert.equal(await page.locator('select[name="mpgType"]').isVisible(),false);
+      assert.match(await page.locator('input[name="distance"]').locator("..").innerText(),/km/);
+      await openTool("currency");const rates=await page.locator('textarea[name="rates"]').inputValue();
+      assert.ok(rates.length>100);await page.locator('textarea[name="rates"]').fill("EUR=1");await reset();
+      assert.equal(await page.locator('textarea[name="rates"]').inputValue(),rates);
+      await openTool("demographics");const shares=await page.locator('textarea[name="shares"]').inputValue();
+      await page.locator('textarea[name="shares"]').fill("Example, 50");await reset();
+      assert.equal(await page.locator('textarea[name="shares"]').inputValue(),shares);
+    });
+    await t.test("keyboard focus follows filters, tool entry and back navigation",async()=>{
+      await page.locator(".back-directory").click();
+      await page.waitForFunction(()=>!document.querySelector("aside").hidden);
+      await page.locator(".category-chip").nth(5).click();
+      assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute("aria-pressed")),"true");
+      await page.locator(".category-chip").first().click();
+      await page.locator('.tool-card[data-tool-key="bmi"]').focus();await page.keyboard.press("Enter");
+      await page.waitForFunction(()=>document.activeElement?.tagName==="H2");
+      assert.equal(await page.locator("#panel").getAttribute("data-tool-key"),"bmi");
+      await page.locator(".back-directory").click();
+      await page.waitForFunction(()=>document.activeElement?.dataset.toolKey==="bmi");
+    });
+    await t.test("pending hashes cannot overwrite reset, newer results, navigation or locale changes",async()=>{
+      await openTool("hash");
+      await page.evaluate(()=>{
+        const digest=crypto.subtle.digest.bind(crypto.subtle);window.__pendingHashes=[];
+        window.__restoreDigest=()=>{crypto.subtle.digest=digest;};
+        crypto.subtle.digest=(...args)=>new Promise((resolve,reject)=>{
+          window.__pendingHashes.push({complete:()=>digest(...args).then(resolve,reject),fail:()=>reject(new Error("delayed failure"))});
+        });
+      });
+      const submit=async text=>{await page.locator('textarea[name="text"]').fill(text);await page.locator('#panel button[type="submit"]').click();};
+      try{
+        await submit("reset");await page.waitForFunction(()=>window.__pendingHashes.length===1);
+        await reset();await page.evaluate(()=>window.__pendingHashes[0].complete());
+        assert.equal(await page.locator(".result").count(),0);
+        await submit("older");await submit("newer");await page.waitForFunction(()=>window.__pendingHashes.length===3);
+        await page.evaluate(()=>window.__pendingHashes[2].complete());
+        const expected=createHash("sha256").update("newer").digest("hex");
+        assert.ok((await page.locator(".result").innerText()).includes(expected));
+        await page.evaluate(()=>window.__pendingHashes[1].complete());
+        assert.ok((await page.locator(".result").innerText()).includes(expected));
+        await submit("navigate");await page.waitForFunction(()=>window.__pendingHashes.length===4);
+        await openTool("bmi");await page.evaluate(()=>window.__pendingHashes[3].fail());
+        assert.equal(await page.locator(".result").count(),0);
+        await openTool("hash");await submit("locale");await page.waitForFunction(()=>window.__pendingHashes.length===5);
+        await page.locator("#language").selectOption("de");await page.evaluate(()=>window.__pendingHashes[4].complete());
+        assert.equal(await page.locator(".result").count(),0);
+        await page.locator("#language").selectOption("en");
+      }finally{await page.evaluate(()=>window.__restoreDigest());}
+    });
+    await t.test("late geolocation errors stay in their original view",async()=>{
+      await openTool("qibla");await page.getByRole("button",{name:"Use my location",exact:true}).click();
+      assert.equal(await page.evaluate(()=>window.__geoCalls),1);
+      await openTool("bmi");await page.evaluate(()=>window.__geoRequests[0].error({code:1}));
+      assert.equal(await page.locator(".result").count(),0);
+    });
+    await t.test("malformed and unknown fragments recover to the directory",async()=>{
+      for(const hash of ["#/%","#/%E0%A4%A","#/missing"]){
+        await page.goto("http://127.0.0.1:4173/"+hash);
+        assert.equal(await page.locator(".tool-card").count(),38);
+        assert.equal(await page.locator("#panel").isVisible(),false);
+      }
+      await openTool("bmi");
+      await page.evaluate(()=>{location.hash="#/%";});
+      await page.waitForFunction(()=>!document.querySelector("aside").hidden);
+      assert.equal(await page.locator(".tool-card").count(),38);
+    });
+
     assert.deepEqual(pageErrors,[]);
     assert.deepEqual(externalRequests,[],"calculator workflows must not make third-party network requests");
   }finally{

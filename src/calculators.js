@@ -9,7 +9,7 @@ export function bearing(lat,lon){lat=Number(lat);lon=Number(lon);if(!ok(lat)||!o
 export function loan(p,rate,years){p=Number(p);rate=Number(rate)/1200;const n=Number(years)*12;if(!ok(p)||p<0||!ok(rate)||rate<0||!pos(years)||!Number.isInteger(n))throw Error("number");const payment=rate===0?p/n:p*rate/(1-(1+rate)**-n);return{payment,total:payment*n,interest:payment*n-p};}
 export function days(a,b){const x=parts(a),y=parts(b);return Math.abs(Date.UTC(y.y,y.m-1,y.d)-Date.UTC(x.y,x.m-1,x.d))/86400000;}
 export function gpa(text){const map={A:4,"A-":3.7,"B+":3.3,B:3,"B-":2.7,"C+":2.3,C:2,"C-":1.7,"D+":1.3,D:1,"D-":.7,F:0};let p=0,c=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[g,cr,...extra]=line.split(",").map(x=>x.trim()),v=map[g?.toUpperCase()],n=Number(cr);if(extra.length||v===undefined||!pos(n))throw Error("number");p+=v*n;c+=n;}if(!c)throw Error("number");return p/c;}
-export function gpaPercentage(text){let weighted=0,credits=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[p,c,...extra]=line.split(",").map(x=>x.trim()),score=Number(p),credit=Number(c);if(extra.length||!ok(score)||score<0||score>100||!pos(credit))throw Error("number");weighted+=score*credit;credits+=credit;}if(!credits)throw Error("number");return weighted/credits;}
+export function gpaPercentage(text){let weighted=0,credits=0;for(const line of String(text).trim().split(/\n/)){if(!line.trim())continue;const[p,c,...extra]=line.split(",").map(x=>x.trim()),score=Number(p),credit=Number(c);if(extra.length||!p||!c||!ok(score)||score<0||score>100||!pos(credit))throw Error("number");weighted+=score*credit;credits+=credit;}if(!credits)throw Error("number");return weighted/credits;}
 
 export function fuel(d,e,p){d=Number(d);e=Number(e);p=Number(p);if(!ok(d)||d<0||!pos(e)||!ok(p)||p<0)throw Error("number");const litres=d*e/100;return{litres,cost:litres*p};}
 export function fuelTrip(distance,efficiency,price,mode="metric",mpgType="us"){distance=Number(distance);efficiency=Number(efficiency);price=Number(price);if(!ok(distance)||distance<0||!pos(efficiency)||!ok(price)||price<0)throw Error("number");let litres,units;
@@ -27,7 +27,12 @@ export function compass(bearing){bearing=Number(bearing);if(!ok(bearing)||bearin
 export function recurringDate(date,today=new Date()){const p=parts(date),t={y:today.getFullYear(),m:today.getMonth()+1,d:today.getDate()};let y=t.y;let candidate={y,m:p.m,d:Math.min(p.d,dim(y,p.m))};if(Date.UTC(candidate.y,candidate.m-1,candidate.d)<Date.UTC(t.y,t.m-1,t.d)){y++;candidate={y,m:p.m,d:Math.min(p.d,dim(y,p.m))};}return{date:[candidate.y,String(candidate.m).padStart(2,"0"),String(candidate.d).padStart(2,"0")].join("-"),days:Math.round((Date.UTC(candidate.y,candidate.m-1,candidate.d)-Date.UTC(t.y,t.m-1,t.d))/86400000)};}
 export function memory(value,operation,stored=0){value=Number(value);stored=Number(stored);if(!ok(value)||!ok(stored))throw Error("number");if(operation==="M+")return stored+value;if(operation==="M-")return stored-value;if(operation==="MC")return 0;if(operation==="MR")return stored;throw Error("operation");}
 
-export function sleep(time,mode,cycle,buffer){if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)||!pos(cycle)||!ok(buffer)||buffer<0)throw Error("number");const base=time.split(":").reduce((h,x)=>h*60+Number(x),0);return Array.from({length:6},(_,i)=>{const d=(i+1)*Number(cycle)+Number(buffer),n=(base+(mode==="bed"?d:-d)+2880)%1440;return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");});}
+export function sleep(time,mode,cycle,buffer){
+cycle=Number(cycle);buffer=Number(buffer);
+if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)||!["bed","wake"].includes(mode)||!Number.isSafeInteger(cycle)||cycle<=0||!Number.isSafeInteger(buffer)||buffer<0||!Number.isSafeInteger(6*cycle+buffer))throw Error("number");
+const base=time.split(":").reduce((h,x)=>h*60+Number(x),0);
+return Array.from({length:6},(_,i)=>{const offset=((i+1)*cycle+buffer)%1440,minutes=base+(mode==="bed"?offset:-offset),n=((minutes%1440)+1440)%1440;return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");});
+}
 
 export function engineering(a,b,op){a=Number(a);b=Number(b);if(!ok(a))throw Error("number");let v;
 switch(op){
@@ -53,5 +58,5 @@ const baseline=8300678395,annualNet=8300678395-8231613070,daysPerYear=365.2425;
 const elapsed=(now.getTime()-Date.UTC(2026,6,1))/86400000;
 const perDay=annualNet/daysPerYear;
 const estimate=baseline+elapsed*perDay;
-return{estimate,rounded:Math.round(estimate/1000)*1000,perDay,baselineDate:"2026-07-01",annualNet};
+return{estimate,rounded:Math.round(estimate/1000)*1000,baseline,perDay,baselineDate:"2026-07-01",annualNet};
 }

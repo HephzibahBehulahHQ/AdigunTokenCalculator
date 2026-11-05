@@ -120,8 +120,20 @@ export function generatePassword(length,charset="all") {
 }
 export function jsonTransform(source,mode="pretty") {
   if(typeof source!=="string"||!source.trim())throw Error("empty");
-  let value;try{value=JSON.parse(source);}catch(e){const message=String(e.message),lc=message.match(/line\s+(\d+)\s+column\s+(\d+)/i),m=message.match(/position\s+(\d+)/i),token=message.match(/Unexpected token [\u0027\u0022](.)[\u0027\u0022]/i);let pos=lc?null:m?Number(m[1]):token?source.indexOf(token[1]):source.length;if(lc)throw Error("JSON syntax error at line "+lc[1]+", column "+lc[2]);if(pos<0)pos=source.length;const before=source.slice(0,pos),line=before.split("\n").length,column=pos-(before.lastIndexOf("\n")+1)+1;throw Error("JSON syntax error at line "+line+", column "+column);}
-  return mode==="minify"?JSON.stringify(value):JSON.stringify(value,null,2);
+  try{JSON.parse(source);}catch(e){const message=String(e.message),lc=message.match(/line\s+(\d+)\s+column\s+(\d+)/i),m=message.match(/position\s+(\d+)/i),token=message.match(/Unexpected token [\u0027\u0022](.)[\u0027\u0022]/i);let pos=lc?null:m?Number(m[1]):token?source.indexOf(token[1]):source.length;if(lc)throw Error("JSON syntax error at line "+lc[1]+", column "+lc[2]);if(pos<0)pos=source.length;const before=source.slice(0,pos),line=before.split("\n").length,column=pos-(before.lastIndexOf("\n")+1)+1;throw Error("JSON syntax error at line "+line+", column "+column);}
+  // Preserve original JSON tokens, including numbers outside JavaScript's safe range.
+  const tokens=source.match(/"(?:\\[\s\S]|[^"\\])*"|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}\[\]:,]/g);
+  if(mode==="minify")return tokens.join("");
+  if(mode!=="pretty")throw Error("number");
+  let depth=0;const output=[],newline=()=>"\n"+"  ".repeat(depth);
+  tokens.forEach((token,i)=>{
+    if(token==="{"||token==="["){output.push(token);depth++;if(tokens[i+1]!=="}"&&tokens[i+1]!=="]")output.push(newline());}
+    else if(token==="}"||token==="]"){depth--;if(tokens[i-1]!=="{"&&tokens[i-1]!=="[")output.push(newline());output.push(token);}
+    else if(token===",")output.push(token,newline());
+    else if(token===":")output.push(": ");
+    else output.push(token);
+  });
+  return output.join("");
 }
 export function parseHexColor(hex) {
   let s=String(hex).trim().replace(/^#/,"");if(/^[0-9a-f]{3}$/i.test(s))s=[...s].map(x=>x+x).join("");
