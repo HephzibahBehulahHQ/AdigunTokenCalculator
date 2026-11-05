@@ -21,7 +21,7 @@ The application contains 39 tools in 11 searchable categories and four locales. 
 
 ## Electrical load follow-up
 
-The owner requested continued completion after the verified electrical release. The continuation adds explicit browser-local Save/Load/Delete, complete four-language copy, validated profile recovery, preservation of unfinished edits and the finite tiny-PF correction fix. No changes to the original 38 calculator implementations, shared router, dependencies, branding or AGENTS.md are included. Bounded file/test checkpoints follow below.
+[PR #14](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/14) implements the owner-requested completion after the verified electrical release. The continuation adds explicit browser-local Save/Load/Delete, complete four-language copy, validated profile recovery, preservation of unfinished edits and the finite tiny-PF correction fix. No changes to the original 38 calculator implementations, shared router, dependencies, branding or AGENTS.md are included. Bounded file/test checkpoints follow below.
 
 ## Remaining human / owner work
 
@@ -83,8 +83,8 @@ No full accessibility or production certification is claimed while required huma
 - Owner instruction: continue building and finish; previous main merge/deployment authorization remains in effect.
 - Base: deployed main `4c0fb20e892cf6e34533160809002a83bed945bb`; branch `codex/electrical-load-profiles`.
 - Scope: explicit local profile save/load/delete, four-language copy, focused numerical correction, tests and release records. Existing 38 calculators remain untouched.
-- Current state: follow-up implementation and documentation complete. Full local `npm test`: 155 passed, 0 failed, 3 browser skips (Chromium unavailable); `npm run build` succeeded. Browser interactions await exact-candidate CI before merge.
-- Next: push the reviewed candidate, verify full Chromium CI, merge to main under standing owner authorization and verify public deployment. Final exact-commit receipts will be recorded in the merged follow-up PR.
+- Current state: follow-up implementation, documentation and Chromium verification complete. Functional candidate `3b9e4885b2cc40db20fd694b29079c2b27883191` passed **176 tests, 0 failed, 0 skipped**, plus production build in [GitHub CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42015301312). Local results were 155 passed with 3 unavailable-Chromium skips; CI resolved those skips.
+- Next: feature work complete. This is the pre-merge verification checkpoint; [PR #14](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/14) records the final main commit, exact-main CI, Pages deployment and live profile verification. Standing owner authorization covers merge/deployment.
 
 | Step | File | Observed verification | Next |
 | --- | --- | --- | --- |
@@ -101,3 +101,4 @@ No full accessibility or production certification is claimed while required huma
 | 41 | `tests/loadUI.test.js` | 4 unit/build checks pass; 2 browser checks await CI. Added rejected saved UI bounds and normalized large-kW editing regressions | Update feature documentation |
 | 42 | `docs/ELECTRICAL_LOAD_CALCULATOR.md` | All 10 storage/locale tests pass; documented opt-in persistence, replacement/deletion behavior, browser-local privacy and recovery | Run full test/build, record candidate, push for browser CI |
 | 43 | `docs/PROJECT_STATUS.md` | Corrected stale 38-tool/pending-PR records with verified PR #11 deployment receipts. Full local suite: 155 passed, 0 failed, 3 browser skips; build and diff checks passed | Push candidate and run Chromium CI |
+| 44 | Final code candidate `3b9e488` | GitHub CI: 176 passed, 0 failed, 0 skipped; build passed. Browser save/reload/load/delete, corrupt/blocked storage, four locales and preserved unfinished edits verified | Record final merge/deployment receipts in PR #14 |
