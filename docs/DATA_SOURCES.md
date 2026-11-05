@@ -51,6 +51,12 @@ The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.m
 
 The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.
 
+## Tip and bill splitting
+
+Tax is applied to the entered subtotal. The tip uses either that subtotal or the subtotal plus unrounded tax, according to the selected basis. Decimal values are taken from the validated JavaScript Number's decimal spelling and calculated as integer ratios; tax and tip are not rounded before splitting. Only the final per-person share is rounded to cents. Nearest-cent ties round up; up/down selects the next/previous cent only when a real remainder exists. Exact cents stay unchanged. For example, 1.10 rounded up remains 1.10, and 0.29 divided between two people rounds to 0.15 each in nearest mode.
+
+The displayed tax, tip and total use the existing two-decimal formatting. Multiplying a rounded share by the party size can differ from the unrounded bill total. Inputs remain subject to JavaScript Number precision; nonfinite outputs or rounded shares whose exact cent value cannot survive conversion to a Number are rejected. This is arithmetic on user-entered amounts, not a currency-specific tax or payment rule.
+
 ## Unit result display
 
 Unit conversions retain the full JavaScript number until display. Results normally use up to eight fractional digits; nonzero results below that rounding threshold use localized scientific notation with eight significant digits, so 1 byte → GB is shown as 1E-9 GB instead of zero. Input/output values outside the finite number range are rejected.

@@ -1,6 +1,15 @@
 # Project status — AdigunTokenCalculator
 
-## Current continuation — accessibility and release checks
+## Current continuation — tip rounding precision
+
+- Base: deployed main `2e4f24e0ccb7fc92a78c7632bc54d7cc13fccf12`, merged [PR #17](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/17). Its [main CI](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42033051748) passed 237 tests with no skips; [Pages deployment](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/42033051760) succeeded. The older pending merge statements below are historical.
+- Objective: correct the tip splitter's cent rounding without changing its tax/tip basis or the other 38 tools. Reproduced failures include 1.10 rounding up to 1.11, 17.90 rounding down to 17.89, and 0.29 split between two people rounding to 0.14.
+- Branch: `codex/tip-rounding-precision`. The owner's existing authorization to merge and deploy this repository remains in effect; required verification gates still apply.
+- Implemented: exact decimal integer ratios through tax, tip and party division; one final cent rounding step; nearest ties round up. Nonfinite outputs and shares that cannot preserve the selected cent amount as a numeric result are rejected.
+- Observed checks: baseline 207 passed, 0 failed, 7 browser skips. The new focused regressions failed against the old implementation; the repaired tip/additional suite passes 35 tests. Local Chromium download failed, so browser behavior is **NOT TESTED locally**; all-four-locale browser regressions are queued for CI.
+- Next: synchronize the candidate, verify its full Chromium CI/build, then merge and verify the actual main/deployment revisions. Exact checkpoint and release receipts belong in the continuation PR. Human locale/assistive-technology review and the owner licence decision remain open.
+
+## Previous continuation — accessibility and release checks
 
 - Base: deployed main `e2d581d5c43240ff9e52d32b4f2840ebe8e089d1` (merged PR #16). All 39 tools and the electrical extensions already exist.
 - Branch: `codex/accessibility-release-review`. This continuation addresses the remaining keyboard, localization, responsive and privacy verification work; no new calculator is being introduced.

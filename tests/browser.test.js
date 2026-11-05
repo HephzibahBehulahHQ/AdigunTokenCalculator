@@ -204,6 +204,40 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.locator('.result[role="alert"]').waitFor();
       assert.doesNotMatch(await page.locator(".result").innerText(),/Infinity|NaN|∞/);
     });
+    await t.test("tip rounding keeps exact cents in all four locales",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        await openTool("tip");
+        for(const [bill,tipRate,taxRate,people,basis,rounding,expected] of [
+          ["1.10","0","0","1","subtotal","up",1.10],
+          ["17.90","0","0","1","subtotal","down",17.90],
+          ["0.29","0","0","2","subtotal","nearest",0.15],
+          ["0.29","50","0","1","subtotal","nearest",0.44],
+          ["19.99","12.5","7.25","3","subtotal","nearest",7.98],
+          ["19.99","12.5","7.25","3","with-tax","nearest",8.04],
+          ["1.0100000000000002","0","0","1","subtotal","up",1.02]
+        ]){
+          for(const [field,value] of Object.entries({bill,tipRate,taxRate,people}))
+            await page.locator(`input[name="${field}"]`).fill(value);
+          await page.locator('select[name="tipBasis"]').selectOption(basis);
+          await page.locator('select[name="rounding"]').selectOption(rounding);
+          await calculate();
+          assert.equal(await page.locator(".result-row strong").nth(3).innerText(),
+            expected.toLocaleString(locale,{maximumFractionDigits:2}),`${locale}: ${bill}, ${rounding}`);
+          assert.equal(await page.locator(".result").getAttribute("role"),"status");
+        }
+        await page.locator('input[name="bill"]').fill("1e15");
+        await page.locator('input[name="people"]').fill("3");
+        await calculate();
+        assert.equal(await page.locator(".result").getAttribute("role"),"alert");
+        assert.doesNotMatch(await page.locator(".result").innerText(),/Infinity|NaN|∞/);
+        await reset();
+        assert.equal(await page.locator('input[name="bill"]').inputValue(),"");
+        assert.equal(await page.locator('select[name="rounding"]').inputValue(),"nearest");
+        assert.equal(await page.locator(".result").count(),0);
+      }
+      await page.locator("#language").selectOption("en");
+    });
     await t.test("dynamic results use all four selected locales",async()=>{
       for(const locale of ["en","de","yo","pcm"]){
         await page.locator("#language").selectOption(locale);
