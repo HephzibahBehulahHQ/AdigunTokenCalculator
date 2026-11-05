@@ -7,6 +7,7 @@ import "./additional-i18n.js";
 import {RESULT_COPY,RESULT_LABELS,resultText} from "./result-i18n.js";
 import "./feature-i18n.js";
 import {normalizeHexColor,rgbToHex,hslToHex} from "./colors.js";
+import {formatNumber} from "./format.js";
 import {createQr} from "./qr.js";
 import "./styles.css";
 
@@ -80,7 +81,7 @@ function renderNav(){
 }
 function out(k){if(RESULT_LABELS[lang]?.[k])return RESULT_LABELS[lang][k];if(tr().additionalOutputs?.[k])return tr().additionalOutputs[k];if(tr().outputs?.[k])return tr().outputs[k];if(k.startsWith("Category "))return (tr().outputs?.Category||"Category")+" "+k.slice(9);if(k.startsWith("After "))return (tr().outputs?.["After cycles"]||"After cycles")+" "+k.slice(6).replace(" cycles","");return k;}
 function result(rows,note="",kind="status"){panel.querySelector(".result")?.remove();const box=el("section","result");box.className="result "+(kind==="error"?"result-error":"");box.setAttribute("role",kind==="error"?"alert":"status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);return box;}
-function fmt(n,d=3){const value=Number(n);if(!Number.isFinite(value))throw Error("number");return value.toLocaleString(lang,{maximumFractionDigits:d});}
+const fmt=(n,d=3,preserveSmall=false)=>formatNumber(n,lang,d,preserveSmall);
 function errorResult(err){const location=/^JSON syntax error at line (\d+), column (\d+)$/.exec(String(err?.message||""));const message=err?.message==="empty"?tr().empty:location?resultText(lang,"jsonSyntaxAt",{line:location[1],column:location[2]}):tr().invalid;result([["",message]],"", "error");}
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 function foregroundColor(d){if(d.colorMode==="hex")return normalizeHexColor(d.foreground);if(d.colorMode==="rgb")return rgbToHex(d.red,d.green,d.blue);if(d.colorMode==="hsl")return hslToHex(d.hue,d.saturation,d.lightness);throw Error("number");}
@@ -99,7 +100,7 @@ async function execute(k,d,isCurrent){
  case"practice":{const r=c.practice(d.minutes,d.sessions,d.years);rows=[["Daily average minutes",fmt(r.day)],["Weekly minutes",fmt(r.week)],["Annual hours",fmt(r.year/60)],["Lifetime hours",fmt(r.lifetime/60)]];note=T.practiceAssumption||"Annual projection assumes 52 weeks per year; daily value is a weekly average.";break;}
  case"zakat":{const r=c.zakat(d,d.rate);rows=[["Entered assets",fmt(r.assets)],["Applied rate",fmt(d.rate)+"%"],["Calculated amount",fmt(r.due)]];note=N.zakat;break;}
  case"qibla":{const b=c.bearing(d.lat,d.lon);rows=[["Initial bearing",fmt(b,1)+"°"],["Compass direction",c.compass(b)]];note=N.qibla;break;}
- case"units":rows=[["Converted value",fmt(c.unit(d.value,d.from,d.to,d.group),8)+" "+d.to]];break;
+ case"units":rows=[["Converted value",fmt(c.unit(d.value,d.from,d.to,d.group),8,true)+" "+d.to]];break;
  case"loan":{const r=c.loan(d.principal,d.annualRate,d.term);rows=[["Monthly payment",fmt(r.payment)],["Total repayment",fmt(r.total)],["Total interest",fmt(r.interest)],["NumberOfPayments",Number(d.term)*12],["LoanFormula",Number(d.annualRate)/1200===0?"M = P / n":"M = P × r / (1 − (1 + r)^(-n))"]];note=(N.loan||"")+" "+(T.loanAssumption||"Assumes 12 monthly payments per year and a nominal annual rate divided monthly.")+" "+resultText(lang,"loanVariables");break;}
  case"dates":{if(d.mode==="annual"){const r=c.recurringDate(d.end);rows=[["Next occurrence",r.date],["Days until event",r.days]];}else{const r=c.dateDifference(d.start,d.end);rows=[["Calendar days (exclusive)",Math.abs(r.days)],["Countdown status",resultText(lang,r.direction)],["Days from today",r.fromToday]];}break;}
  case"gpa":if(d.mode==="percentage"){rows=[["Weighted percentage average",fmt(c.gpaPercentage(d.grades),2)+"%"]];note=T.gpaPercentageAssumption||"Credits are weights. This percentage average is not converted to a GPA."; }else{rows=[["Weighted GPA (4.0 scale)",fmt(c.gpa(d.grades),3)]];note=T.gpaAssumption||"Scale: A 4.0, A− 3.7, B+ 3.3, B 3.0, B− 2.7, C+ 2.3, C 2.0, C− 1.7, D+ 1.3, D 1.0, D− 0.7, F 0.0. Institutions vary.";}break;

@@ -59,3 +59,7 @@ Unit and browser checks cover four-locale dynamic results, ambiguous/normal time
 ## Engineering and loan completion
 
 Unit cases cover defined percentage semantics, decimal/signed/zero operands, finite-output boundaries and overflow. Loan checks cover the ordinary reference vector, zero interest, tiny positive rates, zero principal, safe whole payment counts and invalid/non-finite inputs. Chromium exercises percentage mode after a unary operation and both loan formula branches in all four locales. Consult the current PR for actual run results.
+
+## Unit output precision
+
+Focused formatter checks cover all four locales, real byte→GB and bit→GiB conversions, signed values, zero, rounding boundaries, the smallest positive JavaScript number and invalid inputs. Browser regressions verify scientific fallback and ordinary decimal output. Unit arithmetic rejects genuine overflow while avoiding intermediate overflow when the final answer is finite.

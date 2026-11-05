@@ -50,3 +50,7 @@ The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.m
 
 
 The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.
+
+## Unit result display
+
+Unit conversions retain the full JavaScript number until display. Results normally use up to eight fractional digits; nonzero results below that rounding threshold use localized scientific notation with eight significant digits, so 1 byte → GB is shown as 1E-9 GB instead of zero. Input/output values outside the finite number range are rejected.
