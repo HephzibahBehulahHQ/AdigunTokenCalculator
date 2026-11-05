@@ -4,7 +4,7 @@
 
 Live application: https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
-A static, browser-side suite of 38 token, everyday, health-estimate and developer calculators. The interface is available in English, German, Yoruba and Nigerian Pidgin. The visual system uses the approved corporate logo, corporate colours and a system-font fallback pending official typography.
+A static, browser-side suite of 39 token, everyday, health-estimate and developer calculators. The interface is available in English, German, Yoruba and Nigerian Pidgin. The visual system uses the approved corporate logo, corporate colours and a system-font fallback pending official typography.
 
 ## Tool catalogue
 
@@ -48,6 +48,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Holiday countdown | Time & Date | Common rule-based dates by region; incomplete calendar coverage. | Gregorian computus and selected official holiday references. |
 | Morse code translator | Text & Language | Bidirectional International Morse mapping. | ITU-R M.1677-1. |
 | Statistics calculator | Math & Engineering | Mean, median, mode, range, variance and standard deviation. | Standard descriptive statistics. |
+| Electrical Load Calculator | Math & Engineering | Building/community load, real/reactive/apparent power, peak demand, load factor, cost, CO₂, 24h profile. | Typical appliance wattage/PF engineering estimates; user-editable; no live data. Presets are editable estimates, not manufacturer-specific. [Calculation assumptions](docs/ELECTRICAL_LOAD_CALCULATOR.md). |
 
 ## Privacy and architecture
 

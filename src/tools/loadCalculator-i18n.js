@@ -135,10 +135,10 @@ const rows = {
     "Backup time na full usable battery capacity divided by average load, without losses. E no model efficiency, inverter limit or dispatch; capacity no reduce daily demand or peak load."
   ],
   "help.renewables": [
-    "Daily renewable offsets are capped at daily consumption. Excess generation earns no assumed export revenue. Daily totals alone do not establish hourly self-consumption.",
-    "Tägliche erneuerbare Deckung ist auf den Tagesverbrauch begrenzt. Für Überschüsse wird keine Einspeisevergütung angenommen. Tagesmengen bestimmen keinen stündlichen Eigenverbrauch.",
-    "Agbára àtúnsọ tí a yọ kúrò kò lè ju lílo ojoojúmọ́ lọ. A kò ka owó títà fún ìpèsè tó ṣẹ́kù. Iye ọjọ́ kan nìkan kò sọ lílo tirẹ fún wákàtí kọ̀ọ̀kan.",
-    "Daily renewable offset no fit pass daily use. We no assume export money for extra generation. Daily totals alone no show how much you use for each hour."
+    "Daily offsets assume an ideal energy balance: credited generation replaces same-day grid use. Generation timing, storage losses and battery dispatch are not modeled, so actual grid imports can be higher. Offsets are capped at daily use; excess earns no export revenue.",
+    "Tageswerte setzen eine ideale Energiebilanz voraus: angerechnete Erzeugung ersetzt Netzbezug am selben Tag. Erzeugungszeiten, Speicherverluste und Batterieeinsatz werden nicht modelliert; der tatsächliche Netzbezug kann höher sein. Die Deckung ist auf den Tagesbedarf begrenzt; Überschüsse erhalten keine Vergütung.",
+    "Àyọkúrò ọjọ́ kan ro ìwọ̀ntúnwọ̀nsì agbára tó péye: agbára tí a kà rọ́pò iná nẹ́tíwọ́ọ̀kì ọjọ́ náà. A kò ṣe àpẹẹrẹ àkókò ìpèsè, àdánù ìpamọ́ tàbí lílo bátìrì; iná tí a rà lè pọ̀ ju ìṣirò lọ. Àyọkúrò kò ju lílo ọjọ́ kan lọ; kò sí owó títà fún àṣekù.",
+    "Daily offset assume ideal energy balance: generation we count replaces grid use for that same day. We no model generation time, storage loss or battery dispatch, so actual grid import fit higher. Offset no pass daily use; extra generation no earn export money."
   ],
   "help.power": [
     "Operating P/Q/S use duty cycle and PF with all devices on, before seasonal energy adjustment. Capacitive Q is negative. This is a simplified sinusoidal, balanced-supply model; device type does not override entered PF.",

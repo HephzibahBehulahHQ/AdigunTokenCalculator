@@ -17,22 +17,8 @@ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8*Math.max(1,Math.abs(b)),`${a} ≈
 const browserAvailable=existsSync(chromium.executablePath());
 const buildDirectory=path.join(root,"test-results/electrical-load-preview");
 
-// Test-only preview of the exact proposed three-line integration. This never
-// writes main.js or changes the production build; owner approval is still needed.
-function proposedIntegration(){
-  return {name:"proposed-electrical-load-integration",enforce:"pre",transform(code,id){
-    if(id.split("?")[0]!==path.join(root,"src/main.js"))return null;
-    if(code.includes('from "./tools/loadCalculatorUI.js"'))return null;
-    const keysLine=code.match(/^const keys=\[.*\];$/m)?.[0];
-    const heading='head.querySelector("h2").tabIndex=-1;';
-    assert.ok(keysLine&&code.includes(heading),"Shared router changed; review the proposed integration before testing it");
-    return 'import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";\n'+code
-      .replace(keysLine,keysLine+'\nregisterLoadCalculator(keys);')
-      .replace(heading,heading+'\n if(k==="electrical-load"){mountLoadCalculator(panel,{lang});return;}');
-  }};
-}
 let built;
-const previewBuild=()=>built??=(build({root,logLevel:"silent",plugins:[proposedIntegration()],build:{outDir:buildDirectory,emptyOutDir:true}}));
+const previewBuild=()=>built??=(build({root,logLevel:"silent",build:{outDir:buildDirectory,emptyOutDir:true}}));
 
 test("load UI: registration is additive, localized and idempotent",()=>{
   const keys=JSON.parse(source().match(/^const keys=(\[.*\]);$/m)[1]);
@@ -59,6 +45,7 @@ test("load UI: CSV includes inputs, all results, ranked devices and 24 bins; use
     assert.ok(csv.startsWith("\uFEFF"));assert.ok(csv.includes(LOAD_COPY[lang].profile));
     assert.ok(csv.includes(`'=SUM(1,2) ""quoted""`));assert.ok(csv.includes('"0.972"'));
     assert.ok(csv.includes(LOAD_COPY[lang]["field.seasonalFactor"]));assert.ok(csv.includes(LOAD_COPY[lang]["result.netGridKWh"]));
+    assert.ok(csv.includes(LOAD_COPY[lang]["field.watts"]+" (W)"));
     const lines=csv.trimEnd().split("\r\n");
     assert.equal(lines.filter(line=>/^"(?:[0-9]|1[0-9]|2[0-3])","[0-9.e+-]+"$/.test(line)).length,24);
   }
@@ -66,7 +53,7 @@ test("load UI: CSV includes inputs, all results, ranked devices and 24 bins; use
   assert.throws(()=>buildLoadCsv([{...device,pf:0}],{}));
 });
 
-test("load UI: proposed router integration produces a Vite bundle without editing shared source",async()=>{
+test("load UI: actual registered route produces a Vite bundle without rewriting shared source",async()=>{
   const before=source();await previewBuild();assert.equal(source(),before);
   assert.ok(existsSync(path.join(buildDirectory,"index.html")));
 });
@@ -93,7 +80,7 @@ test("load UI: production-preview device editing, live calculations, four locale
     assert.equal(await ui.locator('select[name="preset"] optgroup').count(),5);
     await field("preset").selectOption("refrigerator");assert.equal(await field("watts").inputValue(),"200");assert.equal(await field("pf").inputValue(),"0.8");
     await field("name").fill('=1+1');await field("watts").fill("100");await field("quantity").fill("2");await field("hoursPerDay").fill("6");await field("dutyCycle").fill("50");await field("standbyW").fill("2");await field("seasonalFactor").fill("1.5");
-    await ui.locator('[data-action="add-device"]').click();await waitResult("dailyKWh",0.972);
+    await ui.locator('[data-action="add-device"]').focus();await page.keyboard.press("Enter");await waitResult("dailyKWh",0.972);
     near(await result("peakDemandKW"),0.15);near(await result("loadFactor"),0.27);
     assert.equal(await ui.locator('[data-device-row]').count(),1);
     await field("pf").fill("0");await ui.locator('[data-action="add-device"]').click();
@@ -117,7 +104,8 @@ test("load UI: production-preview device editing, live calculations, four locale
     await ui.locator('[data-warning="gridLimit"]').waitFor();await ui.locator('[data-warning="peakThreshold"]').waitFor();
     await field("solarKWh").fill("20");await field("batteryKWh").fill("2");await field("tariff").fill("0.3");await waitResult("netGridKWh",0);
     near(await result("dailyCost"),0);near(await result("peakDemandKW"),1.08);
-    await field("voltage").fill("0");await page.waitForFunction(()=>document.querySelector('[data-action="export-csv"]')?.disabled);
+    await field("batteryKWh").fill("");await waitResult("batteryHours",0);near(await result("dailyKWh"),6.9984);
+    await field("voltage").fill("0");await page.waitForFunction(()=>document.querySelector('[data-load-results]')?.hidden);
     assert.equal(await ui.locator('[data-load-results]').isVisible(),false);assert.equal(await field("voltage").getAttribute("aria-invalid"),"true");
     await field("voltage").fill("400");await ui.locator('[data-load-results]').waitFor();
     for(const lang of ["de","yo","pcm","en"]){

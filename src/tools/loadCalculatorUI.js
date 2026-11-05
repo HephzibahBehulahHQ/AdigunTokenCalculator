@@ -74,7 +74,7 @@ export function buildLoadCsv(devices, settings = {}, lang = "en") {
   rows.push([t("field.occupancyEnabled"), s.occupancySchedule ? 1 : 0]);
   if (s.occupancySchedule) rows.push([t("field.startHour"), s.occupancySchedule.startHour], [t("field.endHour"), s.occupancySchedule.endHour]);
   const columns = ["name", "quantity", "watts", "hoursPerDay", "dutyCycle", "standbyW", "pf", "type", "seasonalFactor"];
-  rows.push([], [t("csv.devices")], [...columns.map(key => t("field." + key)), t("result.activeKWh"), t("result.standbyKWh"), t("result.dailyKWh")]);
+  rows.push([], [t("csv.devices")], [...columns.map(key => t("field." + key) + (key === "watts" ? " (W)" : "")), t("result.activeKWh"), t("result.standbyKWh"), t("result.dailyKWh")]);
   for (const item of r.breakdown) {
     const d = normalizeLoadDevice(devices[item.index]);
     rows.push([...columns.map(key => key === "type" ? t("option." + d[key]) : d[key]), item.activeKWh, item.standbyKWh, item.dailyKWh]);
@@ -230,7 +230,7 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     ["demandFactor",{max:1}], ["growthMargin",{max:10000}], ["peakThresholdKW",{optional:true}],
     ["gridLimitKW",{optional:true}], ["co2Factor",{max:1000,help:"co2"}],
     ["renewableOffsetKWh",{help:"renewables"}], ...RENEWABLE_PRESETS.map(item => [item.field,{}]),
-    ["batteryKWh",{help:"battery"}], ["measurementInterval",{choices:choices(["second","minute"])}],
+    ["batteryKWh",{optional:true,help:"battery"}], ["measurementInterval",{choices:choices(["second","minute"])}],
     ["occupancyEnabled",{type:"checkbox",wide:true,help:"schedule"}],
     ["startHour",{max:23.999999}], ["endHour",{max:24}]
   ]) makeField(settingsFields, globalControls, key, state.settings[key], options);
@@ -279,7 +279,7 @@ export function mountLoadCalculator(container, {lang = "en", state = sessionStat
     const raw = readControls(globalControls);
     if (!raw) return null;
     try {
-      return {...normalizeLoadSettings({...raw, occupancySchedule:raw.occupancyEnabled ? {startHour:raw.startHour,endHour:raw.endHour} : null}), currency:raw.currency};
+      return {...normalizeLoadSettings({...raw, batteryKWh:raw.batteryKWh ?? 0, occupancySchedule:raw.occupancyEnabled ? {startHour:raw.startHour,endHour:raw.endHour} : null}), currency:raw.currency};
     } catch (error) {
       if (globalControls[error.field]) setError(globalControls[error.field], errorText(error));
       invalid.textContent = errorText(error);return null;
