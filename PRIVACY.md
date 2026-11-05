@@ -1,6 +1,6 @@
 # Privacy and data handling
 
-AdigunTokenCalculator is a static, browser-side utility. All 38 tools process calculator inputs in the active page using JavaScript. The application has no backend, account system, database, analytics, telemetry, advertising tags or remote calculation API.
+AdigunTokenCalculator is a static, browser-side utility. All 39 tools process calculator inputs in the active page using JavaScript. The application has no backend, account system, database, analytics, telemetry, advertising tags or remote calculation API.
 
 ## What is processed locally
 
@@ -13,6 +13,8 @@ AdigunTokenCalculator is a static, browser-side utility. All 38 tools process ca
 - Foreground/background colors in the color and contrast checker.
 - Coordinates entered manually or returned by the browser geolocation API only after the user explicitly selects **Use my location** in the Qibla tool.
 - Demographic percentages entered or edited by the user.
+- Electrical device labels, power ratings, schedules, tariffs and other load-planning settings. A profile is saved in this browser only when the user selects **Save**.
+- Customer name, phone, address, optional email and estimate reference/date entered for an electrical cost estimate. These details stay in page memory and are excluded from saved load profiles and CSV exports; the requested customer print/PDF output includes them.
 
 The BAC estimator opens a warning dialog and requires an explicit educational-use acknowledgement before revealing its form. Cancel or Escape returns to the directory. Reset or re-entry requires fresh acknowledgement; consent is not persisted. It is not a fitness-to-drive tool.
 
@@ -24,7 +26,17 @@ The browser/device handles its own geolocation permission and location service. 
 
 ## Storage and clipboard
 
-The application does not intentionally persist calculator inputs in cookies, localStorage, sessionStorage or IndexedDB. Inputs remain in the current page until it is refreshed or closed. Token IDs, passwords, hashes, JSON output or other values can be copied only after the user deliberately selects a copy control; this writes to the device clipboard through the browser clipboard API. No clipboard read access is requested.
+Calculator inputs stay in page memory by default. The application does not use cookies, sessionStorage or IndexedDB to store those inputs. Passwords, coordinates, health inputs and customer estimate details are not included in the application's saved profile.
+
+The Electrical Load Calculator offers one opt-in profile in `localStorage`, under `adigun.electrical-load.profile.v1`. **Save** replaces the previous saved copy with the applied device list, including device labels, and current validated load settings. It excludes unfinished device-builder edits and customer estimate details. Saving and restoring are not automatic: **Load** reads and validates the saved copy before replacing the current load profile, and **Delete** removes that saved copy only. The saved profile can survive a page refresh or browser restart until deleted or removed through browser site-data controls. Anyone using the same browser profile can read it; use generic device labels without names, addresses or sensitive details.
+
+Token IDs, passwords, hashes, JSON output or other values can be copied only after the user deliberately selects a copy control; this writes to the device clipboard through the browser clipboard API. No clipboard read access is requested.
+
+## Downloads and customer estimates
+
+QR downloads and electrical CSV exports are generated locally after the user selects the corresponding action. Electrical CSV files contain device labels, load settings and calculated results, but exclude the customer estimate fields. **Print customer estimate / PDF** prepares an estimate containing the entered customer details and amounts and opens the browser's print workflow. A PDF or paper copy is created through the user's browser/printing choices, not uploaded by the application.
+
+Downloaded files, clipboard contents and printed/PDF copies are outside the saved-profile slot. Deleting a profile or clearing the page does not remove those copies. Browser and operating-system download, clipboard and printing behavior remains under the user's control.
 
 ## Limits
 

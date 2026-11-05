@@ -41,10 +41,10 @@ A static, browser-side suite of 39 token, everyday, health-estimate and develope
 | Password generator & strength checker | Security & Privacy | Generate a password or estimate strength locally; no storage or upload. | Browser crypto.getRandomValues; bundled zxcvbn 4.4.2. |
 | QR code generator | Developer | Local QR image preview/download. | Bundled qrcode-generator. |
 | Hash / checksum | Security & Privacy | Local SHA-256, SHA-1 and MD5 for text/files. | Web Crypto and local MD5; MD5/SHA-1 not security choices. |
-| JSON formatter / validator | Developer | Local pretty-print, minify and line/column validation. | Native JSON.parse / JSON.stringify. |
+| JSON formatter / validator | Developer | Local pretty-print, minify and line/column validation; preserves numeric tokens and duplicate members. | Native JSON.parse validation and token-preserving formatting. |
 | Color & contrast checker | Developer | HEX/RGB/HSL and WCAG contrast. | WCAG relative luminance and contrast ratio. |
 | Discount & tax calculator | Finance | Discount, tax and reverse original-price estimate. | Standard arithmetic; currency-neutral. |
-| Recipe scaler | Conversion | Scale quantities and preserve entered units/fractions. | Direct ratio scaling; no inferred unit conversion. |
+| Recipe scaler | Conversion | Scale quantities/fractions and optionally convert compatible metric units. | Direct ratio scaling; exact kg↔g and L↔mL conversions only, with no density assumptions. |
 | Holiday countdown | Time & Date | Common rule-based dates by region; incomplete calendar coverage. | Gregorian computus and selected official holiday references. |
 | Morse code translator | Text & Language | Bidirectional International Morse mapping. | ITU-R M.1677-1. |
 | Statistics calculator | Math & Engineering | Mean, median, mode, range, variance and standard deviation. | Standard descriptive statistics. |
@@ -52,7 +52,7 @@ A static, browser-side suite of 39 token, everyday, health-estimate and develope
 
 ## Privacy and architecture
 
-Calculations run in the browser. There is no application backend, database, analytics, telemetry, remote logging or runtime calculation API/CDN. Inputs are not intentionally persisted. Geolocation is requested only after a user action; token copying is also user initiated. See [PRIVACY.md](PRIVACY.md).
+Calculations run in the browser. There is no application backend, database, analytics, telemetry, remote logging or runtime calculation API/CDN. Inputs stay in page memory by default. The Electrical Load Calculator has an explicit Save/Load/Delete option for one profile in this browser's local storage; saving includes applied device labels and settings, so use generic labels without personal details. Customer estimate details stay in memory and are excluded from saved profiles and CSV exports. Printing an estimate can include those details in the user-requested print/PDF output. Geolocation, copying and exports require user actions. See [PRIVACY.md](PRIVACY.md).
 
 Architecture and assumptions:
 - [Architecture](docs/ARCHITECTURE.md)
@@ -76,6 +76,18 @@ npm run build
 ```
 
 Vite writes the static production site to dist/. GitHub Actions tests and builds before deploying. The project-site base path is configured in vite.config.js. For the full local Chromium integration test, run `npx playwright-core install chromium` once after `npm ci`; without a browser binary, the browser test is skipped locally. CI installs Chromium automatically.
+
+## Contributing
+
+Read [AGENTS.md](AGENTS.md), [MASTER_PROMPT.md](MASTER_PROMPT.md) and the [current project status](docs/PROJECT_STATUS.md) before changing code. Work on a dedicated branch and open a scoped pull request. Preserve unrelated work, review the diff and never force-push shared history.
+
+- Keep calculations local and use safe DOM APIs. Do not add a backend, telemetry, runtime calculation API or CDN dependency.
+- Cover changed behavior with meaningful normal, invalid and boundary cases. Include relevant keyboard, privacy, responsive and EN/DE/YO/PCM interface checks; machine-reviewed translations do not replace fluent-speaker review.
+- Cite the source, date, units and assumptions for non-trivial constants. Keep sourced data distinct from editable estimates. Update affected documentation and dependency notices alongside code; preserve the lockfile and pinned dependencies.
+- Before requesting merge, run `npm ci`, install Chromium with `npx playwright-core install chromium`, then run `npm test` and `npm run build`. Record the exact candidate, results and any skipped or unrun checks in the pull request/current status. A passing build does not establish browser or deployment verification.
+- Merge and deployment require the applicable owner authorization and successful required checks. Verify the resulting revision and published app, and record the release receipts. Repository settings, credentials and domains require their own authorization.
+
+No project-wide licence has been selected. Public repository access does not establish permission to reuse the complete application; see [licensing status](docs/LICENSING.md).
 
 ## Tokenizer scope
 

@@ -1,10 +1,10 @@
 # Design decisions — AdigunTokenCalculator
 
-**Owner decisions confirmed:** 2026-11-04.
+**Initial owner decisions confirmed:** 2026-11-04. The later electrical extension and release history are recorded in [project status](docs/PROJECT_STATUS.md).
 
 ## Confirmed
 1. Division: HB Artificial Intelligence; violet `#A78BFA`.
-2. Full interface language support: English, German, Yoruba and Nigerian Pidgin for all 38 tools.
+2. Full interface language support: English, German, Yoruba and Nigerian Pidgin. The current 39-tool catalogue includes the electrical extension in all four languages.
 3. System-font fallback until official typography is supplied.
 
 ## Verified design identity
@@ -13,17 +13,19 @@ Corporate tokens: midnight navy `#0B1220`, metallic gold `#D4AF37`, royal blue `
 ## Architecture and privacy
 Static Vite + semantic HTML + CSS + vanilla JS. All calculations run in-browser. No backend, analytics, telemetry, remote logging, third-party calculation API or runtime CDN. User input is rendered through DOM APIs and textContent.
 
+Inputs remain in page memory by default. The owner-requested electrical extension adds explicit local Save/Load/Delete for applied device rows and settings. Customer estimate details remain transient and are excluded from saved profiles and CSV; the user's print/PDF action includes them in the estimate. [PRIVACY.md](PRIVACY.md) documents this exception to default memory-only input handling and the export boundaries.
+
 ## Tokenizer dependency
 Pinned dependency: `js-tiktoken@1.0.21`, MIT declared by npm. Lite rank imports keep only `cl100k_base` and `o200k_base` in the product source. Model mappings were checked against OpenAI's upstream tiktoken model table and Cookbook: GPT-4o / GPT-4o mini → `o200k_base`; GPT-4 / GPT-3.5 Turbo → `cl100k_base`. Automated tests cover Unicode inputs and UTF-8 piece reconstruction. The byte-piece adapter still relies on the pinned package's internal byte map because no public per-token byte method is exposed; that implementation detail remains a documented maintenance risk.
 
 ## Data restraint
-The world population tool uses two dated 1 July UN WPP 2024 medium-variant baselines and labels its linear interpolation/extrapolation as an estimate, not a live count. The direct downloadable dataset and checksum comparison for the 2025/2026 numeric rows remains a release check. Births, deaths and CO₂ remain withheld until separately sourced daily baselines are verified. Religion shares are seeded from the cited Pew 2020 estimates, are editable, and retain the Pew “other religions” aggregation; no unsupported folk-only share is invented.
+The world population tool uses two dated 1 July UN WPP 2024 medium-variant baselines and labels its linear interpolation/extrapolation as an estimate, not a live count. The [completed population audit](docs/POPULATION_AUDIT.md) records the official downloadable dataset, checksums and verified 2025/2026 numeric rows from 5 November 2026. Births, deaths and CO₂ remain withheld until separately sourced daily baselines are verified. Religion shares are seeded from the cited Pew 2020 estimates, are editable, and retain the Pew “other religions” aggregation; no unsupported folk-only share is invented.
 
 ## Licensing
-No project-wide product licence has been authorized; no root `LICENSE` file is added until the owner chooses one. Third-party notices are included for `js-tiktoken@1.0.21` (MIT), `qrcode-generator@2.0.4` (MIT) and the development-only `playwright-core@1.57.0` (Apache-2.0). The corporate logo is copied byte-for-byte from the approved canonical design-system asset, with source revision and provenance recorded in `docs/LICENSING.md`.
+No project-wide product licence has been authorized; no root `LICENSE` file is added until the owner chooses one. The complete locked dependency inventory and licence texts are maintained in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and published with the application. The corporate logo is copied byte-for-byte from the approved canonical design-system asset, with source revision and provenance recorded in [licensing status](docs/LICENSING.md).
 
 ## Release gates
-Automated lockfile installation, 58 unit/browser tests, Chromium smoke test and production build pass on the current feature branch. The approved logo asset is integrated. Remaining gates are fluent translation review, manual keyboard/screen-reader/responsive/contrast/offline checks, direct UN WPP downloadable-file verification with checksum, and an owner decision on the project-wide licence. The owner has explicitly authorized completion, merge and deployment; the expanded feature branch is not yet merged or deployed.
+Current implementation work, exact candidate/merge revisions and verification/deployment receipts belong in [project status](docs/PROJECT_STATUS.md) and its linked release PRs. Historical test totals do not verify a later revision. Required feature, browser, build and publication checks must be observed for the relevant candidate; human assistive-technology/fluent-speaker reviews and the project-wide licence decision remain separate acceptance items. The approved logo and completed UN population audit are not pending integration tasks.
 
 
 ## Completion milestone decisions

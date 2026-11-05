@@ -46,10 +46,11 @@ The expanded calculator suite's full source register is maintained in the root [
 The water range is explicitly a project-selected editable heuristic (30–35 mL/kg plus user-entered adjustment), not an official health recommendation. Inflation uses a user-supplied annual rate rather than an unverified CPI series. Holiday outputs are rule-based calendar dates, not legal confirmation of public-holiday status.
 
 
-The official UNData World / Medium record is linked in [SOURCES.md](../SOURCES.md). Exact 2025/2026 numeric rows still require a direct downloadable WPP file comparison and recorded checksum; the values have not been certified against an archived source file.
+The [README](../README.md) contains the full 39-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in [SOURCES.md](../SOURCES.md). The population file/checksum verification is complete and linked above; it does not independently certify the simplified extrapolation model.
 
+## Electrical planning and customer estimates
 
-The README now contains the full 38-tool catalogue with category, purpose and source/formula columns, plus the deliberate exclusions in MASTER_PROMPT.md §7.3. Formula references for BMI, Qibla, units/fuel, Zakat, water and regional holidays are recorded in root SOURCES.md.
+The [electrical calculation contract](ELECTRICAL_LOAD_CALCULATOR.md) records device-preset assumptions, units, power/energy/current formulas, tariffs, time profiles, correction/planning estimates and customer-estimate tax arithmetic. Presets are editable illustrative values rather than manufacturer-specific ratings. Software and numerical tests do not establish hardware testing or certified electrical-design compliance.
 
 ## Tip and bill splitting
 
