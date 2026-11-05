@@ -24,6 +24,7 @@ export function errorFields(tool,error,data={}){
  const code=String(error?.message||"");
  if(tool==="json")return code==="empty"||syntaxError.test(code)||error?.code==="json-too-large"?["text"]:[];
  if(tool==="stats"&&error?.code==="statistics-too-large")return ["numbers"];
+ if(tool==="demographics"&&(code==="demographics-too-large"||error?.code==="demographics-too-large"))return ["shares"];
  if(tool==="demographics"&&code==="number"){
   const fields=[];
   if(has(data,"total")&&(!numeric(data.total)||Number(data.total)<0))fields.push("total");

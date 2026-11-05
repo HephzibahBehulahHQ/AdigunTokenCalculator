@@ -14,6 +14,7 @@ export const COMPLETION_COPY={
   gradeMapping:"Supported 4.0 grade scale",grade:"Grade",points:"Points",gradeHelp:"This calculator uses the mapping below. Institutions may use different scales; use percentage mode or your institution’s rules when appropriate.",
   encoding:"Encoding",tokenPreview:"Token preview",previewRange:"Showing tokens {start}–{end} of {total}. Copy actions include the full result.",previous:"Previous tokens",next:"Next tokens",tokenId:"Token ID",codePoints:"Unicode code points",
   working:"Processing locally…",jsonTooLarge:"JSON input must be at most 5,000,000 UTF-16 code units; formatted output must stay within 10,000,000. Reduce the input or use minify mode for deeply nested data.",statisticsTooLarge:"Use at most 250,000 numbers and 5,000,000 UTF-16 code units.",workerError:"Local processing could not start. Try again, or reload after checking offline readiness. Your input has not been uploaded.",
+  demographicsTooLarge:"Use at most 100,000 UTF-16 text units, 1,000 category rows and 1,024 characters per percentage. Shorten the entries and try again.",
   statsHelp:"Up to 250,000 finite numbers. Results outside the supported numeric range are rejected rather than displayed as infinity.",jsonHelp:"Formatting runs locally in a background worker. Input limit: 5,000,000 UTF-16 code units; output limit: 10,000,000. Number tokens, duplicate members and string escapes are preserved."
  },
  de:{
@@ -27,6 +28,7 @@ export const COMPLETION_COPY={
   gradeMapping:"Unterstützte 4,0-Notenskala",grade:"Note",points:"Punkte",gradeHelp:"Dieser Rechner verwendet die folgende Zuordnung. Hochschulen können andere Skalen nutzen; verwende gegebenenfalls den Prozentmodus oder die Regeln deiner Einrichtung.",
   encoding:"Kodierung",tokenPreview:"Token-Vorschau",previewRange:"Token {start}–{end} von {total}. Die Kopierfunktionen enthalten das vollständige Ergebnis.",previous:"Vorherige Token",next:"Nächste Token",tokenId:"Token-ID",codePoints:"Unicode-Codepunkte",
   working:"Wird lokal verarbeitet…",jsonTooLarge:"JSON-Eingaben dürfen höchstens 5.000.000 UTF-16-Codeeinheiten und formatierte Ausgaben höchstens 10.000.000 enthalten. Kürze die Eingabe oder minimiere tief verschachtelte Daten.",statisticsTooLarge:"Verwende höchstens 250.000 Zahlen und 5.000.000 UTF-16-Codeeinheiten.",workerError:"Die lokale Verarbeitung konnte nicht starten. Versuche es erneut oder prüfe die Offline-Bereitschaft und lade neu. Deine Eingabe wurde nicht hochgeladen.",
+  demographicsTooLarge:"Verwende höchstens 100.000 UTF-16-Codeeinheiten, 1.000 Kategorienzeilen und 1.024 Zeichen je Prozentwert. Kürze die Angaben und versuche es erneut.",
   statsHelp:"Bis zu 250.000 endliche Zahlen. Ergebnisse außerhalb des unterstützten Zahlenbereichs werden abgelehnt und nicht als unendlich angezeigt.",jsonHelp:"Die Formatierung erfolgt lokal in einem Hintergrund-Worker. Eingabegrenze: 5.000.000 UTF-16-Codeeinheiten; Ausgabegrenze: 10.000.000. Zahlentokens, doppelte Schlüssel und Zeichenketten-Escapes bleiben erhalten."
  },
  yo:{
@@ -40,6 +42,7 @@ export const COMPLETION_COPY={
   gradeMapping:"Àtẹ̀ ìpele 4.0 tí a ń lò",grade:"Ìpele",points:"Àmì",gradeHelp:"Ẹrọ ìṣirò yìí lo ìbámu tó wà ní ìsàlẹ̀. Àwọn ilé ẹ̀kọ́ lè lo àtẹ̀ míì; lo ọ̀nà ìdá ọgọ́rùn-ún tàbí òfin ilé ẹ̀kọ́ rẹ bí ó bá yẹ.",
   encoding:"Ìlànà fífi àmì pamọ́",tokenPreview:"Àwòkọ́ṣe àwọn token",previewRange:"Àwọn token {start}–{end} nínú {total}. Àwọn bọ́tìnì ẹ̀dà gba gbogbo èsì.",previous:"Àwọn token tó ṣáájú",next:"Àwọn token tó tẹ̀ lé",tokenId:"ID token",codePoints:"Àwọn ojú àmì Unicode",
   working:"Ìṣirò ń lọ lórí ẹ̀rọ rẹ…",jsonTooLarge:"JSON gbọ́dọ̀ wà lábẹ́ 5,000,000 ẹyọ UTF-16; èsì tí a ṣètò gbọ́dọ̀ wà lábẹ́ 10,000,000. Dín ohun tí o tẹ̀ sí i kù tàbí lo ọ̀nà ìkékúrú fún dátà tó wọ inú ara rẹ lọ́pọ̀.",statisticsTooLarge:"Lo iye tó pọ̀ jù 250,000 nọ́ńbà àti 5,000,000 ẹyọ UTF-16.",workerError:"Ìṣirò lórí ẹ̀rọ kò bẹ̀rẹ̀. Gbìyànjú lẹ́ẹ̀kan sí i, tàbí ṣàyẹ̀wò ìmúrasílẹ̀ láìsí ayélujára kí o tún ṣí ojú ìwé. A kò gbé ohun tí o tẹ̀ sí i ránṣẹ́.",
+  demographicsTooLarge:"Lo iye tó pọ̀ jù 100,000 ẹyọ ọ̀rọ̀ UTF-16, 1,000 ìlà ẹ̀ka àti 1,024 àmì fún ìdá ọgọ́rùn-ún kọ̀ọ̀kan. Dín àwọn ohun tí o tẹ̀ sí i kù kí o tún gbìyànjú.",
   statsHelp:"Títí dé 250,000 nọ́ńbà tí ó ní ààlà. A kọ èsì tó kọjá ààlà nọ́ńbà tí a lè ṣe dípò fífi àìlópin hàn.",jsonHelp:"Ìṣètò ń ṣiṣẹ́ lórí ẹ̀rọ rẹ nínú òṣìṣẹ́ abẹ́lẹ̀. Ààlà ìwọlé: 5,000,000 ẹyọ UTF-16; ààlà èsì: 10,000,000. Àmì nọ́ńbà, kọ́kọ́rọ́ tó tún ara rẹ̀ ṣe àti àmì àsálà ọ̀rọ̀ dúró bí wọ́n ṣe wà."
  },
  pcm:{
@@ -53,6 +56,7 @@ export const COMPLETION_COPY={
   gradeMapping:"4.0 grade scale wey this tool support",grade:"Grade",points:"Points",gradeHelp:"This calculator use di mapping below. Schools fit use different scales; use percentage mode or your school rules when e fit your case.",
   encoding:"Encoding",tokenPreview:"Token preview",previewRange:"Tokens {start}–{end} out of {total} dey show. Copy buttons carry di full result.",previous:"Previous tokens",next:"Next tokens",tokenId:"Token ID",codePoints:"Unicode code points",
   working:"E dey process for your device…",jsonTooLarge:"JSON input no fit pass 5,000,000 UTF-16 code units; formatted output no fit pass 10,000,000. Reduce di input or use minify mode for data wey nest plenty.",statisticsTooLarge:"Use no more than 250,000 numbers and 5,000,000 UTF-16 code units.",workerError:"Local processing no start. Try again, or check offline readiness before you reload. Your input no upload anywhere.",
+  demographicsTooLarge:"Use no more than 100,000 UTF-16 text units, 1,000 category rows and 1,024 characters for each percentage. Shorten di entries and try again.",
   statsHelp:"Up to 250,000 finite numbers. If result pass di number range wey tool support, e go reject am instead of showing infinity.",jsonHelp:"Formatting dey run for your device inside background worker. Input limit: 5,000,000 UTF-16 code units; output limit: 10,000,000. Number tokens, duplicate members and string escapes go remain as dem be."
  }
 };

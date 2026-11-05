@@ -107,7 +107,9 @@ function errorResult(err,context={}){
  if(err?.message==="future")message=resultText(lang,"futureDateError");
  if(err?.code==="json-too-large"||err?.message==="json-too-large")message=COMPLETION_COPY[lang].jsonTooLarge;
  if(err?.code==="statistics-too-large"||err?.message==="statistics-too-large")message=COMPLETION_COPY[lang].statisticsTooLarge;
+ if(err?.code==="demographics-too-large"||err?.message==="demographics-too-large")message=COMPLETION_COPY[lang].demographicsTooLarge;
  if(err?.message==="worker unavailable")message=COMPLETION_COPY[lang].workerError;
+ if(err?.message==="tokenizer unavailable")message=tr().tokenError||COMPLETION_COPY[lang].workerError;
  if(tool==="gpa"&&fields.includes("grades"))message=resultText(lang,data.mode==="percentage"?"gpaPercentError":"gpaGradeError");
  const box=result([["",message]],"","error"),messageNode=box.querySelector(".result-row strong");
  messageNode.id="calculator-error-"+(tool||"general");attachFormError(form,messageNode,fields);
@@ -216,7 +218,7 @@ function renderTool(){
   const live=el("p","muted","");live.setAttribute("role","status");live.setAttribute("aria-live","polite");form.append(live);
   let seq=0;const update=async()=>{const id=++seq,text=inputs.text.value;if(!text){cancelTokenization();live.textContent=tr().tokenLiveEmpty||"Enter text to see a live token count.";return;}live.textContent=tr().tokenCounting||"Counting…";try{const r=await tokenize(text,inputs.encoding.value);if(id===seq&&form.isConnected)live.textContent=(tr().liveTokens||"Live token count")+": "+r.ids.length+" · "+r.chars+" "+C.codePoints;}catch(error){if(error.name!=="AbortError"&&id===seq&&form.isConnected)live.textContent=tr().tokenError||"Tokenizer could not initialise.";}};
   inputs.text.addEventListener("input",update);inputs.encoding.addEventListener("change",update);
-  const quick=el("div","actions");addAction(quick,tr().clear||"Clear",()=>{calculationRequest++;inputs.text.value="";panel.querySelector(".result")?.remove();update();});form.append(quick);
+  const quick=el("div","actions");addAction(quick,tr().clear||"Clear",()=>{inputs.text.value="";panel.querySelector(".result")?.remove();inputs.text.dispatchEvent(new Event("input",{bubbles:true}));});form.append(quick);
  }
  if(k==="math"){
   const second=inputs.b.closest(".field"),refresh=()=>{const unary=["sqrt","sin","cos","tan","log","ln","factorial"].includes(inputs.op.value);second.hidden=unary;inputs.b.required=!unary;inputs.b.disabled=unary;};inputs.op.addEventListener("change",refresh);refresh();
@@ -252,7 +254,7 @@ function renderTool(){
  const processing=el("p","muted processing-status");processing.setAttribute("role","status");processing.setAttribute("aria-live","polite");processing.hidden=true;form.append(processing);
  const setBusy=busy=>{form.setAttribute("aria-busy",String(busy));processing.hidden=!busy;processing.textContent=busy?C.working:"";};
  const edited=e=>{calculationRequest++;clearFormError(form,e.target.name);setBusy(false);if(k==="json")cancelJsonWork();};form.addEventListener("input",edited);form.addEventListener("change",edited);
- form.addEventListener("submit",async e=>{e.preventDefault();if(k==="bac"&&form.dataset.bacApproved!=="true")return;clearFormError(form);if(!form.reportValidity())return;const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;const data=Object.fromEntries(new FormData(form));setBusy(true);try{await execute(k,data,isCurrent);}catch(err){if(err.name!=="AbortError"&&isCurrent())errorResult(err,{form,tool:k,data});}finally{if(isCurrent())setBusy(false);}});
+ form.addEventListener("submit",async e=>{e.preventDefault();if(k==="bac"&&form.dataset.bacApproved!=="true")return;clearFormError(form);if(!form.reportValidity())return;const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;const data=Object.fromEntries(new FormData(form));panel.querySelector(".result")?.remove();setBusy(true);try{await execute(k,data,isCurrent);}catch(err){if(err.name!=="AbortError"&&isCurrent())errorResult(err,{form,tool:k,data});}finally{if(isCurrent())setBusy(false);}});
  form.addEventListener("reset",e=>{e.preventDefault();if(k==="math")memoryValue=0;renderTool();if(!panel.querySelector("dialog[open]"))panel.querySelector('button[type="reset"]')?.focus();});
  panel.append(form);
  if(bacConsent)mountBacGate({panel,form,...bacConsent,copy:{title:resultText(lang,"bacDialogTitle"),continueLabel:resultText(lang,"bacDialogContinue"),cancelLabel:resultText(lang,"bacDialogCancel")},onCancel:()=>{location.hash="#/";}});

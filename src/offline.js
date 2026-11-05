@@ -46,7 +46,7 @@ export function mountOfflineStatus(container,{language="en",enabled=import.meta.
       const result=await message(controller,"CHECK");
       if(disposed||request!==sequence||updating)return;
       if(registration?.waiting){setState("update");return;}
-      if(result.version!==expected){setState("update");return;}
+      if(result.version!==expected){setState(result.ok&&result.ready?"update":"error");return;}
       setState(result.ok&&result.ready?"ready":"error");
     }catch{if(request===sequence&&!updating)setState("error");}
   };
@@ -104,6 +104,7 @@ export function mountOfflineStatus(container,{language="en",enabled=import.meta.
     listen(serviceWorker,"controllerchange",()=>{void refresh();});
     listen(document,"visibilitychange",()=>{if(document.visibilityState==="visible")void refresh();});
     listen(window,"online",()=>{void refresh();});
+    listen(window,"offline",()=>{void refresh();});
     void start();
   }
   return {
