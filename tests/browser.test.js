@@ -298,6 +298,28 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.locator("#language").selectOption("en");
     });
 
+    await t.test("small unit results remain nonzero and localized",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);await openTool("units");
+        await page.locator('select[name="group"]').selectOption("digital");
+        await page.locator('select[name="from"]').selectOption("byte");
+        await page.locator('select[name="to"]').selectOption("GB");
+        await page.locator('input[name="value"]').fill("1");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["1E-9 GB"]);
+        await page.locator('select[name="from"]').selectOption("bit");
+        await page.locator('select[name="to"]').selectOption("GiB");await calculate();
+        const tiny=locale==="de"?"1,1641532E-10":"1.1641532E-10";
+        assert.deepEqual(Object.values(await resultRows()),[tiny+" GiB"]);
+        await page.locator('input[name="value"]').fill("0");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),["0 GiB"]);
+        await page.locator('select[name="from"]').selectOption("byte");
+        await page.locator('select[name="to"]').selectOption("kB");
+        await page.locator('input[name="value"]').fill("1234.5");await calculate();
+        assert.deepEqual(Object.values(await resultRows()),[(locale==="de"?"1,2345":"1.2345")+" kB"]);
+      }
+      await page.locator("#language").selectOption("en");
+    });
+
     await t.test("discount modes exclude invalid inactive prices from validation",async()=>{
       await openTool("discount");
       await page.locator('input[name="price"]').fill("-1");

@@ -94,3 +94,10 @@ test("loan rejects output overflow while retaining finite extreme results",()=>{
  assert.ok(Math.abs(finite.payment-1/1200)<1e-18);
  assert.ok(Math.abs(finite.total-1e9)<1e-6);
 });
+
+test("unit conversion avoids intermediate overflow and rejects genuine overflow",()=>{
+ const result=c.unit(1e308,"byte","GB","digital");
+ assert.ok(Number.isFinite(result));assert.ok(Math.abs(result/1e299-1)<1e-15);
+ assert.equal(c.unit(0,"byte","GB","digital"),0);
+ assert.throws(()=>c.unit(1e308,"GB","byte","digital"),/number/);
+});
