@@ -119,7 +119,7 @@ test("load UI: production-preview device editing, live calculations, four locale
     const stream=await download.createReadStream();let csv="";for await(const chunk of stream)csv+=chunk.toString("utf8");
     assert.ok(csv.includes("'=1+1"));assert.ok(csv.includes("6.9984"));
     await page.evaluate(()=>{window.__prints=0;window.print=()=>window.__prints++;});await ui.locator('[data-action="print"]').click();assert.equal(await page.evaluate(()=>window.__prints),1);
-    await page.emulateMedia({media:"print"});assert.equal(await page.locator("header").isVisible(),false);assert.equal(await ui.locator('[data-action="print"]').isVisible(),false);assert.equal(await ui.locator('svg').isVisible(),true);await page.emulateMedia({media:"screen"});
+    await page.emulateMedia({media:"print"});assert.equal(await page.locator("header").isVisible(),false);assert.equal(await ui.locator('[data-action="print"]').isVisible(),false);assert.equal(await ui.locator('svg').first().isVisible(),true);await page.emulateMedia({media:"screen"});
     for(const width of [375,1280]){await page.setViewportSize({width,height:900});const sizes=await page.evaluate(()=>({view:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));assert.ok(sizes.scroll<=sizes.view,JSON.stringify(sizes));}
     await field("households").fill("11");await page.evaluate(()=>{location.hash="#/math";});await page.locator('#panel[data-tool-key="math"]').waitFor();
     await new Promise(resolve=>setTimeout(resolve,200));assert.equal(await page.locator('.load-calculator').count(),0);
