@@ -82,3 +82,4 @@ No full production/accessibility certification is claimed while human review rem
 | 14 | `src/calculators/loadProfile.js` | All 8 profile tests passed after remaining CO2 null default fix | Align power/factor numerical boundaries |
 | 15 | `tests/loadCalculator.test.js` | New full-day factor regression fails as expected | Fix roundoff and tiny PF evaluation |
 | 16 | `src/calculators/loadCalculator.js` | 22 engine/profile tests passed after numerical fixes | Build UI and interaction checks |
+| 17 | `tests/loadUI.test.js` | Expected red: UI module missing; production preview tests proposed router additions in memory only | Implement isolated UI |
