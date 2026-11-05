@@ -27,7 +27,7 @@ function formatOffset(minutes) {
   const sign=minutes>=0?"+":"-",v=Math.abs(minutes);
   return sign+String(Math.floor(v/60)).padStart(2,"0")+":"+String(v%60).padStart(2,"0");
 }
-export function convertTimeZone(localDateTime, fromZone, toZone) {
+export function convertTimeZone(localDateTime, fromZone, toZone, locale="en") {
   const match=/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(localDateTime));
   if(!match) throw Error("date");
   let plain;
@@ -43,7 +43,7 @@ export function convertTimeZone(localDateTime, fromZone, toZone) {
   const ambiguous=!earlier.toInstant().equals(later.toInstant());
   const target=earlier.toInstant().toZonedDateTimeISO(toZone);
   const local=target.toPlainDateTime().toString({smallestUnit:"minute"});
-  const localFormatted=new Intl.DateTimeFormat(undefined,{timeZone:toZone,dateStyle:"medium",timeStyle:"short",hourCycle:"h23"}).format(new Date(Number(target.epochMilliseconds)));
+  const localFormatted=new Intl.DateTimeFormat(locale,{timeZone:toZone,dateStyle:"medium",timeStyle:"short",hourCycle:"h23"}).format(new Date(Number(target.epochMilliseconds)));
   return {instant:earlier.toInstant().toString(),local,localFormatted,fromOffset:earlier.offset,toOffset:target.offset,ambiguous};
 }
 
