@@ -50,4 +50,4 @@ Manual checks require a human on target browsers before claiming full accessibil
 
 ## Continuation regression coverage
 
-Automated regressions cover default restoration and conditional form state, BMI unit labels in all four locales, keyboard focus, malformed fragments, delayed hash/geolocation results, and mobile overflow across all 38 panels. Unit regressions cover UTF-8 QR byte vectors, JSON numeric-token and string preservation, population baseline output, multi-day sleep rollover and omitted GPA grades. The presence of a test is not a pass receipt: consult the current PR CI result.
+Automated regressions cover default restoration and conditional form state, BMI unit labels in all four locales, keyboard focus, malformed fragments on fresh page loads, non-finite numeric results, delayed hash/geolocation results, and mobile overflow across all 38 panels. Unit regressions cover UTF-8 QR byte vectors, JSON numeric-token and string preservation, population baseline output, multi-day sleep rollover, omitted GPA grades and nonpositive calorie estimates. The presence of a test is not a pass receipt: consult the current PR CI result.

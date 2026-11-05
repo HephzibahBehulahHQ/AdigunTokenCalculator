@@ -77,7 +77,7 @@ function renderNav(){
 }
 function out(k){if(tr().additionalOutputs?.[k])return tr().additionalOutputs[k];if(tr().outputs?.[k])return tr().outputs[k];if(k.startsWith("Category "))return (tr().outputs?.Category||"Category")+" "+k.slice(9);if(k.startsWith("After "))return (tr().outputs?.["After cycles"]||"After cycles")+" "+k.slice(6).replace(" cycles","");return k;}
 function result(rows,note="",kind="status"){panel.querySelector(".result")?.remove();const box=el("section","result");box.className="result "+(kind==="error"?"result-error":"");box.setAttribute("role",kind==="error"?"alert":"status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);return box;}
-function fmt(n,d=3){return Number(n).toLocaleString(lang,{maximumFractionDigits:d});}
+function fmt(n,d=3){const value=Number(n);if(!Number.isFinite(value))throw Error("number");return value.toLocaleString(lang,{maximumFractionDigits:d});}
 function errorResult(err){const message=err?.message==="empty"?tr().empty:(String(err?.message||"").startsWith("JSON syntax error")?err.message:tr().invalid);result([["",message]],"", "error");}
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 async function execute(k,d,isCurrent){

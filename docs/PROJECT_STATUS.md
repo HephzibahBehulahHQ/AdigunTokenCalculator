@@ -26,14 +26,14 @@
 - Preserve keyboard focus through category filtering, tool entry and back navigation; recover safely from malformed URL fragments.
 - Ignore stale asynchronous token/hash/geolocation results after Reset, Clear, navigation, language changes or a newer calculation.
 - Preserve UTF-8 input in generated QR codes and original numeric tokens when formatting JSON.
-- Return the population reference baseline, reject missing GPA grades, and keep sleep times valid across multi-day rollover.
+- Return the population reference baseline, reject missing GPA grades and nonpositive calorie estimates, reject non-finite numeric output, and keep sleep times valid across multi-day rollover.
 - Wrap calculator action rows on narrow screens. Regression coverage checks all 38 calculator panels at 375 px.
 
 ## Automated verification
 
-The last verified pre-repair candidate is commit `2f3543250a4507448d77aadd8e7191eace9a2024`: [CI run 41930814702](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41930814702) passed dependency installation, Chromium integration, tests and production build.
+The first repair candidate, commit `038f380dd7eba709ab608eb2834dee8b0d22b8c6`, passed [CI run #193](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/actions/runs/41993381331): **72 tests passed, 0 failed, 0 skipped**, including Chromium regressions, all 38 mobile tool panels and the production build.
 
-The continuation repairs require a new CI result. Their exact candidate SHA and latest verification receipt are maintained in the [PR #6 verification section](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/6), avoiding a self-referential documentation/CI commit cycle. A prior green run does not verify later changes.
+Follow-up invalid-number checks and fresh-page malformed-link coverage require a new CI result. Their exact candidate SHA and latest verification receipt are maintained in the [PR #6 verification section](https://github.com/HephzibahBehulahHQ/AdigunTokenCalculator/pull/6), avoiding a self-referential documentation/CI commit cycle. A prior green run does not verify later changes.
 
 - Initial repair checks: changed JavaScript syntax and focused isolated JavaScript regressions passed.
 - Full repaired-candidate npm/browser/build verification: pending branch CI when this checkpoint was authored.

@@ -71,6 +71,7 @@ export function calorieTargets(weightKg,heightCm,age,sex,activity,proteinPct=25,
   const factors={sedentary:1.2,light:1.375,moderate:1.55,high:1.725,veryHigh:1.9};
   if(!positive(weightKg)||weightKg>500||!positive(heightCm)||heightCm>280||!Number.isInteger(age)||age<18||age>120||!["male","female"].includes(sex)||!factors[activity]||[proteinPct,carbPct,fatPct].some(x=>!finite(x)||x<0)||Math.abs(proteinPct+carbPct+fatPct-100)>.01) throw Error("number");
   const bmr=10*weightKg+6.25*heightCm-5*age+(sex==="male"?5:-161),tdee=bmr*factors[activity];
+  if(!positive(bmr))throw Error("number");
   return {bmr,tdee,proteinGrams:tdee*proteinPct/100/4,carbGrams:tdee*carbPct/100/4,fatGrams:tdee*fatPct/100/9};
 }
 export function pregnancyEstimate(method,inputDate,today=new Date()) {

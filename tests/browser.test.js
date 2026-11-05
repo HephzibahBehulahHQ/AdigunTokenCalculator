@@ -181,9 +181,19 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await openTool("bmi");await page.evaluate(()=>window.__geoRequests[0].error({code:1}));
       assert.equal(await page.locator(".result").count(),0);
     });
+    await t.test("overflowed calculations report an error instead of Infinity",async()=>{
+      await openTool("currency");
+      await page.locator('input[name="amount"]').fill("1e308");
+      await page.locator('select[name="toCurrency"]').selectOption("JPY");
+      await page.locator('#panel button[type="submit"]').click();
+      await page.locator('.result[role="alert"]').waitFor();
+      assert.doesNotMatch(await page.locator(".result").innerText(),/Infinity|NaN|∞/);
+    });
     await t.test("malformed and unknown fragments recover to the directory",async()=>{
       for(const hash of ["#/%","#/%E0%A4%A","#/missing"]){
         await page.goto("http://127.0.0.1:4173/"+hash);
+        await page.reload();
+        await page.locator(".tool-card").first().waitFor();
         assert.equal(await page.locator(".tool-card").count(),38);
         assert.equal(await page.locator("#panel").isVisible(),false);
       }

@@ -138,3 +138,8 @@ test("JSON formatting preserves escapes and string whitespace",()=>{
 test("JSON pretty output retains ordinary nested formatting",()=>{
  assert.equal(a.jsonTransform('{"a":[1,{"b":true}],"c":null}',"pretty"),'{\n  "a": [\n    1,\n    {\n      "b": true\n    }\n  ],\n  "c": null\n}');
 });
+
+test("calorie estimates reject inputs that produce nonpositive energy needs",()=>{
+ assert.throws(()=>a.calorieTargets(10,100,120,"female","sedentary"));
+ assert.throws(()=>a.calorieTargets(.01,.01,18,"male","sedentary"));
+});
