@@ -24,7 +24,8 @@ Source: [Pew Research Center, The World's Religious Groups: How Their Sizes Chan
 - Practice: annual projection assumes 52 weeks; daily minutes are weekly total divided by seven.
 - Zakat: entered assets and user-selected rate only; no threshold, liabilities or ruling inferred.
 - Qibla: great-circle bearing to 21.4225° N, 39.8262° E; compass is a 16-point approximation.
-- Loan: fixed nominal annual rate divided monthly; 12 equal payments per year.
+- Loan: fixed nominal annual rate divided monthly; 12 end-of-month payments per year, no fees or extra payments. With principal P, monthly decimal rate r = annual percentage / 1200 and n = years × 12, M = P × r / (1 − (1 + r)^(-n)). For r = 0, M = P / n. The implementation uses log1p/expm1 for the equivalent denominator to avoid cancellation near zero; repayment and interest are rounded only for display.
+- Engineering percentage: A is the first input (percentage), B is the second (base); A% of B = A × B / 100. Signed and decimal inputs are allowed.
 - Date difference: elapsed calendar days exclude the start date. Annual events use next occurrence; 29 February maps to 28 February in non-leap years.
 - GPA: 4.0 grade mapping is illustrative; institutions vary. Percentage mode is a weighted percentage average, not a GPA.
 - Fuel: metric uses L/100 km and price/litre; imperial uses miles per US or Imperial gallon and price per matching gallon.

@@ -42,3 +42,55 @@ test("percentage GPA rejects omitted grades without rejecting a genuine zero",()
 });
 
 test("population interpolation passes through both audited UN July baselines",()=>{assert.equal(c.populationEstimate(new Date(Date.UTC(2025,6,1))).estimate,8231613070);assert.equal(c.populationEstimate(new Date(Date.UTC(2026,6,1))).estimate,8300678396);assert.equal(c.populationEstimate(new Date(Date.UTC(2026,6,1))).annualNet,69065326);});
+
+test("engineering percentage means A percent of B for signed decimal inputs",()=>{
+ for(const [a,b,expected] of [[10,200,20],[12.5,80,10],[-15,200,-30],[15,-200,-30],[-15,-200,30],[0,200,0],[25,0,0],[150,80,120],["12.5","80",10]]){
+  assert.equal(c.engineering(a,b,"percentOf"),expected);
+ }
+});
+test("percentage of avoids intermediate overflow without discarding tiny operands",()=>{
+ for(const [a,b] of [[100,Number.MAX_VALUE],[Number.MAX_VALUE,100],[1e308,100],[100,1e308]]){
+  const expected=a===100?b:a;
+  assert.equal(c.percent("of",a,b),expected);
+  assert.equal(c.engineering(a,b,"percentOf"),expected);
+ }
+ assert.equal(c.engineering(Number.MIN_VALUE,100,"percentOf"),Number.MIN_VALUE);
+ assert.ok(c.engineering(1e-323,1e308,"percentOf")>0);
+});
+test("engineering percentage rejects nonfinite operands and overflowing results",()=>{
+ for(const invalid of [NaN,Infinity,-Infinity,"invalid",undefined]){
+  assert.throws(()=>c.engineering(invalid,100,"percentOf"),/number/);
+  assert.throws(()=>c.engineering(100,invalid,"percentOf"),/number/);
+ }
+ for(const a of [Number.MAX_VALUE,-Number.MAX_VALUE])assert.throws(()=>c.engineering(a,200,"percentOf"),/number/);
+});
+test("loan stays finite near zero interest and preserves exact zero-rate totals",()=>{
+ const tiny=c.loan(1200,1e-14,1);
+ assert.ok(Math.abs(tiny.payment-100)<1e-10);
+ assert.ok(Object.values(tiny).every(Number.isFinite));
+ assert.ok(tiny.interest>=0);
+ assert.deepEqual(c.loan(1200,0,1),{payment:100,total:1200,interest:0});
+ assert.deepEqual(c.loan(10,0,7/12),{payment:10/7,total:10,interest:0});
+ const rounded=c.loan(10,1e-14,7/12);
+ assert.ok(rounded.payment>=10/7);assert.ok(rounded.total>=10);assert.ok(rounded.interest>=0);
+ for(const rate of [0,12,Number.MAX_VALUE])assert.deepEqual(c.loan(0,rate,1),{payment:0,total:0,interest:0});
+});
+test("loan validates inputs and a positive safe-integer payment count",()=>{
+ assert.deepEqual(c.loan(1200,0,1/12),{payment:1200,total:1200,interest:0});
+ for(const args of [[-1,12,1],[1200,-1,1],[1200,-Number.MIN_VALUE,1],[1200,12,0],[1200,12,-1],[1200,12,.1],[1200,12,Number.MAX_SAFE_INTEGER]])assert.throws(()=>c.loan(...args),/number/);
+ for(const invalid of [NaN,Infinity,-Infinity,"invalid",undefined]){
+  for(let index=0;index<3;index++){
+   const args=[1200,12,1];args[index]=invalid;assert.throws(()=>c.loan(...args),/number/);
+  }
+ }
+});
+test("loan rejects output overflow while retaining finite extreme results",()=>{
+ assert.throws(()=>c.loan(Number.MAX_VALUE,1200,1/12),/number/);
+ assert.throws(()=>c.loan(1e308,1200,2),/number/);
+ const nearLimit=c.loan(Number.MAX_VALUE,1e-100,1);
+ assert.equal(nearLimit.total,Number.MAX_VALUE);assert.equal(nearLimit.interest,0);
+ const finite=c.loan(1e-308,1e308,1e11);
+ assert.ok(Object.values(finite).every(Number.isFinite));
+ assert.ok(Math.abs(finite.payment-1/1200)<1e-18);
+ assert.ok(Math.abs(finite.total-1e9)<1e-6);
+});
