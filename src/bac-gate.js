@@ -32,6 +32,14 @@ export function mountBacGate({panel,form,consent,checkbox,copy,onCancel}){
   };
   cancel.addEventListener("click",dismiss);
   dialog.addEventListener("cancel",event=>{event.preventDefault();dismiss();});
+  dialog.addEventListener("keydown",event=>{
+    if(event.key!=="Tab")return;
+    const controls=[...dialog.querySelectorAll("input:not(:disabled),button:not(:disabled)")].filter(node=>node.getClientRects().length);
+    const first=controls[0],last=controls.at(-1),active=document.activeElement;
+    if(!first)return;
+    if(event.shiftKey&&(active===first||!controls.includes(active))){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&(active===last||!controls.includes(active))){event.preventDefault();first.focus();}
+  });
   proceed.addEventListener("click",()=>{
     if(!checkbox.checked)return;
     checkbox.removeEventListener("change",syncContinue);
