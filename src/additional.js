@@ -145,7 +145,7 @@ export function rgbToHsl(r,g,b) {
   [r,g,b]=[r,g,b].map(Number);if([r,g,b].some(x=>!Number.isInteger(x)||x<0||x>255))throw Error("number");
   r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=0,s=0,l=(max+min)/2;
   if(d){s=d/(1-Math.abs(2*l-1));switch(max){case r:h=60*(((g-b)/d)%6);break;case g:h=60*((b-r)/d+2);break;default:h=60*((r-g)/d+4);}}
-  return {h:(h+360)%360,s:s*100,l:l*100};
+  return {h:(h+360)%360,s:clamp(s*100,0,100),l:clamp(l*100,0,100)};
 }
 const linear=x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4;};
 export function contrastRatio(hex1,hex2) {

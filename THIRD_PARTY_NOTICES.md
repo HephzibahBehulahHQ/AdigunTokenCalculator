@@ -26,6 +26,31 @@ SOFTWARE.
 
 See each installed package's own metadata for additional third-party notices.
 
+## zxcvbn 4.4.2
+
+MIT License
+
+Copyright (c) 2012-2016 Dan Wheeler and Dropbox, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 ## qrcode-generator 2.0.4
 
 Copyright (c) Kazuhiko Arase
@@ -345,6 +370,7 @@ The following inventory is generated from the committed lockfile. Package-specif
 | `source-map-js` | `1.2.2` | `BSD-3-Clause` |
 | `tinyglobby` | `0.2.17` | `MIT` |
 | `vite` | `6.4.5` | `MIT` |
+| `zxcvbn` | `4.4.2` | `MIT` |
 
 ## ISC License — standard text
 
@@ -396,3 +422,8 @@ Currency table attribution: European Central Bank (ECB), euro foreign exchange r
 
 - `@js-temporal/polyfill@0.5.1` — ISC. Used locally for Temporal.PlainDateTime / ZonedDateTime DST gap and ambiguity handling. The standard ISC licence text is included above.
 - `jsbi@4.3.2` — Apache-2.0, dependency of the Temporal polyfill. The full Apache 2.0 licence text above applies.
+
+
+## UN population source attribution
+
+United Nations, Department of Economic and Social Affairs, Population Division (2024). *World Population Prospects 2024, Online Edition.* CC BY 3.0 IGO. Source: https://population.un.org/wpp/ . The app converts two World/Medium July totals from thousands to people and applies a linear estimate; it does not represent a live UN count. Exact source rows and checksums are recorded in docs/POPULATION_AUDIT.md.

@@ -4,7 +4,9 @@ import * as c from "./calculators.js";
 import {tokenize,encodings} from "./tokenizer.js";
 import * as a from "./additional.js";
 import "./additional-i18n.js";
-import {RESULT_LABELS,resultText} from "./result-i18n.js";
+import {RESULT_COPY,RESULT_LABELS,resultText} from "./result-i18n.js";
+import "./feature-i18n.js";
+import {normalizeHexColor,rgbToHex,hslToHex} from "./colors.js";
 import {createQr} from "./qr.js";
 import "./styles.css";
 
@@ -47,11 +49,11 @@ Religiously unaffiliated, 24.2`]],
  bac:[["weightKg","number"],["sex","select",[["male","Male"],["female","Female"]],"male"],["drinks","number"],["drinkMl","number",null,"330"],["abv","number",null,"5"],["hours","number",null,"0"]],
  roman:[["mode","select",[["toRoman","Integer to Roman"],["fromRoman","Roman to integer"]],"toRoman"],["value","text"]],
  bases:[["value","text"],["fromBase","number",null,"10"],["toBase","number",null,"16"]],
- password:[["length","number",null,"20"],["charset","select",[["all","All characters"],["letters","Letters only"],["alphanumeric","Letters and numbers"],["hex","Hexadecimal"]],"all"]],
+ password:[["passwordMode","select",[["generate","Generate"],["check","Check strength"]],"generate"],["length","number",null,"20"],["charset","select",[["all","All characters"],["letters","Letters only"],["alphanumeric","Letters and numbers"],["hex","Hexadecimal"]],"all"],["passwordInput","password"]],
  qr:[["text","textarea"]],
  hash:[["text","textarea"],["file","file"],["algorithm","select",[["SHA-256","SHA-256"],["SHA-1","SHA-1"],["MD5","MD5"]],"SHA-256"]],
  json:[["text","textarea"],["mode","select",[["pretty","Pretty print"],["minify","Minify"]],"pretty"]],
- color:[["foreground","color",null,"#000000"],["background","color",null,"#ffffff"]],
+ color:[["colorMode","select",[["hex","HEX"],["rgb","RGB"],["hsl","HSL"]],"hex"],["foreground","text",null,"#000000"],["red","number",null,"0"],["green","number",null,"0"],["blue","number",null,"0"],["hue","number",null,"0"],["saturation","number",null,"0"],["lightness","number",null,"0"],["background","color",null,"#ffffff"]],
  discount:[["mode","select",[["forward","Discount a price"],["reverse","Find original price"]],"forward"],["price","number"],["discountPct","number"],["taxRate","number",null,"0"],["salePrice","number"]],
  recipe:[["text","textarea"],["fromServings","number"],["toServings","number"]],
  holidays:[["year","number",null,"2026"],["region","select",[["US","United States"],["GB","United Kingdom"],["DE","Germany"],["NG","Nigeria"],["CA","Canada"]],"US"]],
@@ -81,6 +83,7 @@ function result(rows,note="",kind="status"){panel.querySelector(".result")?.remo
 function fmt(n,d=3){const value=Number(n);if(!Number.isFinite(value))throw Error("number");return value.toLocaleString(lang,{maximumFractionDigits:d});}
 function errorResult(err){const location=/^JSON syntax error at line (\d+), column (\d+)$/.exec(String(err?.message||""));const message=err?.message==="empty"?tr().empty:location?resultText(lang,"jsonSyntaxAt",{line:location[1],column:location[2]}):tr().invalid;result([["",message]],"", "error");}
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
+function foregroundColor(d){if(d.colorMode==="hex")return normalizeHexColor(d.foreground);if(d.colorMode==="rgb")return rgbToHex(d.red,d.green,d.blue);if(d.colorMode==="hsl")return hslToHex(d.hue,d.saturation,d.lightness);throw Error("number");}
 async function execute(k,d,isCurrent){
  const T=tr(),N=T.notices;let rows=[],note="";
  switch(k){
@@ -112,16 +115,20 @@ async function execute(k,d,isCurrent){
  case"bac":{const r=a.bloodAlcohol(d.weightKg,d.sex,d.drinks,d.drinkMl,d.abv,d.hours);rows=[["Ethanol",fmt(r.ethanolGrams,1)],["BAC",fmt(r.bacPercent,3)]];note=N.bac;break;}
  case"roman":{const v=d.mode==="toRoman"?a.toRoman(d.value):a.fromRoman(d.value);rows=[[d.mode==="toRoman"?"Roman":"Integer",v]];break;}
  case"bases":rows=[["Converted",a.convertBase(d.value,d.fromBase,d.toBase)],["Target base",d.toBase]];break;
- case"password":{const r=a.generatePassword(d.length,d.charset);const box=result([["Password",r.password],["Entropy",fmt(r.entropyBits,1)]],N.password);const actions=el("div","actions");addCopyButton(actions,r.password,T.copyPassword||"Copy password");box.append(actions);return;}
+ case"password":{if(d.passwordMode==="check"){
+  const {scorePassword}=await import("./password-strength.js");if(!isCurrent())return;
+  const r=scorePassword(d.passwordInput),patterns=r.patterns.map(pattern=>resultText(lang,Object.hasOwn(RESULT_COPY[lang],"pattern_"+pattern)?"pattern_"+pattern:"pattern_other"));
+  rows=[["StrengthScore",r.score+"/4 · "+resultText(lang,"strength"+r.score)],["DetectedPatterns",patterns.join("; ")]];note=resultText(lang,"passwordStrengthNotice");break;
+ }if(d.passwordMode!=="generate")throw Error("number");const r=a.generatePassword(d.length,d.charset);const box=result([["Password",r.password],["Entropy",fmt(r.entropyBits,1)]],N.password);const actions=el("div","actions");addCopyButton(actions,r.password,T.copyPassword||"Copy password");box.append(actions);return;}
  case"qr":{if(!d.text)throw Error("empty");const qr=createQr(d.text);const url=qr.createDataURL(6,4),box=result([["QR content",d.text]],N.qr);const img=el("img","qr-preview");img.alt=tr().qrPreviewAlt||"Generated QR code";img.src=url;box.append(img);const link=el("a","secondary",T.downloadQr||"Download QR code");link.href=url;link.download="adigun-qr-code.gif";box.append(link);return;}
  case"hash":{const file=d.file&&d.file.size?d.file:null;if(file&&file.size>25000000)throw Error("number");if(!file&&!d.text)throw Error("empty");const data=file?new Uint8Array(await file.arrayBuffer()):new TextEncoder().encode(d.text);if(!isCurrent())return;let digest;if(d.algorithm==="MD5")digest=a.md5Hex(data);else{const raw=await crypto.subtle.digest(d.algorithm,data);digest=[...new Uint8Array(raw)].map(x=>x.toString(16).padStart(2,"0")).join("");}rows=[["Hash",digest],["Input",file?file.name:resultText(lang,"textBytes",{count:fmt(data.length,0)})]];note=N.hash;break;}
  case"json":{const formatted=a.jsonTransform(d.text,d.mode);const box=result([["Formatted",formatted]],N.json);const actions=el("div","actions");addCopyButton(actions,formatted,T.copyResult||"Copy result");box.append(actions);return;}
- case"color":{const fg=d.foreground,bg=d.background,rgb=a.parseHexColor(fg),hsl=a.rgbToHsl(rgb.r,rgb.g,rgb.b),ratio=a.contrastRatio(fg,bg);rows=[["HEX",fg.toUpperCase()],["RGB",rgb.r+", "+rgb.g+", "+rgb.b],["HSL",fmt(hsl.h,1)+"°, "+fmt(hsl.s,1)+"%, "+fmt(hsl.l,1)+"%"],["Contrast",fmt(ratio,2)+":1"],["AA",resultText(lang,ratio>=4.5?"pass":"fail")],["AAA",resultText(lang,ratio>=7?"pass":"fail")]];note=N.color;break;}
+ case"color":{const fg=foregroundColor(d),bg=d.background,rgb=a.parseHexColor(fg),hsl=a.rgbToHsl(rgb.r,rgb.g,rgb.b),ratio=a.contrastRatio(fg,bg);rows=[["HEX",fg.toUpperCase()],["RGB",rgb.r+", "+rgb.g+", "+rgb.b],["HSL",fmt(hsl.h,1)+"°, "+fmt(hsl.s,1)+"%, "+fmt(hsl.l,1)+"%"],["Contrast",fmt(ratio,2)+":1"],["AA",resultText(lang,ratio>=4.5?"pass":"fail")],["AAA",resultText(lang,ratio>=7?"pass":"fail")]];note=N.color;break;}
  case"discount":{if(d.mode==="reverse")rows=[["Original",fmt(a.originalPriceFromSale(d.salePrice,d.discountPct,d.taxRate),2)]];else{const r=a.discountPrice(d.price,d.discountPct,d.taxRate);rows=[["Discounted",fmt(r.discounted,2)],["Tax",fmt(r.tax,2)],["Total",fmt(r.total,2)],["Saved",fmt(r.saved,2)]];}note=N.discount;break;}
  case"recipe":{const r=a.scaleRecipe(d.text,d.fromServings,d.toServings),formatted=r.join("\n");const box=result([["Scaled",formatted]],N.recipe);const actions=el("div","actions");addCopyButton(actions,formatted,T.copyResult||"Copy result");box.append(actions);return;}
  case"holidays":{const r=a.holidayDates(d.year,d.region),now=new Date(),today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()),items=r.map(([name,date])=>({name,date,days:Math.round((Date.parse(date+"T00:00:00Z")-today)/86400000)})).sort((x,y)=>(x.days>=0?x.days:100000+Math.abs(x.days))-(y.days>=0?y.days:100000+Math.abs(y.days)));rows=items.map(x=>[x.name,x.date+" · "+Math.abs(x.days)+" "+(x.days>=0?(T.daysAway||"days away"):(T.daysAgo||"days ago"))]);note=N.holiday;break;}
  case"morse":rows=[["Converted",a.translateMorse(d.text,d.direction)]];break;
- case"stats":{const r=a.summarizeNumbers(d.numbers);rows=[["Mean",fmt(r.mean,6)],["Median",fmt(r.median,6)],["Mode",r.mode.length?r.mode.map(value=>fmt(value,6)).join("; "):resultText(lang,"noUniqueMode")],["Minimum",fmt(r.min,6)],["Maximum",fmt(r.max,6)],["Range",fmt(r.range,6)],["PopulationSD",fmt(r.populationStdDev,6)],["SampleSD",r.sampleStdDev===null?resultText(lang,"singletonDeviation"):fmt(r.sampleStdDev,6)],["Count",r.count]];break;}
+ case"stats":{const r=a.summarizeNumbers(d.numbers);rows=[["Mean",fmt(r.mean,6)],["Median",fmt(r.median,6)],["Mode",r.mode.length?r.mode.map(value=>fmt(value,6)).join("; "):resultText(lang,"noUniqueMode")],["Minimum",fmt(r.min,6)],["Maximum",fmt(r.max,6)],["Range",fmt(r.range,6)],["PopulationVariance",fmt(r.populationVariance,6)],["SampleVariance",r.sampleVariance===null?resultText(lang,"singletonDeviation"):fmt(r.sampleVariance,6)],["PopulationSD",fmt(r.populationStdDev,6)],["SampleSD",r.sampleStdDev===null?resultText(lang,"singletonDeviation"):fmt(r.sampleStdDev,6)],["Count",r.count]];break;}
 
  }
  if(!isCurrent())return;const box=result(rows,note);if(k==="currency"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const aLink=el("a","","European Central Bank reference rates (4 November 2026)");aLink.href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html";aLink.target="_blank";aLink.rel="noopener noreferrer";p.append(aLink);box.append(p);}if(k==="demographics"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const a=el("a","", "Pew Research Center (2025; estimates for 2020)");a.href="https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);}
@@ -143,12 +150,26 @@ function renderTool(){
  if(k==="water")inputs.extraMl.min="-2000";
  if(k==="calories"){inputs.age.min="18";inputs.age.max="120";inputs.weightKg.max="500";inputs.heightCm.max="280";}
  if(k==="bases"){for(const key of ["fromBase","toBase"]){inputs[key].min="2";inputs[key].max="36";}}
- if(k==="password"){inputs.length.min="8";inputs.length.max="128";}
+ if(k==="password"){
+  inputs.length.min="8";inputs.length.max="128";inputs.length.step="1";
+  inputs.passwordInput.maxLength=256;inputs.passwordInput.autocomplete="off";inputs.passwordInput.spellcheck=false;inputs.passwordInput.setAttribute("autocapitalize","none");
+  const refresh=()=>{const checking=inputs.passwordMode.value==="check";for(const key of ["length","charset"]){inputs[key].closest(".field").hidden=checking;inputs[key].required=!checking;inputs[key].disabled=checking;}inputs.passwordInput.closest(".field").hidden=!checking;inputs.passwordInput.required=checking;inputs.passwordInput.disabled=!checking;if(!checking)inputs.passwordInput.value="";};
+  inputs.passwordMode.addEventListener("change",()=>{calculationRequest++;panel.querySelector(".result")?.remove();refresh();});refresh();
+ }
+ if(k==="color"){
+  const modes={hex:["foreground"],rgb:["red","green","blue"],hsl:["hue","saturation","lightness"]};let previousMode=inputs.colorMode.value;
+  for(const key of modes.rgb){inputs[key].max="255";inputs[key].step="1";}inputs.hue.max="360";inputs.saturation.max="100";inputs.lightness.max="100";
+  const refresh=()=>{for(const [mode,fields] of Object.entries(modes))for(const key of fields){const visible=inputs.colorMode.value===mode;inputs[key].closest(".field").hidden=!visible;inputs[key].required=visible;inputs[key].disabled=!visible;}};
+  inputs.colorMode.addEventListener("change",()=>{
+   try{const values=Object.fromEntries(Object.entries(inputs).map(([key,input])=>[key,input.value])),hex=foregroundColor({...values,colorMode:previousMode}),rgb=a.parseHexColor(hex),hsl=a.rgbToHsl(rgb.r,rgb.g,rgb.b);inputs.foreground.value=hex;for(const [key,value] of Object.entries({red:rgb.r,green:rgb.g,blue:rgb.b,hue:hsl.h,saturation:hsl.s,lightness:hsl.l}))inputs[key].value=String(Math.round(value*1e6)/1e6);}catch{}
+   previousMode=inputs.colorMode.value;panel.querySelector(".result")?.remove();refresh();
+  });refresh();
+ }
  if(k==="holidays"){inputs.year.min="1583";inputs.year.max="4099";}
  if(k==="discount")inputs.discountPct.max="99.99";
  if(k==="bac"){const consent=el("div","field bac-consent");const warning=el("p","warning-text",tr().bacConsentWarning||"Educational estimate only. Never use this to decide whether to drive.");const label=el("label","consent-label");const check=el("input");check.type="checkbox";check.name="acknowledge";check.required=true;label.append(check,document.createTextNode(tr().bacConsent||"I understand this is educational only and will never use it to decide whether to drive."));consent.append(warning,label);form.append(consent);}
  if(k==="hash"){inputs.text.required=false;inputs.file.required=false;inputs.file.accept="*/*";const drop=inputs.file.closest(".field");drop.append(el("small","muted",tr().dropFileHint||"Or drop a file here (maximum 25 MB)."));drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("dragover");});drop.addEventListener("dragleave",()=>drop.classList.remove("dragover"));drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("dragover");const file=e.dataTransfer?.files?.[0];if(file){const transfer=new DataTransfer();transfer.items.add(file);inputs.file.files=transfer.files;}});}
- if(k==="discount"){const refresh=()=>{const reverse=inputs.mode.value==="reverse";inputs.price.closest(".field").hidden=reverse;inputs.salePrice.closest(".field").hidden=!reverse;inputs.price.required=!reverse;inputs.salePrice.required=reverse;};inputs.mode.addEventListener("change",refresh);refresh();}
+ if(k==="discount"){const refresh=()=>{const reverse=inputs.mode.value==="reverse";inputs.price.closest(".field").hidden=reverse;inputs.salePrice.closest(".field").hidden=!reverse;inputs.price.required=!reverse;inputs.salePrice.required=reverse;inputs.price.disabled=reverse;inputs.salePrice.disabled=!reverse;};inputs.mode.addEventListener("change",refresh);refresh();}
  if(k==="token"){
   const live=el("p","muted","");live.setAttribute("role","status");live.setAttribute("aria-live","polite");form.append(live);
   let seq=0;const update=async()=>{const id=++seq,text=inputs.text.value;if(!text){live.textContent=tr().tokenLiveEmpty||"Enter text to see a live token count.";return;}live.textContent=tr().tokenCounting||"Counting…";try{const r=await tokenize(text,inputs.encoding.value);if(id===seq&&form.isConnected)live.textContent=(tr().liveTokens||"Live token count")+": "+r.ids.length+" · "+r.chars+" "+(tr().characters||"characters");}catch{if(id===seq&&form.isConnected)live.textContent=tr().tokenError||"Tokenizer could not initialise.";}};
@@ -170,7 +191,7 @@ function renderTool(){
  form.addEventListener("reset",e=>{e.preventDefault();if(k==="math")memoryValue=0;renderTool();panel.querySelector('button[type="reset"]')?.focus();});
  panel.append(form);
 }
-function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;renderNav();renderTool();}
+function setLang(v){lang=v;document.documentElement.lang=v;$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;renderNav();renderTool();}
 search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
 function routeIndex(){
  try{return keys.indexOf(decodeURIComponent(location.hash.replace(/^#\/?/,"")));}

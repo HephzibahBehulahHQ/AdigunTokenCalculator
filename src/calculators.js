@@ -54,7 +54,9 @@ const fromToday=Math.round((y-Date.UTC(today.getFullYear(),today.getMonth(),toda
 }
 
 export function populationEstimate(now=new Date()){
-const baseline=8300678395,annualNet=8300678395-8231613070,daysPerYear=365.2425;
+// Audited UN WPP 2024 World/Medium totals; see docs/POPULATION_AUDIT.md.
+const baseline=8300678396,annualNet=baseline-8231613070;
+const daysPerYear=(Date.UTC(2026,6,1)-Date.UTC(2025,6,1))/86400000;
 const elapsed=(now.getTime()-Date.UTC(2026,6,1))/86400000;
 const perDay=annualNet/daysPerYear;
 const estimate=baseline+elapsed*perDay;

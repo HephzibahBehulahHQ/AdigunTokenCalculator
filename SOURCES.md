@@ -34,8 +34,9 @@ This file records the external references and explicit assumptions used by the b
 - Morse mappings follow ITU-R [Recommendation M.1677-1: International Morse code](https://www.itu.int/rec/R-REC-M.1677/en).
 - QR codes are generated locally with `qrcode-generator@2.0.4`, MIT licensed. The QR content is readable by anyone who scans it.
 - SHA-1 and SHA-256 use the browser [Web Crypto digest API](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest); MD5 is implemented locally for legacy checksum compatibility only. SHA-1 and MD5 must not be used for security-sensitive purposes. A hash is not encryption.
-- Color contrast uses the WCAG relative-luminance ratio. See [WCAG 2.2, Success Criterion 1.4.3](https://www.w3.org/TR/WCAG22/#contrast-minimum) and [1.4.6](https://www.w3.org/TR/WCAG22/#contrast-enhanced).
-- JSON formatting uses the native `JSON.parse` / `JSON.stringify` behavior. Base conversion uses JavaScript `BigInt`.
+- HEX/RGB/HSL conversion follows [CSS Color 4, HSL to sRGB](https://www.w3.org/TR/css-color-4/#hsl-to-rgb); RGB channels are quantized to 8 bits. Color contrast uses the WCAG relative-luminance ratio. See [WCAG 2.2, Success Criterion 1.4.3](https://www.w3.org/TR/WCAG22/#contrast-minimum) and [1.4.6](https://www.w3.org/TR/WCAG22/#contrast-enhanced).
+- JSON validation uses native `JSON.parse`; formatting preserves the original numeric tokens and string values. Base conversion uses JavaScript `BigInt`.
+- Password generation uses browser cryptographic randomness. Strength checking uses the locally bundled [Dropbox zxcvbn](https://github.com/dropbox/zxcvbn) model, version 4.4.2, under its MIT licence. Pattern and strength scores are estimates, not security guarantees.
 
 ## Source refresh policy
 
@@ -43,7 +44,7 @@ Recheck date-sensitive snapshots before release. Never label a stored snapshot �
 
 ### Population baseline verification state
 
-The official [UNData WPP 2024 record](https://data.un.org/Data.aspx?d=PopDiv&f=variableID%3A12%3BcrID%3A900%3BvarID%3A2) identifies the series as “Total population, both sexes combined (thousands)” for World / Medium and cites the 2024 Revision. The application currently seeds 1 July 2025 and 1 July 2026 values from that WPP 2024 medium-variant series. Those numbers have been cross-checked against independent public reproductions, but the direct downloadable UN dataset file and its checksum have not yet been archived in this repository. Therefore, exact baseline-to-file verification remains an open release check; do not describe this dataset audit as fully closed.
+The official UN WPP2024 Medium CSV and indicator notes were downloaded directly on 5 November 2026. World / Medium `TPopulation1July` values, expressed in thousands, verify **8,231,613,070** people for 2025 and **8,300,678,396** for 2026. The exact reference interval is **365 days**. [The completed audit](docs/POPULATION_AUDIT.md) includes checksums, full selected rows and reproduction instructions. Extrapolation outside that interval remains a simplified estimate.
 
 
 ## Remaining original-tool constants and formula references

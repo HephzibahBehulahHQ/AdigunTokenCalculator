@@ -47,6 +47,7 @@ export const RESULT_COPY={
 
 export const RESULT_LABELS={
   en:{
+    PopulationVariance:"Population variance",SampleVariance:"Sample variance",
     "Local ISO":"Converted local date/time (ISO)","QR content":"QR content",Input:"Input",
     "New Year's Day":"New Year's Day","Christmas Day":"Christmas Day","Boxing Day":"Boxing Day",
     "Martin Luther King Jr. Day":"Martin Luther King Jr. Day","Memorial Day":"Memorial Day",
@@ -57,6 +58,7 @@ export const RESULT_LABELS={
     "Democracy Day":"Democracy Day","Canada Day":"Canada Day","Labour Day":"Labour Day","Thanksgiving":"Thanksgiving"
   },
   de:{
+    PopulationVariance:"Populationsvarianz",SampleVariance:"Stichprobenvarianz",
     "Local ISO":"Umgerechnete Ortszeit (ISO)","QR content":"QR-Inhalt",Input:"Eingabe",
     "New Year's Day":"Neujahr","Christmas Day":"Erster Weihnachtsfeiertag","Boxing Day":"Zweiter Weihnachtsfeiertag",
     "Martin Luther King Jr. Day":"Martin-Luther-King-Tag","Memorial Day":"Gedenktag für gefallene US-Soldaten",
@@ -67,6 +69,7 @@ export const RESULT_LABELS={
     "Democracy Day":"Tag der Demokratie","Canada Day":"Kanada-Tag","Labour Day":"Tag der Arbeit","Thanksgiving":"Erntedankfest"
   },
   yo:{
+    PopulationVariance:"Variance gbogbo àkójọpọ̀",SampleVariance:"Variance àpẹẹrẹ",
     "Local ISO":"Àkókò agbègbè tí a yí padà (ISO)","QR content":"Ohun inú QR",Input:"Ohun tí a tẹ̀ sílẹ̀",
     "New Year's Day":"Ọjọ́ Ọdún Tuntun","Christmas Day":"Ọjọ́ Kérésìmesì","Boxing Day":"Ọjọ́ kejì Kérésìmesì",
     "Martin Luther King Jr. Day":"Ọjọ́ Martin Luther King Jr.","Memorial Day":"Ọjọ́ ìrántí àwọn ọmọ ogun tó kú",
@@ -77,6 +80,7 @@ export const RESULT_LABELS={
     "Democracy Day":"Ọjọ́ Ìjọba Tiwantiwa","Canada Day":"Ọjọ́ Kánádà","Labour Day":"Ọjọ́ Àwọn Òṣìṣẹ́","Thanksgiving":"Ọjọ́ Ìdúpẹ́"
   },
   pcm:{
+    PopulationVariance:"Variance for whole set",SampleVariance:"Variance for sample",
     "Local ISO":"Local date and time after conversion (ISO)","QR content":"Wetin dey inside QR",Input:"Wetin you enter",
     "New Year's Day":"New Year Day","Christmas Day":"Christmas Day","Boxing Day":"Boxing Day",
     "Martin Luther King Jr. Day":"Martin Luther King Jr. Day","Memorial Day":"Day to remember soldiers wey die for service",

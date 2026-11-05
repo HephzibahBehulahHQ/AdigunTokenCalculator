@@ -17,7 +17,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Age calculator | Time & Date | Calendar age from birth date to local today. | Calendar arithmetic in browser. |
 | BMI calculator | Health & Body | Metric/imperial adult screening estimate. | CDC BMI formula and adult categories. |
 | Percentage calculator | Math & Engineering | Percent of, ratio and percentage change. | Standard arithmetic. |
-| World population estimate | World & Culture | Interpolated mid-year population estimate; not live. | UN WPP 2024 Medium; direct file checksum audit pending. |
+| World population estimate | World & Culture | Interpolated mid-year population estimate; not live. | UN WPP 2024 Medium; official file checksums and rows verified in [the audit](docs/POPULATION_AUDIT.md). |
 | Religion demographics | World & Culture | Editable global shares and counts. | Pew Research Center 2020 estimates, published 2025. |
 | Contemplative practice time | World & Culture | Daily/weekly/annual/lifetime projections. | User inputs; 52 weeks/year assumption. |
 | Zakat / charity | Finance | User-entered assets and editable rate; not a ruling. | Islamic Relief 2.5% reference; no nisab ruling. |
@@ -38,7 +38,7 @@ A static, browser-side suite of 38 token, everyday, health-estimate and develope
 | Blood alcohol estimate | Health & Body | Educational estimate with required acknowledgement and no-driving warning. | Simplified Widmark-style estimate; EU road-safety / forensic references; assumptions are not person-specific. |
 | Roman numeral converter | Text & Language | Canonical Arabic/Roman conversion 1–3999. | Canonical Roman numeral rules. |
 | Number base converter | Conversion | Signed BigInt conversion between bases 2–36. | JavaScript BigInt. |
-| Password generator | Security & Privacy | Local cryptographic random password generation. | Browser crypto.getRandomValues. |
+| Password generator & strength checker | Security & Privacy | Generate a password or estimate strength locally; no storage or upload. | Browser crypto.getRandomValues; bundled zxcvbn 4.4.2. |
 | QR code generator | Developer | Local QR image preview/download. | Bundled qrcode-generator. |
 | Hash / checksum | Security & Privacy | Local SHA-256, SHA-1 and MD5 for text/files. | Web Crypto and local MD5; MD5/SHA-1 not security choices. |
 | JSON formatter / validator | Developer | Local pretty-print, minify and line/column validation. | Native JSON.parse / JSON.stringify. |

@@ -7,7 +7,7 @@ AdigunTokenCalculator is a static, browser-side utility. All 38 tools process ca
 - Text, model selection, token IDs and token-piece data in the tokenizer and text-statistics tools.
 - Dates and numeric values in engineering, temperature, age, BMI, percentage, population, religion, practice-time, Zakat, Qibla, unit, loan, date-difference, GPA, fuel, sleep, time-zone, inflation, tip, calorie, pregnancy, water, BAC, base, Roman numeral, discount, recipe, holiday and statistics tools.
 - Currency rates and amounts in the offline converter. Its ECB reference-rate snapshot is bundled in the application and can be edited in the page.
-- Password characters and cryptographic random values in the password generator. Generated passwords are not uploaded or intentionally stored.
+- Password characters and cryptographic random values in the password generator. The optional strength checker analyses up to 128 Unicode characters locally with a bundled zxcvbn model, loaded only when checking. Checked passwords are masked in the form and excluded from displayed results. Neither generated nor checked passwords are uploaded or intentionally stored.
 - QR text/URLs in the local QR generator. QR content is encoded in the browser and is readable by anyone who scans the resulting code.
 - Pasted text or explicitly selected/dropped files in the hash tool. Files are read locally in memory, with a 25 MB limit; their contents are not transmitted.
 - Foreground/background colors in the color and contrast checker.
@@ -18,7 +18,7 @@ The BAC estimator requires the user to affirm an explicit educational-use acknow
 
 ## Network behaviour
 
-The browser downloads the published static HTML, CSS, JavaScript and locally bundled tokenizer/QR assets from this GitHub Pages site. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime API or third-party CDN requests. Source links open only when the user deliberately activates them.
+The browser downloads the published static HTML, CSS, JavaScript and locally bundled tokenizer/QR/password-strength assets from this GitHub Pages site. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime API or third-party CDN requests. Source links open only when the user deliberately activates them.
 
 The browser/device handles its own geolocation permission and location service. The application reads the returned coordinates in-page and does not send them to an application server.
 

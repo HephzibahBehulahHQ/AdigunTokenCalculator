@@ -5,6 +5,8 @@ import {createHash} from "node:crypto";
 import {spawn} from "node:child_process";
 import {setTimeout as delay} from "node:timers/promises";
 import {chromium} from "playwright-core";
+import {RESULT_COPY,RESULT_LABELS,resultText} from "../src/result-i18n.js";
+import "../src/feature-i18n.js";
 
 const browserAvailable=existsSync(chromium.executablePath());
 
@@ -19,9 +21,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     }
     assert.ok(ready,"Vite development server should start");
     browser=await chromium.launch({headless:true});
-    const page=await browser.newPage(),pageErrors=[],externalRequests=[];
+    const page=await browser.newPage({locale:"en-US"}),pageErrors=[],externalRequests=[],strengthRequests=[];
     page.on("pageerror",e=>pageErrors.push(e.message));
     page.on("request",request=>{try{if(new URL(request.url()).host!=="127.0.0.1:4173")externalRequests.push(request.url());}catch{externalRequests.push(request.url());}});
+    page.on("request",request=>{if(/password-strength|zxcvbn/.test(request.url()))strengthRequests.push(request.url());});
     await page.addInitScript(()=>{window.__geoCalls=0;window.__geoRequests=[];Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(success,error){window.__geoCalls++;window.__geoRequests.push({success,error});}}});});
     await page.goto("http://127.0.0.1:4173/");
     assert.equal(await page.locator(".tool-card").count(),38);
@@ -95,6 +98,8 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,key);
     };
     const reset=()=>page.locator('#panel button[type="reset"]').click();
+    const calculate=async()=>{await page.locator('#panel button[type="submit"]').click();await page.locator(".result").waitFor({timeout:5000});};
+    const resultRows=()=>page.locator(".result-row").evaluateAll(rows=>Object.fromEntries(rows.map(row=>[row.querySelector("span").textContent,row.querySelector("strong").textContent])));
     await t.test("reset restores defaults, conditional fields and BMI unit labels",async()=>{
       await openTool("bmi");
       for(const locale of ["en","de","yo","pcm"]){
@@ -188,6 +193,169 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       await page.locator('#panel button[type="submit"]').click();
       await page.locator('.result[role="alert"]').waitFor();
       assert.doesNotMatch(await page.locator(".result").innerText(),/Infinity|NaN|∞/);
+    });
+    await t.test("dynamic results use all four selected locales",async()=>{
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        await openTool("timezone");
+        await page.locator('select[name="fromZone"]').selectOption("Europe/Berlin");
+        await page.locator('select[name="toZone"]').selectOption("UTC");
+        await page.locator('input[name="dateTime"]').fill("2026-10-25T02:30");
+        await calculate();
+        assert.ok(Object.values(await resultRows()).includes(RESULT_COPY[locale].yes),locale+" ambiguous time");
+        await page.locator('input[name="dateTime"]').fill("2026-07-01T12:00");
+        await calculate();
+        let rows=await resultRows();
+        assert.ok(Object.values(rows).includes(RESULT_COPY[locale].no),locale+" regular time");
+        assert.ok(Object.hasOwn(rows,RESULT_LABELS[locale]["Local ISO"]));
+        if(locale==="de"){
+          assert.equal(await page.evaluate(()=>navigator.language),"en-US");
+          const expected=await page.evaluate(()=>new Intl.DateTimeFormat("de",{timeZone:"UTC",dateStyle:"medium",timeStyle:"short",hourCycle:"h23"}).format(new Date("2026-07-01T10:00:00Z")));
+          assert.ok(Object.values(rows).includes(expected),"date formatting follows German app locale");
+        }
+
+        await openTool("stats");await page.locator('textarea[name="numbers"]').fill("5");await calculate();
+        rows=await resultRows();
+        assert.ok(Object.values(rows).includes(RESULT_COPY[locale].noUniqueMode));
+        assert.equal(rows[RESULT_LABELS[locale].SampleVariance],RESULT_COPY[locale].singletonDeviation);
+        await page.locator('textarea[name="numbers"]').fill("1,2,3");await calculate();
+        rows=await resultRows();
+        const variance=await page.evaluate(locale=>(2/3).toLocaleString(locale,{maximumFractionDigits:6}),locale);
+        assert.equal(rows[RESULT_LABELS[locale].PopulationVariance],variance);
+        assert.equal(rows[RESULT_LABELS[locale].SampleVariance],"1");
+
+        await openTool("json");await page.locator('textarea[name="text"]').fill('{"x":\n}');await calculate();
+        assert.equal(await page.locator('.result[role="alert"] .result-row strong').innerText(),resultText(locale,"jsonSyntaxAt",{line:2,column:1}));
+
+        await openTool("hash");await page.locator('textarea[name="text"]').fill("é");await calculate();
+        rows=await resultRows();
+        assert.equal(rows[RESULT_LABELS[locale].Input],resultText(locale,"textBytes",{count:2}));
+        assert.ok(Object.values(rows).includes(createHash("sha256").update("é").digest("hex")));
+
+        await openTool("holidays");await page.locator('select[name="region"]').selectOption("DE");await calculate();
+        rows=await resultRows();
+        for(const name of ["New Year's Day","Christmas Day","Boxing Day","German Unity Day","Good Friday","Easter Monday"])assert.ok(Object.hasOwn(rows,RESULT_LABELS[locale][name]),locale+": "+name);
+
+        await openTool("dates");await page.locator('input[name="start"]').fill("2020-01-01");
+        const today=await page.evaluate(()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");});
+        for(const [end,key] of [["2099-12-31","upcoming"],["2000-01-01","elapsed"],[today,"today"]]){
+          await page.locator('input[name="end"]').fill(end);await calculate();
+          assert.ok(Object.values(await resultRows()).includes(RESULT_COPY[locale][key]),locale+": "+key);
+        }
+
+        await openTool("fuel");
+        for(const [field,value] of [["distance","100"],["efficiency","10"],["price","2"]])await page.locator('input[name="'+field+'"]').fill(value);
+        for(const [mode,mpg,key] of [["metric",null,"fuelMetric"],["imperial","us","fuelUS"],["imperial","uk","fuelImperial"]]){
+          await page.locator('select[name="mode"]').selectOption(mode);
+          if(mpg)await page.locator('select[name="mpgType"]').selectOption(mpg);
+          await calculate();assert.ok((await page.locator(".result .notice").innerText()).includes(RESULT_COPY[locale][key]));
+        }
+        await openTool("demographics");await page.locator('input[name="total"]').fill("1000");
+        for(const [shares,key] of [["Example, 50","sharesBelow"],["Example, 100","sharesExact"],["One, 60\nTwo, 60","sharesAbove"]]){
+          await page.locator('textarea[name="shares"]').fill(shares);await calculate();
+          assert.ok((await page.locator(".result .notice").first().innerText()).includes(RESULT_COPY[locale][key]));
+        }
+      }
+      await page.locator("#language").selectOption("en");
+    });
+    await t.test("discount modes exclude invalid inactive prices from validation",async()=>{
+      await openTool("discount");
+      await page.locator('input[name="price"]').fill("-1");
+      await page.locator('select[name="mode"]').selectOption("reverse");
+      await page.locator('input[name="salePrice"]').fill("80");
+      await page.locator('input[name="discountPct"]').fill("20");
+      await page.locator('input[name="taxRate"]').fill("0");
+      assert.equal(await page.locator('input[name="price"]').isDisabled(),true);
+      await calculate();assert.match(await page.locator(".result").innerText(),/100/);
+      await page.locator('input[name="salePrice"]').fill("-1");
+      await page.locator('select[name="mode"]').selectOption("forward");
+      await page.locator('input[name="price"]').fill("100");
+      assert.equal(await page.locator('input[name="salePrice"]').isDisabled(),true);
+      await calculate();assert.match(await page.locator(".result").innerText(),/80/);
+    });
+
+    await t.test("color modes accept HEX RGB and HSL and reset conditional controls",async()=>{
+      await openTool("color");
+      const mode=page.locator('select[name="colorMode"]');
+      assert.equal(await mode.inputValue(),"hex");
+      assert.equal(await page.locator('input[name="foreground"]').getAttribute("type"),"text");
+      assert.equal(await page.locator('input[name="background"]').getAttribute("type"),"color");
+      const checkFields=async active=>{
+        for(const name of ["foreground","red","green","blue","hue","saturation","lightness"]){
+          const input=page.locator('input[name="'+name+'"]'),expected=active.includes(name);
+          assert.equal(await input.isVisible(),expected,name+" visibility");
+          assert.equal(await input.evaluate(node=>node.required),expected,name+" requirement");
+          assert.equal(await input.isDisabled(),!expected,name+" enabled state");
+        }
+      };
+      await checkFields(["foreground"]);
+      await page.locator('input[name="foreground"]').fill("#09f");await calculate();
+      assert.equal((await resultRows()).HEX,"#0099FF");
+      await page.locator('input[name="foreground"]').fill("663399");await calculate();
+      assert.equal((await resultRows()).HEX,"#663399");
+      await mode.selectOption("rgb");await checkFields(["red","green","blue"]);
+      for(const [field,value] of [["red","102"],["green","51"],["blue","153"]]){
+        const input=page.locator('input[name="'+field+'"]');
+        assert.equal(await input.getAttribute("type"),"number");assert.equal(await input.getAttribute("min"),"0");assert.equal(await input.getAttribute("max"),"255");
+        await input.fill(value);
+      }
+      await calculate();assert.equal((await resultRows()).HEX,"#663399");
+      await page.locator('input[name="red"]').fill("300");
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),false);
+      await mode.selectOption("hex");await checkFields(["foreground"]);
+      await page.locator('input[name="foreground"]').fill("#09f");
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),true,"inactive invalid RGB must not block HEX");
+      await calculate();assert.equal((await resultRows()).HEX,"#0099FF");
+      await mode.selectOption("hsl");await checkFields(["hue","saturation","lightness"]);
+      for(const [field,value] of [["hue","240"],["saturation","100"],["lightness","50"]])await page.locator('input[name="'+field+'"]:visible').fill(value);
+      await calculate();assert.equal((await resultRows()).HEX,"#0000FF");
+      await page.locator('input[name="saturation"]').fill("101");
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),false);
+      await mode.selectOption("rgb");await checkFields(["red","green","blue"]);
+      for(const [field,value] of [["red","102"],["green","51"],["blue","153"]])await page.locator('input[name="'+field+'"]').fill(value);
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),true,"inactive invalid HSL must not block RGB");
+      await calculate();assert.equal((await resultRows()).HEX,"#663399");
+      await reset();assert.equal(await mode.inputValue(),"hex");await checkFields(["foreground"]);
+      assert.equal(await page.locator(".result").count(),0);
+    });
+    await t.test("password scoring runs explicitly, stays private and resets to generation",async()=>{
+      await openTool("password");
+      const mode=page.locator('select[name="passwordMode"]'),password=page.locator('input[name="passwordInput"]');
+      assert.equal(await mode.inputValue(),"generate");
+      assert.equal(await password.isVisible(),false);
+      assert.equal(strengthRequests.length,0,"strength estimator must not load merely by opening tools");
+      await calculate();
+      assert.equal(strengthRequests.length,0,"generation must not load strength estimator");
+      await page.locator('input[name="length"]').fill("7");
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),false);
+      await mode.selectOption("check");
+      assert.equal(await password.getAttribute("type"),"password");
+      assert.equal(await password.isVisible(),true);assert.equal(await password.evaluate(input=>input.required),true);
+      assert.equal(await page.locator('input[name="length"]').isDisabled(),true);
+      assert.equal(await page.locator('select[name="charset"]').isDisabled(),true);
+      await password.fill("aaaaaaaaaaaaaaaa");
+      assert.equal(await page.locator("#panel form").evaluate(form=>form.checkValidity()),true,"inactive invalid generator length must not block strength check");
+      assert.equal(strengthRequests.length,0,"typing must not load or run strength scoring");
+      await calculate();
+      await page.waitForFunction(()=>document.querySelector(".result")?.textContent.includes("/4"));
+      assert.ok(strengthRequests.length>0,"explicit check loads the local estimator");
+      assert.doesNotMatch(await page.locator(".result").innerText(),/aaaaaaaaaaaaaaaa/);
+      for(const locale of ["en","de","yo","pcm"]){
+        await page.locator("#language").selectOption(locale);
+        await mode.selectOption("check");await password.fill("aaaaaaaaaaaaaaaa");await calculate();
+        await page.waitForFunction(()=>document.querySelector(".result")?.textContent.includes("/4"));
+        const text=await page.locator(".result").innerText();
+        assert.ok(text.includes(resultText(locale,"pattern_repeat")),locale+" matched pattern");
+        assert.ok(Object.hasOwn(await resultRows(),RESULT_LABELS[locale].StrengthScore));
+        assert.ok(Object.hasOwn(await resultRows(),RESULT_LABELS[locale].DetectedPatterns));
+        assert.doesNotMatch(text,/aaaaaaaaaaaaaaaa/);
+      }
+      await reset();assert.equal(await mode.inputValue(),"generate");
+      assert.equal(await password.inputValue(),"");assert.equal(await password.isVisible(),false);
+      assert.equal(await password.isDisabled(),true);
+      assert.equal(await page.locator('input[name="length"]').isDisabled(),false);
+      assert.equal(await page.locator(".result").count(),0);
+      await page.locator("#language").selectOption("en");
     });
     await t.test("malformed and unknown fragments recover to the directory",async()=>{
       for(const hash of ["#/%","#/%E0%A4%A","#/missing"]){

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {RESULT_COPY,RESULT_LABELS,resultText} from "../src/result-i18n.js";
+import "../src/feature-i18n.js";
 import {holidayDates,convertTimeZone} from "../src/additional.js";
 
 test("dynamic result templates preserve values and literal substitution text",()=>{

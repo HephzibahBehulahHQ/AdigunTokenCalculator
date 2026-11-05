@@ -1,7 +1,7 @@
 # Test plan
 
 ## Automated
-Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. See the PR #6 verification receipt for the exact tested candidate, test totals and build result; old run counts do not verify later repairs.
+Run `npm ci`, `npm test` and `npm run build` with Node.js 20+. See the current release PR verification receipt for the exact tested candidate, test totals and build result; old run counts do not verify later repairs.
 
 Unit coverage includes Unicode text statistics; age/date-only calendar arithmetic; arithmetic, percentages, temperature limits, BMI metric/imperial; Qibla bearing and compass validation; zero-rate loans; GPA and percentage averages; metric and imperial fuel; unit conversion; Zakat; practice projections; named demographic shares; sleep rollover; scientific operations; calculator memory; annual countdowns; population estimate baseline; four-locale tool catalogues, fields, options and results; tokenizer whitespace, newlines, emoji, non-Latin text, special-token literals, token IDs and UTF-8 reconstruction.
 
@@ -51,3 +51,7 @@ Manual checks require a human on target browsers before claiming full accessibil
 ## Continuation regression coverage
 
 Automated regressions cover default restoration and conditional form state, BMI unit labels in all four locales, keyboard focus, malformed fragments on fresh page loads, non-finite numeric results, delayed hash/geolocation results, and mobile overflow across all 38 panels. Unit regressions cover UTF-8 QR byte vectors, JSON numeric-token and string preservation, population baseline output, multi-day sleep rollover, omitted GPA grades and nonpositive calorie estimates. The presence of a test is not a pass receipt: consult the current PR CI result.
+
+## Post-release feature regressions
+
+Unit and browser checks cover four-locale dynamic results, ambiguous/normal time-zone labels, holiday names, JSON error locations, UTF-8 hash byte counts, demographic/fuel notes, population endpoints, rendered variance, bidirectional HEX/RGB/HSL conversion and password-strength scoring. Browser checks also verify inactive controls cannot block submission, mode/reset behaviour, lazy model loading, masked input and exclusion of checked passwords from results. Source-data verification is reproducible separately with `scripts/audit-population.py`. The current PR records actual CI outcomes.
