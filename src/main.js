@@ -194,7 +194,8 @@ function renderTool(){
  calculationRequest++;
  cancelTokenization();cancelJsonWork();
  const aside=$("aside");
- const home=active<0;
+ const home=active<0&&!location.hash;
+ if(active<0&&!home){delete panel.dataset.toolKey;panel.replaceChildren();aside.hidden=false;panel.hidden=true;return;}
  aside.hidden=!home;panel.hidden=false;
  const i=home?keys.indexOf("token"):active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
  const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});if(!home)panel.append(back);
@@ -285,7 +286,7 @@ function renderTool(){
   const placeholder=el("div","token-placeholder");
   const preview=el("div","token-sample");
   preview.setAttribute("aria-hidden","true");
-  ["Hello"," world","!"].forEach(piece=>preview.append(el("span","piece",piece)));
+  ["Hello"," world","!"].forEach(piece=>preview.append(el("span","sample-piece",piece)));
   placeholder.append(preview,el("p","notice",workspaceCopy[lang].empty));
   panel.append(placeholder);
  }
