@@ -16,6 +16,5 @@ export default defineConfig({
       next();
     });}
   },offlineAssetsPlugin()],
-  // GitHub Pages project-site URL: https://<owner>.github.io/AdigunTokenCalculator/
-  base: "/AdigunTokenCalculator/"
+  base: "./"
 });

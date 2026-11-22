@@ -13,7 +13,7 @@ import {LOAD_PROFILE_STORAGE_KEY, serializeLoadV2Profile} from "../src/tools/loa
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const buildDirectory = path.join(root, "test-results/load-v2-preview");
-const baseUrl = "http://127.0.0.1:4186/AdigunTokenCalculator/";
+const baseUrl = "http://127.0.0.1:4186/";
 const browserAvailable = existsSync(chromium.executablePath());
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-8 * Math.max(1, Math.abs(expected)), `${actual} ≈ ${expected}`);
 const bands = [{id:"peak", startHour:17, endHour:22, rate:0.6}, {id:"offPeak", startHour:22, endHour:7, rate:0.1}, {id:"standard", startHour:7, endHour:17, rate:0.3}];

@@ -31,7 +31,7 @@ jobs:
           npm exec vite -- preview --host 127.0.0.1 --port 4197 --strictPort > "$RUNNER_TEMP/calculator-preview.log" 2>&1 &
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
-          node scripts/verify-deployment.mjs --url http://127.0.0.1:4197/AdigunTokenCalculator/ --artifact dist
+          node scripts/verify-deployment.mjs --url http://127.0.0.1:4197/ --artifact dist
   lockfile:
     if: github.event_name == 'push' && github.ref == 'refs/heads/codex/milestone-4-completion'
     runs-on: ubuntu-latest
