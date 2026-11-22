@@ -66,3 +66,48 @@
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+/* Product identity and calculator workspace */
+:root {
+  --navy:#172038;
+  --violet:#a78bfa;
+  --line:#dce1ed;
+  --blue:#6845c5;
+}
+body { background:#f0f1f8; }
+header {
+  position:relative;
+  z-index:1;
+  background:#13142b;
+  color:#f6f3ff;
+  border-bottom:1px solid #34314f;
+}
+header .brand strong { color:#fff; }
+header .brand small, header .language { color:#d3caef; }
+header .language select { background:#25243f; color:#fff; border-color:#625a85; }
+.intro {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  padding-block:clamp(3rem,8vw,6.5rem);
+  background:radial-gradient(ellipse at 85% 5%,#483378 0%,transparent 60%),#171831;
+  color:#fff;
+}
+.intro .eyebrow { color:#c5b5ff; letter-spacing:.18em; }
+.intro h1 { max-width:18ch; font-size:clamp(2.4rem,6vw,5rem); line-height:1.04; letter-spacing:-.055em; }
+.intro #subtitle { color:#e1dbf4; max-width:38rem; line-height:1.65; }
+.intro .privacy { color:#ede7ff; background:#272440; border:1px solid #706394; }
+.workspace { max-width:1320px; margin-inline:auto; }
+.workspace aside, #panel { border-color:#deddeb; border-radius:18px; background:#fff; }
+.directory-heading h2 { font-size:clamp(1.5rem,3vw,2.25rem); letter-spacing:-.035em; }
+.tool-card { border-radius:14px; box-shadow:0 4px 12px #26245508; }
+.tool-card:hover { background:#faf8ff; border-color:#8769d0; }
+.tool-icon { background:#ede7ff; color:#4f3293; }
+.primary { background:#493286; border-color:#493286; }
+.primary:hover { background:#352461; }
+footer { background:#171831; color:#e1dbf4; }
+footer a { color:#d8c8ff; }
+@media(max-width:600px){
+  .intro { padding-block:2.8rem; }
+  .workspace aside, #panel { border-radius:12px; }
+}
