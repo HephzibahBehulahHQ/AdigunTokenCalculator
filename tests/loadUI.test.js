@@ -69,7 +69,7 @@ test("load UI: production-preview device editing, live calculations, four locale
     const errors=[],external=[];
     page.on("pageerror",error=>errors.push(error.message));
     page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});
-    await page.goto("http://127.0.0.1:4175/AdigunTokenCalculator/");
+    await page.goto("http://127.0.0.1:4175/");
     assert.equal(await page.locator(".tool-card").count(),39);
     await page.locator('#search').fill("Electrical");assert.equal(await page.locator('.tool-card').count(),1);
     await page.locator('[data-tool-key="electrical-load"]').click();
@@ -139,7 +139,7 @@ test("load UI: explicit local save/load/delete, recovery and unfinished edit pre
     const page=await browser.newPage({locale:"en-US"}),errors=[],external=[];
     page.on("pageerror",error=>errors.push(error.message));
     page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});
-    await page.goto("http://127.0.0.1:4175/AdigunTokenCalculator/#/electrical-load");
+    await page.goto("http://127.0.0.1:4175/#/electrical-load");
     const ui=page.locator(".load-calculator"),field=name=>ui.locator(`[name="${name}"]`),action=name=>ui.locator(`[data-action="${name}"]`);
     const waitResult=async(key,value)=>page.waitForFunction(({key,value})=>Math.abs(Number(document.querySelector(`[data-result="${key}"]`)?.dataset.value)-value)<1e-8,{key,value});
     const message=key=>ui.locator("[data-profile-status]").filter({hasText:LOAD_COPY.en[key]}).waitFor();

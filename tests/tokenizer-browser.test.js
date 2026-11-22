@@ -9,7 +9,7 @@ import {build,preview} from "vite";
 import {chromium} from "playwright-core";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
-const origin="http://127.0.0.1:4193",base=origin+"/AdigunTokenCalculator/";
+const origin="http://127.0.0.1:4193",base=origin+"/";
 const browserAvailable=existsSync(chromium.executablePath());
 let buildDirectory,built;
 const productionBuild=()=>built??=(async()=>{

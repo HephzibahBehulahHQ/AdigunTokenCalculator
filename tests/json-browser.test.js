@@ -9,7 +9,7 @@ test("JSON worker keeps the browser responsive and discards cancelled/queued wor
   skip:!existsSync(chromium.executablePath()),timeout:60000
 },async()=>{
   const origin="http://127.0.0.1:4197";
-  const appUrl=new URL("/AdigunTokenCalculator/",origin).href;
+  const appUrl=new URL("/",origin).href;
   const server=spawn(process.execPath,["node_modules/vite/bin/vite.js","--host","127.0.0.1","--port","4197","--strictPort"],{stdio:"ignore"});
   let browser;
   try{

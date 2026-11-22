@@ -279,7 +279,7 @@ test("production first load prepares untouched tools; offline tokenization, stre
     browser=await chromium.launch({headless:true});
     const context=await browser.newContext({locale:"en-US"}),page=await context.newPage(),errors=[];
     page.on("pageerror",error=>errors.push(error.message));
-    const url="http://127.0.0.1:4194/AdigunTokenCalculator/";
+    const url="http://127.0.0.1:4194/";
     await page.goto(url);
     await page.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:90000});
     assert.ok(await page.evaluate(()=>navigator.serviceWorker.controller?.scriptURL.endsWith("/offline-sw.js")),"readiness requires control on the first visit");
