@@ -28,6 +28,16 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     page.on("request",request=>{if(/password-strength|zxcvbn/.test(request.url()))strengthRequests.push(request.url());});
     await page.addInitScript(()=>{window.__geoCalls=0;window.__geoRequests=[];Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(success,error){window.__geoCalls++;window.__geoRequests.push({success,error});}}});});
     await page.goto("http://127.0.0.1:4173/");
+    await page.locator("#panel[data-tool-key=token] h1").waitFor();
+    assert.equal(await page.locator('textarea[name="text"]').inputValue(),"Hello world!");
+    await page.locator('#panel button[type="submit"]').click();
+    await page.locator("#panel .segments").waitFor();
+    assert.match(await page.locator("#panel .result").innerText(),/Tokens\s+3/);
+    await page.locator("#theme").click();
+    assert.equal(await page.locator("html").getAttribute("data-theme"),"dark");
+    await page.reload();
+    assert.equal(await page.locator("#theme").getAttribute("aria-pressed"),"true");
+    await page.locator("#theme").click();
     assert.equal(await page.locator(".tool-card").count(),39);
     assert.equal(await page.locator(".category-chip").count(),11);
     await page.locator(".category-chip").nth(5).click();
