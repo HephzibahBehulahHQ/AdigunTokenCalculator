@@ -16,7 +16,7 @@ export function mountOfflineStatus(container,{language="en",enabled=import.meta.
   let state="preparing",disposed=false,registration,sequence=0,updating=false,timer;
   const cleanup=[];
   const expected=document.querySelector('meta[name="adigun-offline-build"]')?.content;
-  const scope=new URL(base,window.location.href),workerURL=new URL("offline-sw.js",scope).href;
+  const scope=new URL(base,window.location.href ?? window.location.origin),workerURL=new URL("offline-sw.js",scope).href;
   const isOwnWorker=worker=>worker?.scriptURL===workerURL;
   const draw=()=>{
     const copy=OFFLINE_COPY[language]||OFFLINE_COPY.en;
