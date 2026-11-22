@@ -173,18 +173,42 @@ async function execute(k,d,isCurrent){
  if(!isCurrent())return;const box=result(rows,note);if(k==="currency"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const aLink=el("a","","European Central Bank reference rates (4 November 2026)");aLink.href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html";aLink.target="_blank";aLink.rel="noopener noreferrer";p.append(aLink);box.append(p);}if(k==="demographics"){const p=el("p","notice");p.append(document.createTextNode((T.sourceLabel||"Source")+": "));const a=el("a","", "Pew Research Center (2025; estimates for 2020)");a.href="https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);}
 }
 function addAction(container,text,fn,cls="secondary"){const b=el("button",cls,text);b.type="button";b.addEventListener("click",fn);container.append(b);return b;}
+const workspaceCopy={
+ en:{privacy:"Your text is processed in this browser.",empty:"Count tokens to see the breakdown here.",dark:"Dark mode"},
+ de:{privacy:"Ihr Text wird in diesem Browser verarbeitet.",empty:"Zählen Sie Tokens, um hier die Aufschlüsselung zu sehen.",dark:"Dunkelmodus"},
+ yo:{privacy:"A ń ṣàgbékalẹ̀ ọ̀rọ̀ rẹ nínú aṣàwákiri yìí.",empty:"Ka àwọn tókìnì láti rí àlàyé wọn níbí.",dark:"Ìrísí òkùnkùn"},
+ pcm:{privacy:"Na inside dis browser we dey process your text.",empty:"Count tokens make you see how dem split here.",dark:"Dark mode"}
+};
+const themeButton=$("#theme");
+function setTheme(dark){
+ document.documentElement.dataset.theme=dark?"dark":"light";
+ themeButton.setAttribute("aria-pressed",String(dark));
+}
+try{setTheme(localStorage.getItem("hb-calculator-theme")==="dark");}catch{setTheme(false);}
+themeButton.addEventListener("click",()=>{
+ const dark=themeButton.getAttribute("aria-pressed")!=="true";
+ setTheme(dark);
+ try{localStorage.setItem("hb-calculator-theme",dark?"dark":"light");}catch{}
+});
 function renderTool(){
  calculationRequest++;
  cancelTokenization();cancelJsonWork();
  const aside=$("aside");
- if(active<0||!keys[active]){delete panel.dataset.toolKey;panel.replaceChildren();aside.hidden=false;panel.hidden=true;return;}
- aside.hidden=true;panel.hidden=false;
- const i=active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
- const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});panel.append(back);
- const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el("h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);head.querySelector("h2").tabIndex=-1;
+ const home=active<0;
+ aside.hidden=!home;panel.hidden=false;
+ const i=home?keys.indexOf("token"):active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
+ const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});if(!home)panel.append(back);
+ const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el(home?"h1":"h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);head.querySelector("h1,h2").tabIndex=-1;
  if(k==="electrical-load"){mountLoadCalculator(panel,{lang});return;}
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};let bacConsent=null;(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
+ if(k==="token"){
+  if(home)inputs.text.value="Hello world!";
+  const privacy=el("p","notice token-privacy",workspaceCopy[lang].privacy);
+  privacy.id="token-privacy";
+  inputs.text.setAttribute("aria-describedby",privacy.id);
+  inputs.text.closest(".field").after(privacy);
+ }
  const C=COMPLETION_COPY[lang];
  const helpText={water:C.waterHelp,holidays:C.holidayHelp,qibla:C.qiblaLocation,zakat:C.zakatDefault,demographics:tr().demographicsSourceNote,json:C.jsonHelp,stats:C.statsHelp}[k];
  if(helpText){const help=el("p","notice form-help",helpText);help.id=k+"-help";panel.append(help);form.setAttribute("aria-describedby",help.id);}
@@ -257,9 +281,17 @@ function renderTool(){
  form.addEventListener("submit",async e=>{e.preventDefault();if(k==="bac"&&form.dataset.bacApproved!=="true")return;clearFormError(form);if(!form.reportValidity())return;const request=++calculationRequest,isCurrent=()=>request===calculationRequest&&form.isConnected;const data=Object.fromEntries(new FormData(form));panel.querySelector(".result")?.remove();setBusy(true);try{await execute(k,data,isCurrent);}catch(err){if(err.name!=="AbortError"&&isCurrent())errorResult(err,{form,tool:k,data});}finally{if(isCurrent())setBusy(false);}});
  form.addEventListener("reset",e=>{e.preventDefault();if(k==="math")memoryValue=0;renderTool();if(!panel.querySelector("dialog[open]"))panel.querySelector('button[type="reset"]')?.focus();});
  panel.append(form);
+ if(k==="token"){
+  const placeholder=el("div","token-placeholder");
+  const preview=el("div","token-sample");
+  preview.setAttribute("aria-hidden","true");
+  ["Hello"," world","!"].forEach(piece=>preview.append(el("span","piece",piece)));
+  placeholder.append(preview,el("p","notice",workspaceCopy[lang].empty));
+  panel.append(placeholder);
+ }
  if(bacConsent)mountBacGate({panel,form,...bacConsent,copy:{title:resultText(lang,"bacDialogTitle"),continueLabel:resultText(lang,"bacDialogContinue"),cancelLabel:resultText(lang,"bacDialogCancel")},onCancel:()=>{location.hash="#/";}});
 }
-function setLang(v){lang=v;document.documentElement.lang=v;offlineStatus.setLanguage(v);$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;$("#title").textContent=tr().title;$("#subtitle").textContent=tr().subtitle;$("#privacy").textContent=tr().privacy;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
+function setLang(v){lang=v;document.documentElement.lang=v;offlineStatus.setLanguage(v);$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;themeButton.textContent=workspaceCopy[lang].dark;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
 search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
 function routeIndex(){
  try{return keys.indexOf(decodeURIComponent(location.hash.replace(/^#\/?/,"")));}
@@ -268,6 +300,6 @@ function routeIndex(){
 window.addEventListener("hashchange",()=>{
  const previousKey=keys[active];active=routeIndex();renderNav();renderTool();
  if(active>=0){if(!panel.querySelector("dialog[open]"))panel.querySelector("h2")?.focus();}
- else{const card=[...nav.querySelectorAll(".tool-card")].find(node=>node.dataset.toolKey===previousKey);(card||search).focus();}
+ else if(previousKey){const card=[...nav.querySelectorAll(".tool-card")].find(node=>node.dataset.toolKey===previousKey);(card||search).focus();}
 });
 active=routeIndex();setLang("en");
