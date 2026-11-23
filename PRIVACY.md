@@ -1,6 +1,8 @@
 # Privacy and data handling
 
-AdigunTokenCalculator is a static, browser-side utility. All 39 tools process calculator inputs in browser memory, including local background workers for tokenization and JSON formatting. The application has no backend, account system, database, analytics, telemetry, advertising tags or remote calculation API.
+AdigunTokenCalculator processes calculator inputs in browser memory, including local background workers for tokenization and JSON formatting. Calculator inputs are never sent to the account service. The application has no analytics, telemetry, advertising tags or remote calculation API.
+
+Where accounts are enabled, the account service processes the email address, product password, and one-time code for registration, sign-in, and password recovery. Supabase verifies email ownership and stores a product-specific password hash. Secure cookies record the guest deadline and signed-in session.
 
 ## What is processed locally
 

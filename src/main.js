@@ -17,6 +17,9 @@ import {createQr} from "./qr.js";
 import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";
 import {ACCESSIBILITY_COPY} from "./accessibility-i18n.js";
 import "./styles.css";
+import { mountProductAccount } from "./product-account.js";
+
+if (import.meta.env.VITE_PRODUCT_ACCOUNTS === "true") mountProductAccount();
 
 const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
 const main=$("#main");
