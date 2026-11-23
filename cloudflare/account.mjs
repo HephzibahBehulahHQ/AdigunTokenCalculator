@@ -238,9 +238,12 @@ function provider(env, path, data, token, schema) {
 }
 
 async function rpc(env, name, data, token) {
+  const prefix = env.PRODUCT_ACCOUNT_PREFIX ?? "adiguntokencalculator";
+  if (!["adiguntokencalculator", "adiguntokencalculator_preview"].includes(prefix))
+    throw new Error("Invalid account namespace");
   const response = await provider(
     env,
-    "/rest/v1/rpc/" + name,
+    "/rest/v1/rpc/" + name.replace(/^adiguntokencalculator/, prefix),
     { ...data, worker_proof: env.ACCOUNT_RPC_PROOF },
     token,
     "public",
