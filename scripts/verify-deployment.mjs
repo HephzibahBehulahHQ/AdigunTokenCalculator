@@ -30,6 +30,21 @@ async function artifactFiles(directory){
   return files.sort();
 }
 
+async function fetchSameOrigin(url,label){
+  let current=new URL(url);
+  for(let redirects=0;redirects<=5;redirects++){
+    const response=await fetch(current,{redirect:"manual",cache:"no-store",headers:{"Cache-Control":"no-cache"},signal:AbortSignal.timeout(8_000)});
+    if(![301,302,303,307,308].includes(response.status))return response;
+    const location=response.headers.get("location");
+    assert.ok(location,`${label}: redirect response is missing Location`);
+    const next=new URL(location,current);
+    assert.equal(next.origin,site.origin,`${label}: refused cross-origin redirect to ${next.origin}`);
+    assert.ok(redirects<5,`${label}: too many same-origin redirects`);
+    current=next;
+  }
+  assert.fail(`${label}: too many same-origin redirects`);
+}
+
 async function verifyBytes(url,expected,label){
   let failure;
   // Covers short server startup / CDN propagation delays without endless polling.
@@ -37,11 +52,12 @@ async function verifyBytes(url,expected,label){
     if(attempt)await delay(1000*2**(attempt-1));
     try{
       assert.ok(Date.now()<deadline-60_000,"Artifact checks exhausted their time budget");
-      const response=await fetch(url,{redirect:"error",cache:"no-store",headers:{"Cache-Control":"no-cache"},signal:AbortSignal.timeout(8_000)});
-      assert.equal(response.status,200,`${label}: HTTP ${response.status}`);
+      const response=await fetchSameOrigin(url,label);
+      assert.equal(response.status,200,`${label}: HTTP ${response.status} at ${response.url}`);
+      assert.equal(new URL(response.url).origin,site.origin,`${label}: final response left the site origin`);
       assert.equal(digest(new Uint8Array(await response.arrayBuffer())),expected,`${label}: deployed bytes differ from the artifact`);
       return;
-    }catch(error){failure=error;}
+    }catch(error){failure=new Error(`${label} at ${url}: ${error.message}`,{cause:error});}
   }
   throw failure;
 }
