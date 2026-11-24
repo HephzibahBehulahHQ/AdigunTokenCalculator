@@ -21,6 +21,12 @@ function offlineWorkerRuntime(config){
     const digest=await crypto.subtle.digest("SHA-256",await response.clone().arrayBuffer());
     return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,"0")).join("")===expected;
   };
+  const fetchAsset=async(url,expected)=>{
+    const response=await fetch(new Request(url,{mode:"same-origin",cache:"no-store",credentials:"omit",redirect:"follow"}));
+    if(!response.url||new URL(response.url).origin!==scope.origin)throw new Error("Application asset redirected off origin");
+    if(!await valid(response,expected))throw new Error("Application asset unavailable or version mismatch");
+    return response;
+  };
   const complete=async()=>{
     if(!(await caches.has(cacheName)))return false;
     const cache=await caches.open(cacheName);
@@ -34,8 +40,7 @@ function offlineWorkerRuntime(config){
       try{
         for(const [url,digest] of manifest){
           if(await valid(await cache.match(url),digest))continue;
-          const response=await fetch(new Request(url,{cache:"no-store",credentials:"omit",redirect:"error"}));
-          if(!await valid(response,digest))throw new Error("Application asset unavailable or version mismatch");
+          const response=await fetchAsset(url,digest);
           pending.push([url,response]);
         }
         for(const [url,response] of pending)await cache.put(url,response);
@@ -65,7 +70,7 @@ function offlineWorkerRuntime(config){
       // Routes live in the hash. Queries and visited URLs are never cache keys.
       event.respondWith((async()=>{
         const cached=await (await caches.open(cacheName)).match(indexURL);
-        return cached||fetch(new Request(indexURL,{credentials:"omit",cache:"no-store",redirect:"error"}));
+        return cached||fetchAsset(indexURL,manifest.get(indexURL));
       })());
       return;
     }
@@ -74,8 +79,7 @@ function offlineWorkerRuntime(config){
       event.respondWith((async()=>{
         const cache=await caches.open(cacheName),cached=await cache.match(url.href);
         if(cached)return cached;
-        const response=await fetch(new Request(url.href,{credentials:"omit",cache:"no-store",redirect:"error"}));
-        if(!await valid(response,manifest.get(url.href)))throw new Error("Application asset version mismatch");
+        const response=await fetchAsset(url.href,manifest.get(url.href));
         await cache.put(url.href,response.clone());
         return response;
       })());
