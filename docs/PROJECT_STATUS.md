@@ -1,5 +1,19 @@
 # Project status — AdigunTokenCalculator
 
+## Cross-site template work — 24 November 2026
+
+- Current local branch: `codex/token-calculator-adigun-bot`, based on verified `origin/main` at `f95080745af3fb8bb05d7073371ca5fc7eb70e60`.
+- Added a floating Adigun BOT for TokenCalculator with EN/DE/Yoruba/Nigerian Pidgin UI; the selected app language is followed. The backend sends a product-scoped request to the Cloudflare Workers AI binding only after the visitor checks explicit consent and types a message. It does not send calculator state, account data, files or saved work. It fails closed without the AI/rate-limit bindings and applies same-origin, body/message-size, role and IP-rate bounds.
+- Added the approved compact company footer links after reading the current AdigunSPs `src/brand.js`: company website and its Facebook, X, Instagram, TikTok and LinkedIn destinations. Added a small localized Help & docs dialog. Corrected the privacy wording in all four interface locales and `PRIVACY.md` so that the optional AI chat is disclosed accurately.
+- `node --test tests/product-bot.test.mjs tests/product-bot-browser.test.mjs`: **5 passed** using installed system Chrome. Browser acceptance verified explicit consent, only typed chat payload, German language synchronization, help dialog and 375px layout. `npm run build` passed. `npm test`: **277 passed, 12 skipped, 0 failed**; skipped checks depend on the missing Playwright-managed browser. `wrangler.toml` parsed successfully with Python `tomllib`; `git diff --check` passed.
+- No worker was deployed, no Cloudflare model request was sent, and no Supabase, secret, account, domain or production setting was changed. Live AI availability/cost depends on the hosting account and is **NOT TESTED**. Existing product account UI remains behind its existing `VITE_PRODUCT_ACCOUNTS` preview flag; it was not enabled in production.
+- The app's OTP worker calls shared Supabase Auth and does not select a product-specific email template. Product-named OTP delivery still needs an authenticated custom send-email hook/provider or equivalent verified shared-project configuration. Do not claim this checkpoint fixes OTP branding, account readiness or all-site adoption.
+- This is still an uncommitted local feature branch; no PR, merge or deployment has been made.
+
+### Next bounded action
+
+Review the diff, commit and push this scoped branch, then let its CI verify the exact candidate. Continue the cross-repository audit afterward; full template adoption remains open.
+
 ## Master-prompt completion
 
 - Scope: all original 18 calculators, the 20-tool addendum and shared implementation/documentation requirements in [MASTER_PROMPT.md](../MASTER_PROMPT.md). The owner-authorized electrical-load tool is preserved, bringing the application to 39 tools.
