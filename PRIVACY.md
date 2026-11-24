@@ -1,6 +1,8 @@
 # Privacy and data handling
 
-AdigunTokenCalculator processes calculator inputs in browser memory, including local background workers for tokenization and JSON formatting. Calculator inputs are never sent to the account service. The application has no analytics, telemetry, advertising tags or remote calculation API.
+AdigunTokenCalculator processes calculator inputs in browser memory, including local background workers for tokenization and JSON formatting. Calculator inputs are never sent to the account service or Adigun BOT. The application has no analytics, telemetry, advertising tags or remote calculation API.
+
+Adigun BOT is optional. Only the chat messages a user explicitly types and sends after checking the consent box are sent to the product's Cloudflare Worker and Cloudflare Workers AI. Calculator inputs/results, account data, saved work, files and browser data are not attached to the chat. Do not enter private text or personal data into the copilot. The application does not intentionally retain chat on its server; conversation history exists in page memory until the user clears it or closes the page. The copilot can be unavailable when the Worker AI or rate-limit binding is not configured. Cloudflare AI usage is subject to the hosting account's plan and allowance.
 
 Where accounts are enabled, the account service processes the email address, product password, and one-time code for registration, sign-in, and password recovery. Supabase verifies email ownership and stores a product-specific password hash. Secure cookies record the guest deadline and signed-in session.
 
@@ -22,7 +24,7 @@ The BAC estimator opens a warning dialog and requires an explicit educational-us
 
 ## Network behaviour
 
-The browser downloads the published static HTML, CSS, JavaScript, worker scripts, WebAssembly, images, notices and locally bundled tokenizer/QR/password-strength assets from this GitHub Pages site. Production offline preparation downloads the complete build manifest, including lazy tool assets, and the browser can request updated application files on later visits. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime calculation API or third-party CDN requests. Source links open only when the user deliberately activates them.
+The browser downloads the published static HTML, CSS, JavaScript, worker scripts, WebAssembly, images, notices and locally bundled tokenizer/QR/password-strength assets from this GitHub Pages site. Production offline preparation downloads the complete build manifest, including lazy tool assets, and the browser can request updated application files on later visits. Calculator inputs are not included in those asset requests and are not transmitted to the project owner or a calculation service. The application makes no runtime calculation API or third-party CDN requests. When the user deliberately sends a copilot message, that message is processed by the Worker AI route described above. Source links open only when the user deliberately activates them.
 
 The browser/device handles its own geolocation permission and location service. The application reads the returned coordinates in-page and does not send them to an application server.
 

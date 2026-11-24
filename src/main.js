@@ -18,6 +18,8 @@ import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculator
 import {ACCESSIBILITY_COPY} from "./accessibility-i18n.js";
 import "./styles.css";
 import { mountProductAccount } from "./product-account.js";
+import { mountProductBot } from "./product-bot.js";
+import { mountCompanyFooter } from "./company-footer.js";
 
 if (import.meta.env.VITE_PRODUCT_ACCOUNTS === "true") mountProductAccount();
 
@@ -306,4 +308,4 @@ window.addEventListener("hashchange",()=>{
  if(active>=0){if(!panel.querySelector("dialog[open]"))panel.querySelector("h2")?.focus();}
  else if(previousKey){const card=[...nav.querySelectorAll(".tool-card")].find(node=>node.dataset.toolKey===previousKey);(card||search).focus();}
 });
-active=routeIndex();setLang("en");
+active=routeIndex();setLang("en");mountCompanyFooter();mountProductBot();

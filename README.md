@@ -6,6 +6,8 @@ Live application: https://hephzibahbehulahhq.github.io/AdigunTokenCalculator/
 
 A static, browser-side suite of 39 token, everyday, health-estimate and developer calculators. The interface is available in English, German, Yoruba and Nigerian Pidgin. The visual system uses the approved corporate logo, corporate colours and a system-font fallback pending official typography.
 
+The scoped `codex/token-calculator-adigun-bot` work adds the floating Adigun BOT and the compact company footer used by the approved AdigunSPs template. The copilot answers product-use questions and cannot inspect calculator values. It sends only chat the visitor explicitly consents to send; calculator entries remain local. See [privacy and data handling](PRIVACY.md). This branch is not yet deployed, and live Workers AI access has not been verified.
+
 ## Tool catalogue
 
 | Tool | Category | Purpose and assumptions | Data source / formula |
