@@ -10,10 +10,10 @@ const COPY = {
 export function mountProductBot() {
   const root = document.createElement("section");
   root.className = "token-bot";
-  root.innerHTML = `<button class="token-bot-launch" type="button" aria-expanded="false" aria-controls="token-bot-panel"></button><aside class="token-bot-panel" id="token-bot-panel" hidden aria-label="Adigun BOT"><header><strong data-title></strong><label><span class="sr-only" data-language-label></span><select data-language><option value="en">English</option><option value="de">Deutsch</option><option value="yo">Yorùbá</option><option value="pcm">Nigerian Pidgin</option></select></label><button type="button" data-close aria-label="Close">×</button></header><p data-intro></p><div class="token-bot-log" role="log" aria-live="polite" aria-relevant="additions text"></div><small data-privacy></small><form><label class="token-bot-consent"><input type="checkbox" required data-consent><span data-consent-copy></span></label><label class="sr-only" for="token-bot-input" data-input-label></label><textarea id="token-bot-input" rows="2" maxlength="1500" required></textarea><div class="token-bot-actions"><button type="button" data-clear></button><button type="submit" data-send></button></div></form></aside>`;
+  root.innerHTML = `<button class="token-bot-launch" type="button" aria-expanded="false" aria-controls="token-bot-panel"></button><aside class="token-bot-panel" id="token-bot-panel" hidden aria-label="Adigun BOT"><div class="token-bot-head"><strong data-title role="heading" aria-level="2"></strong><label><span class="sr-only" data-language-label></span><select data-language><option value="en">English</option><option value="de">Deutsch</option><option value="yo">Yorùbá</option><option value="pcm">Nigerian Pidgin</option></select></label><button type="button" data-close aria-label="Close">×</button></div><p data-intro></p><div class="token-bot-log" role="log" aria-live="polite" aria-relevant="additions text"></div><small data-privacy></small><form><label class="token-bot-consent"><input type="checkbox" required data-consent><span data-consent-copy></span></label><label class="sr-only" for="token-bot-input" data-input-label></label><textarea id="token-bot-input" rows="2" maxlength="1500" required></textarea><div class="token-bot-actions"><button type="button" data-clear></button><button type="button" data-send></button></div></form></aside>`;
   document.body.append(root);
 
-  const launcher=root.querySelector(".token-bot-launch"),panel=root.querySelector(".token-bot-panel"),select=root.querySelector("[data-language]"),log=root.querySelector(".token-bot-log"),input=root.querySelector("textarea"),form=root.querySelector("form"),consent=root.querySelector("[data-consent]");
+  const launcher=root.querySelector(".token-bot-launch"),panel=root.querySelector(".token-bot-panel"),select=root.querySelector("[data-language]"),log=root.querySelector(".token-bot-log"),input=root.querySelector("textarea"),form=root.querySelector("form"),consent=root.querySelector("[data-consent]"),sendButton=root.querySelector("[data-send]");
   let language=document.querySelector("#language")?.value||"en",messages=[],busy=false;
   const copy=()=>COPY[language]||COPY.en;
   function updateCopy(){const words=copy();launcher.textContent=words.title;launcher.setAttribute("aria-label",panel.hidden?words.open:words.close);root.querySelector("[data-title]").textContent=words.title;root.querySelector("[data-intro]").textContent=words.intro;root.querySelector("[data-privacy]").textContent=words.privacy;root.querySelector("[data-consent-copy]").textContent=words.consent;root.querySelector("[data-language-label]").textContent=words.language;root.querySelector("[data-input-label]").textContent=words.message;root.querySelector("[data-send]").textContent=words.send;root.querySelector("[data-clear]").textContent=words.clear;input.placeholder=words.placeholder;select.value=language;}
@@ -27,12 +27,16 @@ export function mountProductBot() {
   root.querySelector("[data-clear]").addEventListener("click",()=>{messages=[];log.replaceChildren();consent.checked=false;input.focus();});
   updateCopy();
 
-  form.addEventListener("submit",async event=>{
-    event.preventDefault();const text=input.value.trim();if(!text||busy)return;if(!consent.checked){bubble("assistant",copy().unavailable);return;}
-    busy=true;input.value="";messages.push({role:"user",content:text});bubble("user",text);const answer=bubble("assistant",copy().thinking),submit=form.querySelector('[type="submit"]');submit.disabled=true;
+  async function send(){
+    const text=input.value.trim();if(!text||busy)return;if(!consent.checked){bubble("assistant",copy().unavailable);return;}
+    busy=true;input.value="";messages.push({role:"user",content:text});bubble("user",text);const answer=bubble("assistant",copy().thinking);sendButton.disabled=true;
     try{const response=await fetch("/api/bot",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({messages:messages.slice(-8),language})});if(!response.ok)throw new Error("unavailable");const payload=await response.json();if(typeof payload.answer!=="string"||!payload.answer.trim())throw new Error("empty-response");answer.textContent=payload.answer;messages.push({role:"assistant",content:payload.answer});messages=messages.slice(-8);}
     catch{answer.textContent=copy().error;messages.pop();}
-    finally{busy=false;submit.disabled=false;input.focus();}
-  });
+    finally{busy=false;sendButton.disabled=false;input.focus();}
+  }
+  sendButton.addEventListener("click",send);
+  input.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();send();}});
+  form.addEventListener("submit",event=>{event.preventDefault();send();});
   return root;
 }
+
