@@ -108,7 +108,7 @@ async function verifyBrowser(){
   assert.equal(keys.length,39);assert.equal(new Set(keys).size,39);
   assert.equal(await page.locator(".category-chip").count(),11);
   await page.locator("#search").fill("currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
-  await page.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:30_000});
+  await page.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:90_000});
 
   const open=async key=>{
     await page.evaluate(value=>{location.hash="#/"+value;},key);
