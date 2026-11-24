@@ -1,0 +1,53 @@
+name: Publish verified TokenCalculator to Cloudflare
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tokencalculator-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: cloudflare-production
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Require successful main verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?branch=main&head_sha=$GITHUB_SHA&status=success" --jq '.total_count')
+          test "$result" -gt 0 || { echo "::error::Build and test must pass for this main revision."; exit 1; }
+      - name: Install dependencies and build
+        run: |
+          npm ci --no-audit --no-fund
+          npm test
+          npm run build
+          npx playwright-core install --with-deps chromium
+      - name: Publish the verified product Worker and static assets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID" || {
+            echo "::error::Configure Cloudflare credentials in the cloudflare-production environment."
+            exit 1
+          }
+          npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --config wrangler.toml --env production --keep-vars
+      - name: Verify the live product assets and calculator workflows
+        run: node scripts/verify-deployment.mjs --url "https://adiguntokencalculator.hephzibahbehulah.com/" --artifact dist
