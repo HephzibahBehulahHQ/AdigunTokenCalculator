@@ -85,6 +85,16 @@ async function verifyBrowser(){
   page.on("pageerror",error=>errors.push(error.message));
   context.on("request",request=>{
     const url=new URL(request.url());
+    // Cloudflare injects Browser Insights into production responses. Ignore only
+    // its exact beacon script and same-origin RUM endpoint; all app networking
+    // and every other non-GET request remain subject to the privacy assertion.
+    const cloudflareBeacon=request.method()==="GET"
+      &&url.origin==="https://static.cloudflareinsights.com"
+      &&/^\/beacon\.min\.js\/v[a-f0-9]+$/.test(url.pathname);
+    const cloudflareRum=request.method()==="POST"
+      &&url.origin===site.origin
+      &&url.pathname==="/cdn-cgi/rum";
+    if(cloudflareBeacon||cloudflareRum)return;
     if(/^https?:$/.test(url.protocol)&&(url.origin!==site.origin||request.method()!=="GET"))external.push(`${request.method()} ${url.href}`);
   });
   context.on("response",response=>{
