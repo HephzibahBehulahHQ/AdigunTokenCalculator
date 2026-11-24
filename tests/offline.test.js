@@ -49,16 +49,22 @@ function cacheStorage(){
 }
 
 function workerHarness({config=fixtureConfig(),storage=cacheStorage()}={}){
-  const handlers=new Map(),requests=[],state={offline:false,badAsset:"",claims:0,skips:0,windows:[{url:scope}]};
+  const handlers=new Map(),requests=[],state={offline:false,badAsset:"",redirects:{},claims:0,skips:0,windows:[{url:scope}]};
   const self={registration:{scope},addEventListener(type,listener){handlers.set(type,listener);},
     clients:{async claim(){state.claims++;},async matchAll(){return state.windows;}},
     async skipWaiting(){state.skips++;}};
   const fetch=async request=>{
     const url=key(request);requests.push(url);
     if(state.offline)throw new TypeError("Offline");
-    const name=url.slice(scope.length),source=sources.get(name);
-    if(name===state.badAsset)return new Response("wrong version");
-    return source===undefined?new Response("not found",{status:404}):new Response(source);
+    if(request.mode!=="same-origin")throw new TypeError("Asset request must be same-origin");
+    const target=state.redirects[url]||url;
+    if(new URL(target).origin!==new URL(url).origin)throw new TypeError("Cross-origin redirect blocked");
+    const name=new URL(target).pathname.slice(new URL(scope).pathname.length),source=sources.get(name);
+    let response;
+    if(name===state.badAsset)response=new Response("wrong version");
+    else response=source===undefined?new Response("not found",{status:404}):new Response(source);
+    Object.defineProperty(response,"url",{value:target});
+    return response;
   };
   runInNewContext(renderOfflineWorker(config),{self,caches:storage,crypto:webcrypto,fetch,Request,URL,Uint8Array,Map});
   return {state,requests,storage,
@@ -119,6 +125,20 @@ test("first installation prepares every lazy asset before readiness and works of
   const keys=await (await worker.storage.open(cachePrefix+"new")).keys();
   assert.deepEqual(keys.map(request=>request.url).sort(),[...sources.keys()].map(name=>scope+name).sort());
   assert.equal(worker.requests.some(url=>/private|password=|elsewhere/.test(url)),false);
+});
+
+test("same-origin asset redirects pass integrity checks while cross-origin redirects are blocked",async()=>{
+  const asset=scope+"assets/logo-123.jpg",worker=workerHarness();
+  worker.state.redirects[asset]=asset+"?canonical=1";
+  await worker.dispatch("install");
+  assert.equal((await worker.message("CHECK")).ready,true);
+  assert.ok(worker.requests.includes(asset));
+  assert.equal(worker.requests.every(url=>!url.includes("elsewhere")),true);
+
+  const blocked=workerHarness();
+  blocked.state.redirects[asset]="https://elsewhere.example/logo.jpg";
+  await assert.rejects(blocked.dispatch("install"),/Cross-origin redirect blocked/);
+  assert.equal(await blocked.storage.has(cachePrefix+"new"),false);
 });
 
 test("an interrupted or mismatched new build leaves the working version intact and can retry",async()=>{
