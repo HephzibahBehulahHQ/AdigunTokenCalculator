@@ -23,8 +23,8 @@ export function mountProductAccount() {
   const workspace = document.querySelector("#main");
   const accountButton = document.createElement("button");
   accountButton.type = "button";
-  accountButton.className = "theme-toggle";
-  accountButton.textContent = "Account";
+  accountButton.className = "theme-toggle product-account-launch";
+  accountButton.innerHTML = `<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg><span class="product-account-indicator" aria-hidden="true"></span>`;
   document.querySelector(".site-controls").prepend(accountButton);
 
   const dialog = document.createElement("dialog");
@@ -69,6 +69,16 @@ export function mountProductAccount() {
   let timer;
   let trialAvailable = true;
   let signedIn = false;
+  const updateAccountIndicator = () => {
+    const online = signedIn && navigator.onLine;
+    const state = signedIn ? (online ? "Online" : "Offline") : "Signed out";
+    accountButton.dataset.online = String(online);
+    accountButton.setAttribute("aria-label", `Account · ${state}`);
+    accountButton.title = `Account · ${state}`;
+  };
+  updateAccountIndicator();
+  window.addEventListener("online", updateAccountIndicator);
+  window.addEventListener("offline", updateAccountIndicator);
   let verifying = false;
 
   function setVerification(active) {
@@ -97,6 +107,7 @@ export function mountProductAccount() {
   function updateAccess(result) {
     clearTimeout(timer);
     signedIn = result.step === "signed-in";
+    updateAccountIndicator();
     if (typeof result.trialAvailable === "boolean") trialAvailable = result.trialAvailable;
     const remaining = Number(result.remainingMs) || 0;
     workspace.inert = !signedIn && remaining <= 0;

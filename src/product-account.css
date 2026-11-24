@@ -1,3 +1,7 @@
+.product-account-launch { position: relative; display: inline-grid; place-items: center; min-width: 2.5rem; }
+.product-account-indicator { position: absolute; inset: .25rem .25rem auto auto; width: .5rem; height: .5rem; border-radius: 50%; background: #94a3b8; }
+.product-account-launch[data-online="true"] .product-account-indicator { background: #22c55e; }
+
 .product-account {
   width: min(28rem, calc(100% - 2rem));
   max-height: calc(100dvh - 2rem);
