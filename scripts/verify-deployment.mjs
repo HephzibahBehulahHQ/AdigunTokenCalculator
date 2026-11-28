@@ -123,7 +123,7 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,141);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(keys.length,161);assert.equal(new Set(keys).size,keys.length);
   assert.equal(await page.locator(".category-chip").count(),19);
   await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
   const expectedGroups={
@@ -133,7 +133,7 @@ async function verifyBrowser(){
     "Education & Sport":["final-grade-target","running-pace","cycling-gear-speed"],
     "Conversion":["print-resolution","ev-charging-session","dough-hydration"],
     "Developer":["download-time","pcm-audio-size"],
-    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost","classification-metrics","embedding-index-storage","llm-context-budget"],
+    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost","classification-metrics","embedding-index-storage","llm-context-budget","ai-macro-f1","ai-balanced-accuracy","ai-matthews-correlation","ai-reviewer-agreement","ai-brier-score","ai-retrieval-precision-recall","ai-mean-reciprocal-rank","ai-caption-word-error","ai-retrieval-window-count","ai-training-optimizer-steps","ai-inference-concurrency","ai-latency-slo-budget","ai-accelerator-hours","ai-quantized-artifact-savings","ai-canary-traffic-count","ai-token-cache-cost","ai-document-review-coverage","ai-dataset-dedup-yield","ai-api-run-quota","ai-model-error-change"],
     "Electronics & Automation":["pump-energy","conveyor-throughput","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque","loaded-voltage-divider","current-loop-scaling","lc-resonance","ohms-law-series","parallel-resistor-load","rc-charge-time","capacitor-stored-energy","inductor-current-ramp","pwm-resistive-power","stepper-travel-resolution","encoder-machine-speed","gearbox-output","vfd-synchronous-speed","ac-power-triangle","digital-sampling-rate","adc-code-step","uart-frame-transmission","thermal-resistance-rise","hydraulic-cylinder-force","process-cycle-takt","oee-machine-effectiveness","synchronous-belt-ratio","tank-fill-duration"],
     "Trading":["inventory-reorder","trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff","fx-round-trip","futures-tick-result","position-loss-budget","long-call-expiry","cagr-return","trade-dividend-yield","trade-multiple-lots-exit","trading-funding-payment","margin-markup-pair","target-margin-price","inventory-turnover-days","trade-invoice-cash-discount","trade-invoice-unit-landed","trade-fx-exchange-fee","trade-bond-price","trade-real-return","trade-profit-factor","trade-benefit-expectancy","trade-order-book-fill","trade-contribution-return","trade-simple-forward","trade-stock-split","trade-cash-secured-put","trade-inventory-shrink"],
     "Faith & Outreach":["scripture-reading-plan","sermon-timing","outreach-print-order","service-livestream-data","worship-song-range","food-relief-parcels","wireless-mic-batteries","service-booklet-printing"],
