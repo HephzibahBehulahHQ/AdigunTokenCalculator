@@ -70,3 +70,49 @@ test("calculator locks at the guest deadline and opens only after sign-in code v
     await server.close();
   }
 });
+
+test("optional sign-in stays at the right of the header and never locks the tools", {
+  skip: !existsSync(executablePath),
+  timeout: 30_000,
+}, async () => {
+  const server = await createServer({
+    server: { host: "127.0.0.1", port: 0 },
+    define: { "import.meta.env.VITE_PRODUCT_ACCOUNTS": JSON.stringify("optional") },
+  });
+  let browser;
+  try {
+    await server.listen();
+    browser = await chromium.launch({ executablePath, headless: true });
+    const page = await browser.newPage();
+    await page.route("**/api/account", async (route) => {
+      const request = route.request().postDataJSON();
+      if (request.step === "verify") {
+        return route.fulfill({ json: { step: "signed-in", remainingMs: 28_800_000 } });
+      }
+      if (request.step === "begin") return route.fulfill({ json: { step: "verify" } });
+      return route.fulfill({ status: 503, json: { error: "account-unavailable" } });
+    });
+    const status = page.waitForResponse(response => response.url().endsWith("/api/account"));
+    await page.goto(server.resolvedUrls.local[0]);
+    assert.equal((await status).status(), 503);
+    const workspace = page.locator("#main");
+    const dialog = page.getByRole("dialog");
+    const button = page.getByRole("button", { name: /Account · Signed out/ });
+    await button.waitFor();
+    assert.equal(await button.evaluate(element => element.parentElement.lastElementChild === element), true);
+    assert.equal(await workspace.evaluate(element => element.inert), false);
+    assert.equal(await dialog.isVisible(), false);
+    await button.click();
+    await dialog.getByLabel("Email", { exact: true }).fill("test@example.com");
+    await dialog.getByLabel("Password", { exact: true }).fill("A product-only password");
+    await dialog.getByRole("button", { name: "Send email code" }).click();
+    await dialog.getByLabel("Email code").fill("123456");
+    await dialog.getByRole("button", { name: "Verify email code" }).click();
+    await dialog.waitFor({ state: "hidden" });
+    await page.getByRole("button", { name: /Account · Online/ }).waitFor();
+    assert.equal(await workspace.evaluate(element => element.inert), false);
+  } finally {
+    await browser?.close();
+    await server.close();
+  }
+});

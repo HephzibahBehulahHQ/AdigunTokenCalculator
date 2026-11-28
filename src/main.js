@@ -21,7 +21,10 @@ import { mountProductAccount } from "./product-account.js";
 import { mountProductBot } from "./product-bot.js";
 import { mountCompanyFooter } from "./company-footer.js";
 
-if (import.meta.env.VITE_PRODUCT_ACCOUNTS === "true") mountProductAccount();
+const accountMode = import.meta.env.VITE_PRODUCT_ACCOUNTS;
+if (accountMode === "true" || accountMode === "optional") {
+  mountProductAccount({ requireAccess: accountMode === "true" });
+}
 
 const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
 const main=$("#main");

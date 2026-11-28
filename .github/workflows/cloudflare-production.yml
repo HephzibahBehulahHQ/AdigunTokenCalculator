@@ -16,6 +16,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: cloudflare-production
+    env:
+      VITE_PRODUCT_ACCOUNTS: optional
     timeout-minutes: 25
     steps:
       - name: Checkout
@@ -52,3 +54,9 @@ jobs:
           npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --config wrangler.toml --env production --keep-vars
       - name: Verify the live product assets and calculator workflows
         run: node scripts/verify-deployment.mjs --url "https://adiguntokencalculator.hephzibahbehulah.com/" --artifact dist
+      - name: Verify the production account endpoint
+        run: |
+          site="https://adiguntokencalculator.hephzibahbehulah.com"
+          curl --fail-with-body --silent --show-error "$site/api/account" \
+            --header "Origin: $site" --header "Content-Type: application/json" \
+            --data '{"step":"guest"}' | jq -e '.step == "guest" and .remainingMs == 0'
