@@ -48,4 +48,8 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.deepEqual(run(29,{datasetRecordCount:1,validationSetPct:25,testSetPct:25}), [1,0,0]);
   assert.throws(() => run(29,{validationSetPct:90}), {field:"testSetPct"});
   assert.deepEqual(run(31,{closedRequestsWeek:30}), [90,null]);
+  assert.throws(() => run(32,{ledSupplyVolts:6}), {field:"ledsInSeries"});
+  assert.deepEqual(run(33,{currentAccountValue:0}), [1000,100,null]);
+  assert.throws(() => run(34,{modelBitsPerParameter:65}), {field:"modelBitsPerParameter"});
+  assert.deepEqual(run(36,{scheduledBusinessMinutes:90}), [0,0,0]);
 });

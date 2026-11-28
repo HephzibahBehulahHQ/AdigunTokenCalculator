@@ -550,6 +550,96 @@ export const practicalTools = {
       const netClosed=closed-incoming;
       return [Math.max(0,open-netClosed*weeks),open===0?0:netClosed>0?roundUp(open/netClosed):null];
     }),
+
+  "led-series-resistor": tool("Home & Construction",
+    "LED series resistor|LED-Vorwiderstand|Resístọ̀ LED ní tẹ̀léra|LED series resistor",
+    "Estimate resistance and resistor dissipation for a steady DC supply and a string of identical LEDs in series.|Widerstand und Verlustleistung für eine konstante Gleichspannungsquelle und gleiche LEDs in Reihe schätzen.|Ṣírò ìdènà àti agbára tó sọnù fún orísun DC tó dúró àti LED kan náà ní tẹ̀léra.|Estimate resistor value and heat for steady DC and matching LEDs for one series.",
+    [
+      number("ledSupplyVolts","DC supply (V)|Gleichspannung (V)|Foliteji DC (V)|DC supply (V)",0.01,60),
+      positive("ledForwardVolts","Forward voltage per LED (V)|Durchlassspannung je LED (V)|Foliteji iwájú LED kan (V)|Forward voltage per LED (V)"),
+      whole("ledsInSeries","LEDs in series|LEDs in Reihe|LED ní tẹ̀léra|LEDs in series"),
+      positive("ledTargetMilliamps","Target current (mA)|Zielstrom (mA)|Ìṣàn tí a fẹ́ (mA)|Target current (mA)"),
+    ],[
+      "Resistor voltage (V)|Spannung am Widerstand (V)|Foliteji resístọ̀ (V)|Resistor voltage (V)",
+      "Calculated resistance (Ω)|Berechneter Widerstand (Ω)|Ìdènà tí a ṣírò (Ω)|Calculated resistance (Ω)",
+      "Resistor dissipation (W)|Verlustleistung am Widerstand (W)|Agbára tí resístọ̀ ń tú (W)|Resistor heat loss (W)",
+    ],(supply,forward,count,milliamps)=>{
+      const voltage=supply-forward*count;
+      above(voltage>0,"ledsInSeries");
+      const current=milliamps/1000;
+      return [voltage,voltage/current,voltage*current];
+    }),
+
+  "drawdown-recovery": tool("Finance",
+    "Drawdown and recovery|Verlust und Erholung|Ìdínkù àti ìpadà bọ̀|Drawdown and recovery",
+    "Compare a current account value with its earlier peak. Use the same currency and exclude the effect of deposits and withdrawals.|Aktuellen Kontowert mit früherem Höchststand vergleichen. Gleiche Währung verwenden und Ein- und Auszahlungen herausrechnen.|Fi iye owó lọ́wọ́ wé iye tó ga jù tẹ́lẹ̀. Lo owó kan náà, yọ owó tí a fi kún tàbí yọ kúrò.|Compare current account value with the old peak. Use one currency and leave deposits and withdrawals out.",
+    [
+      positive("accountPeakValue","Earlier peak value|Früherer Höchststand|Iye tó ga jù tẹ́lẹ̀|Earlier peak value"),
+      number("currentAccountValue","Current account value|Aktueller Kontowert|Iye owó báyìí|Current account value"),
+    ],[
+      "Value lost|Wertverlust|Iye tó sọnù|Value lost",
+      "Drawdown from peak (%)|Rückgang vom Höchststand (%)|Ìdínkù láti ibi gíga (%)|Drawdown from peak (%)",
+      "Gain required to recover (%)|Nötiger Gewinn zur Erholung (%)|Èrè tí a nílò láti padà (%)|Gain wey you need to recover (%)",
+    ],(peak,current)=>{
+      above(current<=peak,"currentAccountValue");
+      const loss=peak-current;
+      return [loss,loss/peak*100,current>0?loss/current*100:null];
+    }),
+
+  "ai-model-weight-memory": tool("Token & AI",
+    "AI model weight memory|Speicherbedarf für KI-Modellgewichte|Ìrántí fún ìwọ̀n àwòṣe AI|AI model weight memory",
+    "Estimate ideal weight storage plus an explicit allowance for runtime overhead. Enter the allowance separately for cache and buffers.|Ideale Speichergröße der Gewichte plus einen Zuschlag für die Laufzeit angeben. Cache und Puffer im Zuschlag berücksichtigen.|Ṣírò ibi ìpamọ́ ìwọ̀n àwòṣe àti àfikún ìrántí fún iṣẹ́. Ka cache àti buffer sínú àfikún.|Estimate weight storage and add your own runtime allowance for cache and buffers.",
+    [
+      positive("modelParametersBillions","Model parameters (billions)|Modellparameter (Milliarden)|Àwọn paramita àwòṣe (bílíọ̀nù)|Model parameters (billions)"),
+      {...whole("modelBitsPerParameter","Stored bits per parameter|Gespeicherte Bits je Parameter|Bítì fún paramita kan|Stored bits per parameter"),max:64},
+      number("modelRuntimeAllowanceGib","Extra runtime memory (GiB)|Zusätzlicher Laufzeitspeicher (GiB)|Ìrántí àfikún fún iṣẹ́ (GiB)|Extra runtime memory (GiB)"),
+    ],[
+      "Ideal weights (GB)|Ideale Gewichtsgröße (GB)|Ìwọ̀n àwòṣe (GB)|Ideal weights (GB)",
+      "Ideal weights (GiB)|Ideale Gewichtsgröße (GiB)|Ìwọ̀n àwòṣe (GiB)|Ideal weights (GiB)",
+      "Total with allowance (GiB)|Gesamt mit Zuschlag (GiB)|Àpapọ̀ pẹ̀lú àfikún (GiB)|Total with allowance (GiB)",
+    ],(parameters,bits,allowance)=>{
+      const gb=parameters*bits/8;
+      const gib=gb*1e9/2**30;
+      return [gb,gib,gib+allowance];
+    }),
+
+  "outreach-print-order": tool("World & Culture",
+    "Outreach print order|Druckauftrag für Gemeindearbeit|Àṣẹ ìtẹ̀wé fún ìtànkálẹ̀|Outreach print order",
+    "Plan outreach handouts with spare copies, pack rounding and a printing budget. Use one currency.|Handzettel für Gemeindearbeit mit Reserve, Packungsrundung und Druckbudget planen. Eine Währung verwenden.|Ṣètò ìwé ìtànkálẹ̀ pẹ̀lú àfikún, àpò odidi àti ètò owó. Lo owó kan náà.|Plan outreach handouts with spare copies, full packs and print cost. Use one currency.",
+    [
+      whole("outreachRecipients","People to reach|Zu erreichende Personen|Iye ènìyàn tí a fẹ́ dé ọ̀dọ̀|People to reach"),
+      percent("extraHandoutPct","Extra copies (%)|Reserveexemplare (%)|Ìwé àfikún (%)|Extra copies (%)"),
+      whole("handoutsPerPack","Copies per pack|Exemplare je Packung|Ìwé nínú àpò kan|Copies per pack"),
+      number("outreachPackPrice","Price per printed pack|Preis je Druckpackung|Iye owó àpò ìtẹ̀wé kan|Price per printed pack"),
+    ],[
+      "Copies to plan for|Einzuplanende Exemplare|Iye ìwé tí a nílò|Copies to plan for",
+      "Packs to order|Zu bestellende Packungen|Àpò láti pàṣẹ|Packs to order",
+      "Total printing cost|Gesamtdruckkosten|Gbogbo owó ìtẹ̀wé|Total print cost",
+    ],(people,extra,perPack,price)=>{
+      const copies=people+roundUp(people*extra/100);
+      const packs=roundUp(copies/perPack);
+      return [copies,packs,packs*price];
+    }),
+
+  "public-comment-slots": tool("Business & Work",
+    "Public meeting comment slots|Redeplätze für öffentliche Sitzungen|Àyè ọ̀rọ̀ ní ìpàdé gbogbogbò|Public meeting comment slots",
+    "Reserve time for agenda business, then count how many equal speaker slots fit in the remainder, including changeovers.|Zeit für Tagesordnungspunkte abziehen und gleich lange Redeplätze einschließlich Wechselzeiten zählen.|Yọ àkókò iṣẹ́ ìpàdé kúrò, kí o sì ka iye àyè ọ̀rọ̀ tó dọ́gba pẹ̀lú ìyípadà.|Keep time for meeting business, then count equal speaker slots wey fit, including changeovers.",
+    [
+      positive("meetingDurationMinutes","Full meeting length (min)|Gesamte Sitzungsdauer (min)|Gbogbo gígùn ìpàdé (ìṣẹ́jú)|Full meeting length (min)"),
+      number("scheduledBusinessMinutes","Scheduled agenda time (min)|Feste Tagesordnungszeit (min)|Àkókò iṣẹ́ tí a ṣètò (ìṣẹ́jú)|Scheduled agenda time (min)"),
+      positive("speakerMinutesEach","Speaking time per person (min)|Redezeit je Person (min)|Àkókò ọ̀rọ̀ fún ẹnìkan (ìṣẹ́jú)|Speaking time per person (min)"),
+      number("speakerChangeMinutes","Changeover per slot (min)|Wechselzeit je Platz (min)|Àkókò ìyípadà fún àyè kan (ìṣẹ́jú)|Changeover per slot (min)"),
+    ],[
+      "Public comment time available (min)|Verfügbare Zeit für Wortmeldungen (min)|Àkókò ọ̀rọ̀ tó wà (ìṣẹ́jú)|Public comment time available (min)",
+      "Full speaker slots|Ganze Redeplätze|Àyè ọ̀rọ̀ odidi|Full speaker slots",
+      "Unallocated time (min)|Unverplante Zeit (min)|Àkókò tí a kò pín (ìṣẹ́jú)|Time left unallocated (min)",
+    ],(total,business,speaker,change)=>{
+      above(business<=total,"scheduledBusinessMinutes");
+      const available=total-business;
+      const block=speaker+change;
+      const slots=Math.floor(available/block+Number.EPSILON*available/block);
+      return [available,slots,Math.max(0,available-slots*block)];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
