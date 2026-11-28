@@ -74,3 +74,17 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.deepEqual(run(60,{bookletPagesPerCopy:16,bookletPaperSparePct:0}), [4,0,480]);
   assert.deepEqual(run(61,{ballotPapersFoundInBox:890}), [1007,-7]);
 });
+
+test("new track tools handle exact thresholds and reject inconsistent totals", () => {
+  const run=(key, data)=>calculatePracticalTool(key,data).map(([,value])=>value);
+  assert.throws(()=>run("rc-charge-time",{rcResistor:10,rcCapacitor:100,rcTarget:100}),{field:"rcTarget"});
+  assert.deepEqual(run("adc-code-step",{adcTopVoltage:4.096,adcBits:12,adcInputVoltage:4.096}),[1,4095]);
+  assert.throws(()=>run("target-margin-price",{marginProductCost:40,marginTargetPct:70,marginSaleFeePct:30}),{field:"marginSaleFeePct"});
+  assert.deepEqual(run("trade-bond-price",{bondFaceValue:1000,bondAnnualCouponRate:5,bondRequiredYield:0,bondRemainingYears:3}),[50,1150]);
+  assert.deepEqual(run("ai-retrieval-window-count",{documentTotalTokens:48,windowChunkCapacity:64,windowOverlapTokens:16}),[1,48,48]);
+  assert.throws(()=>run("ai-retrieval-precision-recall",{retrievalReturned:5,retrievalKnownRelevant:10,retrievalTrueHits:7}),{field:"retrievalTrueHits"});
+  assert.deepEqual(run("potluck-dietary-portions",{potluckExpectedGuests:200,potluckSpecialMeals:100,potluckMealReserve:10}),[110,110]);
+  assert.deepEqual(run("food-pantry-shelf-coverage",{foodPantryShelfUnits:15,foodPantryDailyUnits:40,foodPantryReserveUnits:30}),[0,15]);
+  assert.throws(()=>run("civic-mail-ballot-returns",{mailIssuedBallots:30,mailReturnedBallots:31}),{field:"mailReturnedBallots"});
+  assert.deepEqual(run("civic-grant-reimbursement",{grantEligibleCost:1000,grantReimbursementPct:80,grantAwardCeiling:5000,grantClaimsAlreadyPaid:5000}),[0,0]);
+});
