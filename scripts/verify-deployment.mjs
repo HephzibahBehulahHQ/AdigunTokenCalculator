@@ -5,6 +5,7 @@ import {resolve,join,relative,sep} from "node:path";
 import {parseArgs} from "node:util";
 import {setTimeout as delay} from "node:timers/promises";
 import {chromium} from "playwright-core";
+import {practicalExamples} from "../tests/fixtures/practical-examples.js";
 
 // Checks the downloaded deployment artifact and a fresh browser context only.
 // No server, account, real customer data, or saved electrical profile is used.
@@ -119,10 +120,32 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,39);assert.equal(new Set(keys).size,39);
-  assert.equal(await page.locator(".category-chip").count(),11);
-  await page.locator("#search").fill("currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
+  assert.equal(keys.length,51);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(await page.locator(".category-chip").count(),15);
+  await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
+  const expectedGroups={
+    "Home & Construction":["paint-coverage","concrete-slab","tile-order"],
+    "Garden & Water":["rainwater-harvest","drip-irrigation","plant-spacing"],
+    "Business & Work":["product-break-even","shift-staffing"],
+    "Education & Sport":["final-grade-target","running-pace"],
+    "Conversion":["print-resolution"], Developer:["download-time"],
+  };
+  const categorized=[];
+  const filters=page.locator(".category-chip");
+  for(let index=1;index<await filters.count();index++){
+    const filter=filters.nth(index),category=(await filter.innerText()).trim();
+    await filter.click();
+    const cards=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>[node.dataset.toolKey,node.querySelector(".tool-card-category").textContent]));
+    assert.ok(cards.length,category+" has no calculator");
+    assert.ok(cards.every(([,name])=>name===category),category+" contains a mislabeled calculator");
+    const categoryKeys=cards.map(([key])=>key);
+    assert.deepEqual(categoryKeys.filter(key=>practicalExamples.some(([example])=>example===key)),expectedGroups[category]||[],category);
+    categorized.push(...categoryKeys);
+  }
+  assert.deepEqual(categorized.sort(),[...keys].sort(),"Every live calculator belongs to exactly one category");
+  await filters.first().click();
   await page.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:90_000});
+  await context.setOffline(true);
 
   const open=async key=>{
     await page.evaluate(value=>{location.hash="#/"+value;},key);
@@ -210,13 +233,14 @@ async function verifyBrowser(){
   await page.locator('[data-action="add-device"]').click();
   await page.waitForFunction(()=>Math.abs(Number(document.querySelector('[data-result="dailyKWh"]')?.dataset.value)-0.972)<1e-9);
   assert.equal(await page.locator("[data-device-row]").count(),1);completed.push("electrical-load");await reflow("electrical-load");
+  for(const [key,inputs,expected] of practicalExamples)await flow(key,inputs,equal(expected.map(value=>value.toLocaleString('en-US',{maximumFractionDigits:3}))));
   assert.deepEqual([...completed].sort(),[...keys].sort(),"Every deployed tool must complete its smoke calculation");
-  console.log(`PASS browser: meaningful synthetic calculations for ${completed.length}/39 tools, both token encodings, password strength, and discount error/recovery`);
+  console.log(`PASS browser: offline calculations for ${completed.length}/${keys.length} tools, both token encodings, password strength, and discount error/recovery`);
 
   for(const locale of ["en","de","yo","pcm"]){
     await open("");await page.locator("#language").selectOption(locale);
     assert.equal(await page.locator("html").getAttribute("lang"),locale);
-    assert.equal(await page.locator(".tool-card").count(),39);await reflow(`${locale} directory`);
+    assert.equal(await page.locator(".tool-card").count(),keys.length);await reflow(`${locale} directory`);
     await page.locator('[data-tool-key="math"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel")?.dataset.toolKey==="math");
     await fill({a:12,b:4,op:"divide"});equal(["3"])(await calculate());await reflow(`${locale} calculator`);

@@ -15,6 +15,7 @@ import {mountBacGate} from "./bac-gate.js";
 import {errorFields,attachFormError,clearFormError} from "./form-errors.js";
 import {createQr} from "./qr.js";
 import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";
+import {calculatePracticalTool,practicalCategories,practicalTools,registerPracticalCategories,registerPracticalTools} from "./practical-tools.js";
 import {ACCESSIBILITY_COPY} from "./accessibility-i18n.js";
 import "./styles.css";
 import { mountProductAccount } from "./product-account.js";
@@ -86,6 +87,8 @@ Religiously unaffiliated, 24.2`]],
  morse:[["text","textarea"],["direction","select",[["text","Text to Morse"],["morse","Morse to text"]],"text"]],
  stats:[["numbers","textarea"]]
 };
+registerPracticalCategories();
+registerPracticalTools(keys,schema);
 const unitChoices={length:["m","km","mi","ft","in"],mass:["kg","g","lb","oz"],volume:["L","mL","US gal","US qt"],area:["m²","ft²","acre","ha"],speed:["km/h","mph","m/s"],digital:["bit","byte","kB","MB","GB","KiB","MiB","GiB"]};
 const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
 const tr=()=>I[lang],label=k=>tr().fields[k]||k;
@@ -96,9 +99,9 @@ function makeField(form,spec){const [key,type,opts,def]=spec,wrap=el("label","fi
  else{input=el("input");input.type=type;if(type==="number"){input.step="any";input.required=true;if(!["lat","lon","value","a","b"].includes(key))input.min="0";if(key==="lat"){input.min="-90";input.max="90";}if(key==="lon"){input.min="-180";input.max="180";}}else input.required=true;}
  input.name=key;if(def!==undefined)input.value=def;wrap.append(input);form.append(wrap);return input;}
 function renderNav(){
- nav.replaceChildren();const q=search.value.toLocaleLowerCase(),categories=tr().categories||["All"],values=["All","Token & AI","Math","Text & Language","Conversion","Health","Finance","Time & Date","World & Culture","Developer","Security & Privacy"],chips=$("#categories");
+ nav.replaceChildren();const q=search.value.toLocaleLowerCase(),categories=tr().categories||["All"],values=["All","Token & AI","Math","Text & Language","Conversion","Health","Finance","Time & Date","World & Culture","Developer","Security & Privacy",...practicalCategories.map(([id])=>id)],chips=$("#categories");
  chips.replaceChildren();categories.forEach((name,i)=>{const b=el("button","category-chip",name);b.type="button";b.setAttribute("aria-pressed",values[i]===activeCategory?"true":"false");b.addEventListener("click",()=>{activeCategory=values[i]||"All";renderNav();chips.querySelector('[aria-pressed="true"]')?.focus();});chips.append(b);});
- const icons={"Token & AI":"🔤","Math":"∑","Text & Language":"文","Conversion":"⇄","Health":"♥","Finance":"¤","Time & Date":"◷","World & Culture":"◎","Developer":"{}","Security & Privacy":"⌑"};
+ const icons={"Token & AI":"🔤","Math":"∑","Text & Language":"文","Conversion":"⇄","Health":"♥","Finance":"¤","Time & Date":"◷","World & Culture":"◎","Developer":"{}","Security & Privacy":"⌑","Home & Construction":"⌂","Garden & Water":"♧","Business & Work":"▤","Education & Sport":"◇"};
  keys.forEach((key,i)=>{const category=tr().toolCategoryByKey[key]||tr().groups[i];if(activeCategory!=="All"&&category!==activeCategory)return;if(q&&!tr().names[i].toLocaleLowerCase().includes(q)&&!tr().descriptions[i].toLocaleLowerCase().includes(q))return;
   const card=el("button","tool-card");card.type="button";card.dataset.toolKey=key;card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",tr().toolCategoryLabels?.[category]||category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{location.hash="#/"+key;});nav.append(card);
  });
@@ -108,7 +111,7 @@ function out(k){if(RESULT_LABELS[lang]?.[k])return RESULT_LABELS[lang][k];if(tr(
 function result(rows,note="",kind="status"){clearFormError(panel.querySelector("form"));panel.querySelector(".result")?.remove();const box=el("section","result");box.className="result "+(kind==="error"?"result-error":"");box.setAttribute("role",kind==="error"?"alert":"status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);return box;}
 const fmt=(n,d=3,preserveSmall=false)=>formatNumber(n,lang,d,preserveSmall);
 function errorResult(err,context={}){
- const form=context.form||panel.querySelector("form"),tool=context.tool||keys[active],data=context.data||(form?Object.fromEntries(new FormData(form)):{}),fields=errorFields(tool,err,data);
+ const form=context.form||panel.querySelector("form"),tool=context.tool||keys[active],data=context.data||(form?Object.fromEntries(new FormData(form)):{}),fields=err.field?[err.field]:errorFields(tool,err,data);
  const location=/^JSON syntax error at line (\d+), column (\d+)$/.exec(String(err?.message||""));
  let message=err?.message==="empty"?tr().empty:location?resultText(lang,"jsonSyntaxAt",{line:location[1],column:location[2]}):tr().invalid;
  if(err?.message==="zero")message=resultText(lang,"nonzeroDivisor");
@@ -125,6 +128,7 @@ function errorResult(err,context={}){
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(typeof text==="function"?text():text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 function foregroundColor(d){if(d.colorMode==="hex")return normalizeHexColor(d.foreground);if(d.colorMode==="rgb")return rgbToHex(d.red,d.green,d.blue);if(d.colorMode==="hsl")return hslToHex(d.hue,d.saturation,d.lightness);throw Error("number");}
 async function execute(k,d,isCurrent){
+ if(practicalTools[k]){result(calculatePracticalTool(k,d,lang).map(([name,value])=>[name,fmt(value,3,true)]));return;}
  const T=tr(),N=T.notices,C=COMPLETION_COPY[lang];let rows=[],note="";
  switch(k){
  case"token":{
@@ -217,6 +221,9 @@ function renderTool(){
   privacy.id="token-privacy";
   inputs.text.setAttribute("aria-describedby",privacy.id);
   inputs.text.closest(".field").after(privacy);
+ }
+ for(const field of practicalTools[k]?.fields||[]){
+  const input=inputs[field.key];input.min=String(field.min);input.max=String(field.max);input.step=field.whole?"1":"any";
  }
  const C=COMPLETION_COPY[lang];
  const helpText={water:C.waterHelp,holidays:C.holidayHelp,qibla:C.qiblaLocation,zakat:C.zakatDefault,demographics:tr().demographicsSourceNote,json:C.jsonHelp,stats:C.statsHelp}[k];
