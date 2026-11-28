@@ -13,6 +13,7 @@ assert.ok(args.url&&args.artifact,"Usage: node scripts/verify-deployment.mjs --u
 const site=new URL(args.url);
 assert.ok(["https:","http:"].includes(site.protocol)&&!site.username&&!site.password&&!site.search&&!site.hash,"Use the site's plain HTTP(S) directory URL");
 if(!site.pathname.endsWith("/"))site.pathname+="/";
+const optionalAccounts=process.env.VITE_PRODUCT_ACCOUNTS==="optional";
 const artifact=resolve(args.artifact),started=Date.now(),deadline=started+180_000;
 const watchdog=setTimeout(()=>{console.error("Deployment verification exceeded its three-minute limit");process.exit(1);},180_000);
 watchdog.unref();
@@ -78,7 +79,7 @@ async function verifyArtifact(){
 }
 
 async function verifyBrowser(){
-  browser=await chromium.launch({headless:true});
+  browser=await chromium.launch({executablePath:process.env.PRODUCT_TEST_CHROMIUM||chromium.executablePath(),headless:true});
   const context=await browser.newContext({locale:"en-US",timezoneId:"UTC",viewport:{width:375,height:812}});
   const page=await context.newPage(),errors=[],external=[],failed=[],completed=[];
   page.setDefaultTimeout(8_000);page.setDefaultNavigationTimeout(20_000);
@@ -94,7 +95,9 @@ async function verifyBrowser(){
     const cloudflareRum=request.method()==="POST"
       &&url.origin===site.origin
       &&url.pathname==="/cdn-cgi/rum";
-    if(cloudflareBeacon||cloudflareRum)return;
+    const accountStatus=optionalAccounts&&request.method()==="POST"
+      &&url.href===new URL("/api/account",site).href&&request.postData()==='{"step":"guest"}';
+    if(cloudflareBeacon||cloudflareRum||accountStatus)return;
     if(/^https?:$/.test(url.protocol)&&(url.origin!==site.origin||request.method()!=="GET"))external.push(`${request.method()} ${url.href}`);
   });
   context.on("response",response=>{
@@ -114,6 +117,7 @@ async function verifyBrowser(){
   await page.clock.setFixedTime(new Date("2026-11-05T12:00:00Z"));
   await page.goto(site.href,{waitUntil:"domcontentloaded"});
   await page.locator(".tool-card").first().waitFor();
+  if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
   assert.equal(keys.length,39);assert.equal(new Set(keys).size,39);
   assert.equal(await page.locator(".category-chip").count(),11);
