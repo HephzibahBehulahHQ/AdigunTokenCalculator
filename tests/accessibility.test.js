@@ -8,7 +8,8 @@ import {ACCESSIBILITY_COPY} from "../src/accessibility-i18n.js";
 
 const origin="http://127.0.0.1:4187";
 const locales=["en","de","yo","pcm"];
-const browserAvailable=existsSync(chromium.executablePath());
+const executablePath=process.env.PRODUCT_TEST_CHROMIUM||chromium.executablePath();
+const browserAvailable=existsSync(executablePath);
 
 test("accessible navigation, memory, reflow and offline privacy",{skip:!browserAvailable,timeout:180000},async t=>{
   const server=spawn(process.execPath,["node_modules/vite/bin/vite.js","--host","127.0.0.1","--port","4187","--strictPort"],{stdio:"ignore"});
@@ -20,7 +21,7 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
       await delay(200);
     }
     assert.ok(ready,"the local app should start");
-    browser=await chromium.launch({headless:true});
+    browser=await chromium.launch({executablePath,headless:true});
     const context=await browser.newContext({viewport:{width:1280,height:900},locale:"en-US"});
     const page=await context.newPage(),pageErrors=[],externalRequests=[];
     page.on("pageerror",error=>pageErrors.push(error.message));
@@ -61,14 +62,14 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
         assert.equal(await page.locator(".back-directory").evaluate(node=>node===document.activeElement),true);
         await press(page.locator(".back-directory"));
         await page.locator("#search").waitFor();
-        await page.locator(".category-chip").nth(2).click();
+        await page.locator('[data-track-filter="electronics"]').click();
         const toolName=await page.locator('[data-tool-key="math"]').getAttribute("aria-label");
         await page.locator("#search").fill(toolName);
-        assert.equal(await page.locator(".tool-card").count(),1);
+        assert.equal(await page.locator(".tool-card").first().getAttribute("data-tool-key"),"math");
         await press(page.locator(".skip"));
         assert.equal(await page.locator("#search").inputValue(),toolName);
-        assert.equal(await page.locator(".tool-card").count(),1);
-        assert.equal(await page.locator(".category-chip").nth(2).getAttribute("aria-pressed"),"true");
+        assert.equal(await page.locator(".tool-card").first().getAttribute("data-tool-key"),"math");
+        assert.equal(await page.locator('[data-track-filter="electronics"]').getAttribute("aria-pressed"),"true");
         await page.keyboard.press("Tab");
         assert.equal(await page.evaluate(()=>document.activeElement?.id),"search");
         await page.locator("#search").fill("");
@@ -133,7 +134,7 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
       assert.equal(await page.locator('input[name="a"]').inputValue(),"0");
     });
 
-    await t.test("all 39 panels reflow on narrow, tablet, desktop and enlarged layouts",async()=>{
+    await t.test("all calculator panels reflow on narrow, tablet, desktop and enlarged layouts",async()=>{
       const layouts=[{width:320,height:800,zoom:1},{width:768,height:1024,zoom:1},{width:1440,height:900,zoom:1},{width:1280,height:900,zoom:2}];
       const failures=[];
       for(const locale of locales){
