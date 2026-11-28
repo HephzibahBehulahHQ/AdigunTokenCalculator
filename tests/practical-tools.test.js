@@ -69,4 +69,8 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.throws(() => run(54,{bytesPerVectorDimension:9}), {field:"bytesPerVectorDimension"});
   assert.deepEqual(run(55,{micUseHours:2,eventMicSpareSets:0}), [0,4,8]);
   assert.throws(() => run(56,{motionYesVotes:26}), {field:"motionYesVotes"});
+  assert.deepEqual(run(58,{callExpiryUnderlyingPrice:49}), [0,-410,52.05]);
+  assert.throws(() => run(59,{llmReplyReservationTokens:8000}), {field:"llmReplyReservationTokens"});
+  assert.deepEqual(run(60,{bookletPagesPerCopy:16,bookletPaperSparePct:0}), [4,0,480]);
+  assert.deepEqual(run(61,{ballotPapersFoundInBox:890}), [1007,-7]);
 });

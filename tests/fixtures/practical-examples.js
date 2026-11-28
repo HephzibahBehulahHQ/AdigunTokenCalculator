@@ -56,4 +56,9 @@ export const practicalExamples = [
   ["embedding-index-storage", {storedEmbeddingCount:1000000,embeddingDimensionCount:768,bytesPerVectorDimension:4,indexExtraBytesPerVector:128}, [3.072,0.128,3.2]],
   ["wireless-mic-batteries", {wirelessMicCount:4,micUseHours:5,micSetHours:2,cellsPerMicSet:2,eventMicSpareSets:2}, [2,14,28]],
   ["motion-approval", {motionCountedVoteBase:25,motionApprovalShare:60,motionYesVotes:14}, [15,56,1]],
+  ["lc-resonance", {inductanceMicrohenry:100,capacitanceNanofarad:100}, [100*Math.sqrt(10)/(2*Math.PI),Math.sqrt(1000)]],
+  ["long-call-expiry", {callStrikeUnitPrice:50,callExpiryUnderlyingPrice:53,callPremiumPerUnit:2,callUnitsEach:100,longCallContractCount:2,longCallTotalFees:10}, [600,190,52.05]],
+  ["llm-context-budget", {llmContextWindowTokens:8192,llmFixedPromptTokens:512,llmReplyReservationTokens:1024,llmChunkTokensWithOverhead:600}, [6656,11,56]],
+  ["service-booklet-printing", {bookletPagesPerCopy:14,serviceBookletCopies:120,bookletPaperSparePct:5}, [4,2,504]],
+  ["ballot-stock-reconciliation", {ballotPapersReceived:1000,unusedBallotPapers:100,spoiledBallotPapersOutsideBox:10,ballotPapersFoundInBox:880,issuedNotReturnedPapers:7}, [997,3]],
 ];
