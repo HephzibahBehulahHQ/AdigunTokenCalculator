@@ -114,7 +114,7 @@ The visual preview shows 2,000 tokens per page; the reported count and copy cont
 - AI prediction, fortune-telling, personality and relationship-scoring tools are excluded because they imply unsupported certainty.
 - Medical diagnosis/treatment tools beyond labelled screening or formula estimates are excluded.
 - Live stock/crypto tickers and live exchange APIs are excluded to preserve the static local-only architecture.
-- User accounts, cloud profiles and persistent sensitive data are excluded.
+- Calculator inputs and results stay local. The optional account uses email verification and does not sync calculator data.
 
 ## Data restraint and known limitations
 

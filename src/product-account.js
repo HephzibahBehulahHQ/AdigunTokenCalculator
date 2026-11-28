@@ -19,20 +19,20 @@ const errors = {
   "wait-and-retry": "Too many requests. Wait a minute and try again.",
 };
 
-export function mountProductAccount() {
+export function mountProductAccount({ requireAccess = false } = {}) {
   const workspace = document.querySelector("#main");
   const accountButton = document.createElement("button");
   accountButton.type = "button";
   accountButton.className = "theme-toggle product-account-launch";
   accountButton.innerHTML = `<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg><span class="product-account-indicator" aria-hidden="true"></span>`;
-  document.querySelector(".site-controls").prepend(accountButton);
+  document.querySelector(".site-controls").append(accountButton);
 
   const dialog = document.createElement("dialog");
   dialog.className = "product-account";
   dialog.setAttribute("aria-labelledby", "product-account-title");
   dialog.innerHTML = `
     <h2 id="product-account-title">AdigunTokenCalculator account</h2>
-    <p>Use your own TokenCalculator account, or try the tools for four minutes.</p>
+    <p>${requireAccess ? "Use your own TokenCalculator account, or try the tools for four minutes." : "Sign in, create an account, or reset your password."}</p>
     <form>
       <div data-credentials>
         <label>Action <select name="mode">
@@ -104,18 +104,21 @@ export function mountProductAccount() {
     if (!dialog.open) dialog.showModal();
   }
 
-  function updateAccess(result) {
+  function updateAccess(result, { closeDialog = true } = {}) {
     clearTimeout(timer);
     signedIn = result.step === "signed-in";
     updateAccountIndicator();
     if (typeof result.trialAvailable === "boolean") trialAvailable = result.trialAvailable;
     const remaining = Number(result.remainingMs) || 0;
-    workspace.inert = !signedIn && remaining <= 0;
+    workspace.inert = requireAccess && !signedIn && remaining <= 0;
     if (workspace.inert) {
       showAccount();
       return;
     }
-    if (dialog.open) dialog.close();
+    if (dialog.open) {
+      if (closeDialog) dialog.close();
+      else showAccount();
+    }
     if (remaining > 0) {
       if (!signedIn) trialAvailable = false;
       timer = setTimeout(() => {
@@ -138,7 +141,7 @@ export function mountProductAccount() {
     }
   }
 
-  workspace.inert = true;
+  workspace.inert = requireAccess;
   mode.addEventListener("change", () => {
     password.autocomplete = mode.value === "sign-in" ? "current-password" : "new-password";
   });
@@ -160,7 +163,7 @@ export function mountProductAccount() {
   }));
   signout.addEventListener("click", () => run(signout, async () => {
     await accountRequest({ step: "sign-out" });
-    updateAccess(await accountRequest({ step: "guest" }));
+    updateAccess(requireAccess ? await accountRequest({ step: "guest" }) : { step: "signed-out" });
   }));
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -185,8 +188,10 @@ export function mountProductAccount() {
       }
     });
   });
-  void accountRequest({ step: "guest" }).then(updateAccess, () => {
+  void accountRequest({ step: "guest" }).then(result => {
+    updateAccess(result, { closeDialog: requireAccess });
+  }, () => {
     message.textContent = "Account service unavailable. Try again.";
-    showAccount();
+    if (requireAccess) showAccount();
   });
 }
