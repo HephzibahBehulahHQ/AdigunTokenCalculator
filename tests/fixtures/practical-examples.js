@@ -17,4 +17,13 @@ export const practicalExamples = [
   ["ev-charging-session", {usableBatteryKwh:60,batteryStartPct:20,batteryTargetPct:80,averageWallKw:8,chargingEfficiencyPct:90}, [36,40,5]],
   ["dough-hydration", {totalFlourG:500,totalWaterG:350,doughSaltG:10}, [70,2]],
   ["pcm-audio-size", {audioMinutes:10,samplesPerSecond:48000,bytesPerAudioSample:3,audioChannels:2}, [172.8,2.304]],
+  ["pump-energy", {pumpFlowLpm:600,pumpHeadM:10,pumpOverallEfficiencyPct:50,pumpHours:2}, [0.980665,1.96133,3.92266]],
+  ["conveyor-throughput", {beltMetresPerMinute:12,itemPitchCm:30,conveyorRunMinutes:2.5}, [40,100]],
+  ["inventory-reorder", {dailyUnitsSold:15,supplierLeadDays:4,reserveStockUnits:10,stockPositionUnits:55}, [60,70,15]],
+  ["llm-output-capacity", {instanceOutputTokensSec:200,averageOutputTokenCount:400,targetRequestsPerMinute:100,instanceUtilizationPct:80}, [24,5]],
+  ["scripture-reading-plan", {chaptersToRead:53,readingWeeks:4,readingDaysPerWeek:5}, [20,2,13]],
+  ["community-event-seating", {eventAttendees:90,seatsPerTable:8,seatingReservePct:10}, [99,13,5]],
+  ["community-match-funding", {eligibleDonations:1500,sponsorMatchPct:50,sponsorMatchLimit:600,communityProjectBudget:2500}, [600,2100,400]],
+  ["trade-fee-break-even", {tradeEntryUnitPrice:20,tradeAssetQuantity:10,tradeFeePct:0,fixedTradeFee:5}, [205,21,5]],
+  ["election-turnout", {registeredVoterCount:1000,ballotsCastCount:600,validBallotsCount:570}, [60,30,95]],
 ];
