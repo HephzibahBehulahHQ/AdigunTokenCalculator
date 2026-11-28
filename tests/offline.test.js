@@ -266,6 +266,7 @@ test("client updates preserve current work until the explicit reload button and 
 });
 
 const root=fileURLToPath(new URL("../",import.meta.url));
+const executablePath=process.env.PRODUCT_TEST_CHROMIUM||chromium.executablePath();
 const buildDirectory=path.join(root,"test-results/offline-preview");
 let built;
 const productionBuild=()=>built??=build({root,logLevel:"silent",build:{outDir:buildDirectory,emptyOutDir:true}});
@@ -284,7 +285,7 @@ test("production offline manifest covers the actual app, tokenizer worker, WASM,
   }
 });
 
-test("production first load prepares untouched tools; offline tokenization, strength, reload and privacy work",{skip:!existsSync(chromium.executablePath()),timeout:180000},async t=>{
+test("production first load prepares untouched tools; offline tokenization, strength, reload and privacy work",{skip:!existsSync(executablePath),timeout:180000},async t=>{
   await productionBuild();
   let failedAsset="";
   const server=await preview({root,logLevel:"silent",build:{outDir:buildDirectory},preview:{host:"127.0.0.1",port:4194,strictPort:true},
@@ -296,7 +297,7 @@ test("production first load prepares untouched tools; offline tokenization, stre
     }}]});
   let browser;
   try{
-    browser=await chromium.launch({headless:true});
+    browser=await chromium.launch({executablePath,headless:true});
     const context=await browser.newContext({locale:"en-US"}),page=await context.newPage(),errors=[];
     page.on("pageerror",error=>errors.push(error.message));
     const url="http://127.0.0.1:4194/";
@@ -346,6 +347,44 @@ test("production first load prepares untouched tools; offline tokenization, stre
       await retryPage.locator('[data-offline-action="retry"]').click();
       await retryPage.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:90000});
       await retryContext.close();
+    });
+    await t.test("a normal reload adopts the new release and tokenizes offline",async()=>{
+      const profile=mkdtempSync(path.join(root,"test-results/chrome-profile-"));
+      let updateContext;
+      try{
+        updateContext=await chromium.launchPersistentContext(profile,{executablePath,headless:true});
+        const updatePage=updateContext.pages()[0];
+        const revision=()=>updatePage.locator('meta[name="adigun-offline-build"]').getAttribute("content");
+        const ready=()=>updatePage.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:90000});
+        await updatePage.goto(url);
+        await ready();
+        const oldRevision=await revision();
+        await build({root,logLevel:"silent",build:{outDir:buildDirectory,emptyOutDir:true},plugins:[{
+          name:"offline-test-release-update",
+          transformIndexHtml:html=>html.replace("<title>","<title>Updated "),
+          transform(code,id){
+            if(id.endsWith("/src/main.js"))return code+"\ndocument.body.dataset.testRelease = 'updated';";
+          }
+        }]});
+        await updatePage.reload();
+        assert.match(await updatePage.title(),/^Updated /);
+        assert.notEqual(await revision(),oldRevision);
+        const newRevision=await revision();
+        await ready();
+        assert.equal(await updatePage.locator("body").getAttribute("data-test-release"),"updated");
+        await updateContext.setOffline(true);
+        await updatePage.reload();
+        await ready();
+        assert.equal(await revision(),newRevision);
+        assert.equal(await updatePage.locator("body").getAttribute("data-test-release"),"updated");
+        await updatePage.locator('textarea[name="text"]').fill("Hello world!");
+        await updatePage.locator('#panel button[type="submit"]').click();
+        await updatePage.locator(".segments").waitFor({timeout:30000});
+        assert.match(await updatePage.locator(".result").innerText(),/Tokens\s+3/);
+      }finally{
+        await updateContext?.close();
+        rmSync(profile,{recursive:true,force:true});
+      }
     });
   }finally{
     await browser?.close();await new Promise(resolve=>server.httpServer.close(resolve));
