@@ -827,6 +827,103 @@ export const practicalTools = {
       for(const index of ranking.slice(0,left))allocations[index]++;
       return allocations;
     }),
+
+  "loaded-voltage-divider": tool("Home & Construction",
+    "Loaded voltage divider|Belasteter Spannungsteiler|Olùpín foliteji pẹ̀lú ẹrù|Loaded voltage divider",
+    "Compare the divider output before and after you connect a resistive load across the lower resistor.|Teilerausgang ohne Last und mit einem Lastwiderstand parallel zum unteren Widerstand vergleichen.|Fi foliteji olùpín wé ṣáájú àti lẹ́yìn fífi ẹrù so mọ́ resístọ̀ ìsàlẹ̀.|Compare output before and after you put a resistive load across the bottom resistor.",
+    [
+      positive("dividerInputVoltage","DC input (V)|Gleichspannung am Eingang (V)|Foliteji ìwọlé DC (V)|DC input (V)"),
+      positive("upperDividerOhms","Upper resistor (Ω)|Oberer Widerstand (Ω)|Resístọ̀ òkè (Ω)|Upper resistor (Ω)"),
+      positive("lowerDividerOhms","Lower resistor (Ω)|Unterer Widerstand (Ω)|Resístọ̀ ìsàlẹ̀ (Ω)|Lower resistor (Ω)"),
+      positive("dividerLoadOhms","Load resistance (Ω)|Lastwiderstand (Ω)|Ìdènà ẹrù (Ω)|Load resistance (Ω)"),
+    ],[
+      "Unloaded output (V)|Unbelasteter Ausgang (V)|Foliteji láìsí ẹrù (V)|Unloaded output (V)",
+      "Loaded output (V)|Belasteter Ausgang (V)|Foliteji pẹ̀lú ẹrù (V)|Loaded output (V)",
+      "Load current (mA)|Laststrom (mA)|Ìṣàn ẹrù (mA)|Load current (mA)",
+    ],(input,upper,lower,load)=>{
+      const parallel=lower*load/(lower+load);
+      const loaded=input*parallel/(upper+parallel);
+      return [input*lower/(upper+lower),loaded,loaded/load*1000];
+    }),
+
+  "futures-tick-result": tool("Finance",
+    "Futures tick profit and loss|Gewinn und Verlust je Futures-Tick|Èrè àti òfo fún ìgbésẹ̀ futures|Futures tick profit and loss",
+    "Calculate the result of a long futures position from the price movement, contract tick size and value, and total fees. Use one currency.|Ergebnis einer Long-Futures-Position aus Kursbewegung, Tickgröße, Tickwert und Gebühren berechnen. Eine Währung verwenden.|Ṣírò èrè tàbí òfo futures rírà láti inú ìyípadà iye, ìgbésẹ̀ àti owó iṣẹ́. Lo owó kan náà.|Work out a long futures trade from price movement, tick size, tick value and all fees. Use one currency.",
+    [
+      positive("futuresEntryPrice","Entry price|Einstiegskurs|Iye ìwọlé|Entry price"),
+      positive("futuresExitPrice","Exit price|Ausstiegskurs|Iye ìjáde|Exit price"),
+      positive("contractTickSize","Contract minimum price increment|Kleinste Preisänderung je Kontrakt|Ìgbésẹ̀ iye tó kéré jù|Contract minimum price step"),
+      positive("contractTickValue","Money per tick per contract|Geldwert pro Tick und Kontrakt|Owó ìgbésẹ̀ kan fún àdéhùn kan|Money for each tick per contract"),
+      whole("numberOfFuturesContracts","Contracts held|Gehaltene Kontrakte|Iye àdéhùn tí a mú|Contracts held"),
+      number("futuresTotalFees","Total entry and exit fees|Gesamte Ein- und Ausstiegsgebühren|Gbogbo owó iṣẹ́ ìwọlé àti ìjáde|Total entry and exit fees"),
+    ],[
+      "Signed price movement (ticks)|Kursbewegung mit Vorzeichen (Ticks)|Ìyípadà iye pẹ̀lú àmì (ticks)|Signed price movement (ticks)",
+      "Trade result before fees|Handelsergebnis vor Gebühren|Àbájáde kí a tó yọ owó iṣẹ́|Trade result before fees",
+      "Trade result after fees|Handelsergebnis nach Gebühren|Àbájáde lẹ́yìn owó iṣẹ́|Trade result after fees",
+    ],(entry,exit,tick,value,contracts,fees)=>{
+      const movement=(exit-entry)/tick;
+      const ticks=Math.round(movement);
+      above(Math.abs(movement-ticks)<0.00001,"futuresExitPrice");
+      const gross=ticks*value*contracts;
+      return [ticks||0,gross||0,gross-fees];
+    }),
+
+  "classification-metrics": tool("Token & AI",
+    "Binary classification metrics|Metriken für binäre Klassifikation|Ìwọ̀n ìpín sí ẹ̀ka méjì|Binary classification metrics",
+    "Calculate precision, recall, specificity and F1 from your confusion matrix. A dash indicates a metric with no denominator.|Präzision, Sensitivität, Spezifität und F1 aus der Konfusionsmatrix berechnen. Ein Strich kennzeichnet eine undefinierte Metrik.|Ṣírò ìpéye, ìrántí, ìdánimọ̀ odi àti F1 láti inú àbájáde ẹ̀ka. Àmì gígùn túmọ̀ sí pé kò sí iye láti fi pín.|Work out precision, recall, specificity and F1 from the confusion matrix. A dash means the metric no get denominator.",
+    [
+      whole("truePositiveCount","True positives|Richtig Positive|Rere tó tọ́|True positives",0),
+      whole("falsePositiveCount","False positives|Falsch Positive|Rere tí kò tọ́|False positives",0),
+      whole("trueNegativeCount","True negatives|Richtig Negative|Odi tó tọ́|True negatives",0),
+      whole("falseNegativeCount","False negatives|Falsch Negative|Odi tí kò tọ́|False negatives",0),
+    ],[
+      "Precision (%)|Präzision (%)|Ìpéye (%)|Precision (%)",
+      "Recall (%)|Sensitivität (%)|Ìrántí (%)|Recall (%)",
+      "Specificity (%)|Spezifität (%)|Ìdánimọ̀ odi (%)|Specificity (%)",
+      "F1 score (%)|F1-Wert (%)|Ìwọ̀n F1 (%)|F1 score (%)",
+    ],(tp,fp,tn,fn)=>{
+      above(tp+fp+tn+fn>0,"truePositiveCount");
+      const ratio=(top,bottom)=>bottom?100*top/bottom:null;
+      return [ratio(tp,tp+fp),ratio(tp,tp+fn),ratio(tn,tn+fp),ratio(2*tp,2*tp+fp+fn)];
+    }),
+
+  "food-relief-parcels": tool("World & Culture",
+    "Food relief parcel capacity|Kapazität für Lebensmittelpakete|Iye àpò oúnjẹ ìrànlọ́wọ́|Food relief parcel capacity",
+    "Find how many households can receive one complete parcel with the available staple food and packed items.|Haushalte mit einem vollständigen Paket aus verfügbaren Grundnahrungsmitteln und Packartikeln ermitteln.|Rí iye ìdílé tí ó lè gba àpò oúnjẹ pípé pẹ̀lú oúnjẹ àti ohun tí ó wà.|Check how many households fit get one complete food parcel with the staple and packed items wey dey.",
+    [
+      whole("recipientHouseholds","Households to serve|Zu versorgende Haushalte|Ìdílé tí a fẹ́ ràn lọ́wọ́|Households to serve"),
+      positive("stapleKgPerParcel","Staple food per parcel (kg)|Grundnahrungsmittel je Paket (kg)|Oúnjẹ ìpìlẹ̀ nínú àpò kan (kg)|Staple food per parcel (kg)"),
+      number("stapleKgInStock","Staple food in stock (kg)|Vorrat an Grundnahrungsmitteln (kg)|Oúnjẹ ìpìlẹ̀ tí ó wà (kg)|Staple food available (kg)"),
+      whole("packedItemsPerParcel","Packed items per parcel|Packartikel je Paket|Ohun tí a dì nínú àpò kan|Packed items per parcel"),
+      whole("packedItemsAvailable","Packed items available|Verfügbare Packartikel|Ohun tí a dì tí ó wà|Packed items available",0),
+    ],[
+      "Complete parcels for households|Vollständige Pakete für Haushalte|Àpò pípé fún ìdílé|Complete parcels for households",
+      "Unserved households|Nicht versorgte Haushalte|Ìdílé tí kò tíì gba|Households wey never get parcel",
+      "Extra staple food needed (kg)|Zusätzlich benötigte Grundnahrungsmittel (kg)|Oúnjẹ àfikún tí a nílò (kg)|Extra staple food needed (kg)",
+      "Extra packed items needed|Zusätzlich benötigte Packartikel|Ohun àfikún tí a nílò|Extra packed items needed",
+    ],(households,kilos,stock,perParcel,items)=>{
+      const complete=Math.min(households,Math.floor(stock/kilos),Math.floor(items/perParcel));
+      return [complete,households-complete,Math.max(0,households*kilos-stock),Math.max(0,households*perParcel-items)];
+    }),
+
+  "civic-survey-interval": tool("World & Culture",
+    "Civic survey support interval|Intervall für Zustimmung in Umfragen|Àlàfo ìtìlẹ́yìn nínú ìwádìí|Civic survey support interval",
+    "Estimate a Wilson interval for a simple random sample. Enter 1.96 for an approximate 95% interval. Weighting and nonresponse are excluded.|Wilson-Intervall für eine einfache Zufallsstichprobe schätzen. Für etwa 95 % den Wert 1,96 eingeben. Gewichtung und Antwortausfall bleiben unberücksichtigt.|Ṣírò àlàfo Wilson fún àpẹẹrẹ tí a yàn laileto. Tẹ 1.96 fún àlàfo 95% ní ìsúnmọ́. A kò ka ìwọ̀n àfikún tàbí àìdáhùn.|Estimate a Wilson interval for a simple random sample. Enter 1.96 for about 95%. The model no include weighting or missing replies.",
+    [
+      whole("civicSurveyRespondents","Number of respondents|Anzahl Befragte|Iye olùdáhùn|Number of respondents"),
+      whole("civicSurveySupporters","Respondents in support|Befragte mit Zustimmung|Olùdáhùn tó ṣe àtìlẹ́yìn|Respondents in support",0),
+      number("surveyNormalCritical","Confidence multiplier (z)|Kritischer Normalwert (z)|Olùsọdipúpọ̀ ìgbẹ́kẹ̀lé (z)|Confidence multiplier (z)",0.01,10),
+    ],[
+      "Observed support (%)|Beobachtete Zustimmung (%)|Ìtìlẹ́yìn tí a rí (%)|Observed support (%)",
+      "Lower estimate (%)|Untere Intervallgrenze (%)|Ààlà ìsàlẹ̀ (%)|Lower estimate (%)",
+      "Upper estimate (%)|Obere Intervallgrenze (%)|Ààlà òkè (%)|Upper estimate (%)",
+    ],(total,support,z)=>{
+      above(support<=total,"civicSurveySupporters");
+      const p=support/total, z2=z*z, scale=1+z2/total;
+      const midpoint=(p+z2/(2*total))/scale;
+      const half=z*Math.sqrt((p*(1-p)+z2/(4*total))/total)/scale;
+      return [p*100,Math.max(0,midpoint-half)*100,Math.min(1,midpoint+half)*100];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
