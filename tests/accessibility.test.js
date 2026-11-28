@@ -28,7 +28,7 @@ test("accessible navigation, memory, reflow and offline privacy",{skip:!browserA
     await page.goto(origin);
     await page.locator(".tool-card").first().waitFor();
     const toolKeys=await page.locator(".tool-card").evaluateAll(cards=>cards.map(card=>card.dataset.toolKey));
-    assert.equal(toolKeys.length,66);
+    assert.equal(toolKeys.length,71);
     const openTool=async key=>{
       await page.evaluate(key=>{location.hash="#/"+key;},key);
       await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,key);
