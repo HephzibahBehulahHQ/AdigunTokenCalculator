@@ -93,7 +93,7 @@ export const faithExpansion = {
       field("potluckMealReserve", "Serving reserve (%)|Portionsreserve (%)|Ìpín oúnjẹ àfikún (%)|Serving reserve (%)", 0, 100, false),
     ],
     outputs: ["Regular servings|Standardportionen|Ìpín oúnjẹ deede|Regular servings","Dietary servings|Sonderkostportionen|Ìpín oúnjẹ àkànṣe|Special servings"],
-    calculate: (n,s,p)=>{requireField(s<=n,'potluckSpecialMeals');return [Math.ceil((n-s)*(1+p/100)),Math.ceil(s*(1+p/100))];},
+    calculate: (n,s,p)=>{requireField(s<=n,'potluckSpecialMeals');return [n-s+Math.ceil((n-s)*p/100),s+Math.ceil(s*p/100)];},
   },
 
   "food-pantry-shelf-coverage": {

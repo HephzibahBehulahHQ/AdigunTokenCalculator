@@ -255,7 +255,7 @@ export const tradingExpansion = {
       field("putCoveredUnits", "Total underlying units|Basiseinheiten insgesamt|Gbogbo ẹyọ àdéhùn|Total underlying units", 1, 1000000000000, true),
       field("putTradeFees", "Total fees|Gesamtgebühren|Gbogbo owó iṣẹ́|Total fees", 0, 1000000000000, false),
     ],
-    outputs: ["Gross assignment value owed|Bruttoverpflichtung bei Zuteilung|Àpapọ̀ ìnáwó ìmúṣẹ|Gross assignment loss","Net result at expiry|Nettoergebnis am Verfall|Àbájáde gidi ní ìparí|Net result at expiry"],
+    outputs: ["Gross intrinsic loss|Innerer Verlust vor Prämie|Òfo ìmúṣẹ ṣáájú owó àṣàyàn|Gross loss before premium","Net result at expiry|Nettoergebnis am Verfall|Àbájáde gidi ní ìparí|Net result at expiry"],
     calculate: (k,s,p,q,f)=>{const loss=Math.max(0,k-s)*q;return [loss,p*q-loss-f];},
   },
 
