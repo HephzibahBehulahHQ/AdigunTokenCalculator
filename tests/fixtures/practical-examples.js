@@ -36,4 +36,9 @@ export const practicalExamples = [
   ["ai-model-weight-memory", {modelParametersBillions:8,modelBitsPerParameter:4,modelRuntimeAllowanceGib:2}, [4,3.725290298461914,5.725290298461914]],
   ["outreach-print-order", {outreachRecipients:120,extraHandoutPct:10,handoutsPerPack:50,outreachPackPrice:12}, [132,3,36]],
   ["public-comment-slots", {meetingDurationMinutes:90,scheduledBusinessMinutes:53,speakerMinutesEach:3,speakerChangeMinutes:0.5}, [37,10,2]],
+  ["transformer-turns", {transformerPrimaryVolts:120,transformerPrimaryTurns:600,transformerSecondaryTurns:60,transformerSecondaryAmps:2}, [12,0.2,24]],
+  ["trade-payoff", {payoffEntryPrice:20,favorableExitPrice:27,adverseExitPrice:18,payoffTradeQuantity:10,payoffRoundTripCost:10}, [60,30,100/3]],
+  ["ai-annotation-capacity", {recordsToAnnotate:600,annotationMinutesPerRecord:2,reviewSamplePct:10,reviewMinutesPerRecord:1.5,productiveTeamHoursDay:5}, [20,1.5,4.3]],
+  ["service-livestream-data", {serviceStreamMinutes:60,churchVideoMbps:4,churchAudioKbps:128,streamOverheadPct:0,directUploadFeeds:2}, [8.256,3.7152]],
+  ["meeting-quorum", {membersEligibleForQuorum:21,requiredQuorumPct:60,membersPresentForQuorum:12}, [13,1200/21,1]],
 ];
