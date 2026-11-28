@@ -15,6 +15,10 @@ function offlineWorkerRuntime(config){
   const manifest=new Map(config.assets.map(asset=>[new URL(asset.path,scope).href,asset.sha256]));
   const indexURL=new URL("index.html",scope).href;
   let preparing;
+  // A navigation cannot use a followed redirect response, including one read from Cache Storage.
+  const navigationResponse=response=>response.redirected?new Response(response.body,{
+    status:response.status,statusText:response.statusText,headers:response.headers
+  }):response;
   const ownedNames=async()=>(await caches.keys()).filter(name=>name.startsWith(prefix));
   const valid=async(response,expected)=>{
     if(!response?.ok||response.type==="opaque")return false;
@@ -72,12 +76,12 @@ function offlineWorkerRuntime(config){
         // Keep queries out of the network request and preserve the verified offline copy.
         try{
           const response=await fetch(new Request(indexURL,{mode:"same-origin",cache:"no-store",credentials:"omit",redirect:"follow"}));
-          if(response.ok&&new URL(response.url).origin===scope.origin&&/^text\/html\b/i.test(response.headers.get("content-type")||""))return response;
+          if(response.ok&&new URL(response.url).origin===scope.origin&&/^text\/html\b/i.test(response.headers.get("content-type")||""))return navigationResponse(response);
         }catch{
           // Offline or the request failed.
         }
         const cached=await (await caches.open(cacheName)).match(indexURL);
-        return cached||Response.error();
+        return cached?navigationResponse(cached):Response.error();
       })());
       return;
     }
