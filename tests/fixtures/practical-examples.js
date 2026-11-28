@@ -41,4 +41,9 @@ export const practicalExamples = [
   ["ai-annotation-capacity", {recordsToAnnotate:600,annotationMinutesPerRecord:2,reviewSamplePct:10,reviewMinutesPerRecord:1.5,productiveTeamHoursDay:5}, [20,1.5,4.3]],
   ["service-livestream-data", {serviceStreamMinutes:60,churchVideoMbps:4,churchAudioKbps:128,streamOverheadPct:0,directUploadFeeds:2}, [8.256,3.7152]],
   ["meeting-quorum", {membersEligibleForQuorum:21,requiredQuorumPct:60,membersPresentForQuorum:12}, [13,1200/21,1]],
+  ["shaft-torque", {mechanicalShaftKw:1,shaftRevolutionsMinute:60}, [2*Math.PI,500/Math.PI]],
+  ["fx-round-trip", {fxBaseUnits:100,fxBidQuote:1.2,fxAskQuote:1.25,fxCommissionPct:2}, [127.5,117.6,9.9,20000/49]],
+  ["llm-batch-token-cost", {batchRequestCount:100,meanInputTokens:2000,meanOutputTokens:500,inputCostPerMillion:1,outputCostPerMillion:4}, [0.2,0.2,0.4]],
+  ["worship-song-range", {melodyLowestMidi:60,melodyHighestMidi:72,comfortableLowestMidi:55,comfortableHighestMidi:69}, [12,-5,-3]],
+  ["council-seat-projection", {seatsToAllocate:10,firstListVotes:53,secondListVotes:32,thirdListVotes:15}, [5,3,2]],
 ];
