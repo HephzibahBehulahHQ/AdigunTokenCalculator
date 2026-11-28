@@ -70,7 +70,7 @@ test("load UI: production-preview device editing, live calculations, four locale
     page.on("pageerror",error=>errors.push(error.message));
     page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});
     await page.goto("http://127.0.0.1:4175/");
-    assert.equal(await page.locator(".tool-card").count(),121);
+    assert.equal(await page.locator(".tool-card").count(),141);
     await page.locator('#search').fill("Electrical");assert.equal(await page.locator('.tool-card').count(),1);
     await page.locator('[data-tool-key="electrical-load"]').click();
     const ui=page.locator(".load-calculator"),field=name=>ui.locator(`[name="${name}"]`);

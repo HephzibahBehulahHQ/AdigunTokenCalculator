@@ -73,7 +73,7 @@ test("completion controls, explanations, exact totals and responsive workflows w
 
   await t.test("reduced motion disables card transitions without hiding the directory",async()=>{
    await page.emulateMedia({reducedMotion:"reduce"});await open("");
-   assert.equal(await page.locator(".tool-card").count(),121);assert.equal(await page.locator(".tool-card").first().evaluate(node=>getComputedStyle(node).transitionDuration),"0s");await noOverflow();
+   assert.equal(await page.locator(".tool-card").count(),141);assert.equal(await page.locator(".tool-card").first().evaluate(node=>getComputedStyle(node).transitionDuration),"0s");await noOverflow();
   });
 
   await t.test("large token results paginate while full copy preserves every token and code point",async()=>{
