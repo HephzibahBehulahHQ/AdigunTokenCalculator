@@ -1,3 +1,4 @@
+import {aiExpansion} from "./aiExpansion.js";
 import {tradingExpansion} from "./tradingExpansion.js";
 import {electronicsExpansion} from "./electronicsExpansion.js";
 import {I} from "./i18n.js";
@@ -1107,6 +1108,7 @@ export const practicalTools = {
     }),
   ...electronicsExpansion,
   ...tradingExpansion,
+  ...aiExpansion,
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
