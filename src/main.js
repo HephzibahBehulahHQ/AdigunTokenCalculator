@@ -128,7 +128,7 @@ function errorResult(err,context={}){
 function addCopyButton(container,text,labelText){const b=el("button","secondary",labelText);b.type="button";b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(typeof text==="function"?text():text);b.textContent=tr().copied||"Copied";}catch{b.textContent=tr().copyFailed||"Copy unavailable";}});container.append(b);}
 function foregroundColor(d){if(d.colorMode==="hex")return normalizeHexColor(d.foreground);if(d.colorMode==="rgb")return rgbToHex(d.red,d.green,d.blue);if(d.colorMode==="hsl")return hslToHex(d.hue,d.saturation,d.lightness);throw Error("number");}
 async function execute(k,d,isCurrent){
- if(practicalTools[k]){result(calculatePracticalTool(k,d,lang).map(([name,value])=>[name,fmt(value,3,true)]));return;}
+ if(practicalTools[k]){result(calculatePracticalTool(k,d,lang).map(([name,value])=>[name,value===null?"—":fmt(value,3,true)]));return;}
  const T=tr(),N=T.notices,C=COMPLETION_COPY[lang];let rows=[],note="";
  switch(k){
  case"token":{

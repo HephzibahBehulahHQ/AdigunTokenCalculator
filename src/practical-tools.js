@@ -304,6 +304,160 @@ export const practicalTools = {
       const bytesPerSecond=rate*bytes*channels;
       return [bytesPerSecond*minutes*60/1e6,bytesPerSecond*8/1e6];
     }),
+
+  "pump-energy": tool("Business & Work",
+    "Water pump power and energy|Pumpenleistung und Energie|Agbára fifa omi|Water pump power and energy",
+    "Estimate hydraulic power, input power and energy for fresh water at a steady flow and head.|Hydraulische Leistung, Eingangsleistung und Energie für Frischwasser bei konstantem Durchfluss und Förderhöhe schätzen.|Ṣírò agbára omi, agbára tí fifa ń gba àti iná tí ó lò fún omi tútù ní ìṣàn tó dúró.|Estimate water power, input power and energy when fresh water dey flow steady.",
+    [
+      positive("pumpFlowLpm","Water flow (L/min)|Wasserdurchfluss (L/min)|Ìṣàn omi (L/ìṣẹ́jú)|Water flow (L/min)"),
+      positive("pumpHeadM","Total head (m)|Gesamtförderhöhe (m)|Gíga fífa omi lápapọ̀ (m)|Total head (m)"),
+      percent("pumpOverallEfficiencyPct","Overall efficiency (%)|Gesamtwirkungsgrad (%)|Ìmúlò agbára lápapọ̀ (%)|Overall efficiency (%)",0.01),
+      number("pumpHours","Running time (h)|Laufzeit (h)|Àkókò iṣẹ́ (wákàtí)|Running time (h)"),
+    ],[
+      "Hydraulic power (kW)|Hydraulische Leistung (kW)|Agbára omi (kW)|Water power (kW)",
+      "Input power (kW)|Eingangsleistung (kW)|Agbára tí fifa ń gba (kW)|Input power (kW)",
+      "Input energy (kWh)|Energiebedarf (kWh)|Iná tí fifa lò (kWh)|Input energy (kWh)",
+    ],(flow,head,efficiency,hours)=>{
+      const hydraulic=flow*9.80665*head/60000;
+      const input=hydraulic*100/efficiency;
+      return [hydraulic,input,input*hours];
+    }),
+
+  "conveyor-throughput": tool("Business & Work",
+    "Conveyor throughput|Förderbanddurchsatz|Iye ẹrù lórí bẹ́líìtì|Conveyor throughput",
+    "Estimate steady single-lane output using belt speed, centre-to-centre item spacing and working time.|Konstante einspurige Leistung aus Bandgeschwindigkeit, Mittenabstand und Betriebsdauer schätzen.|Ṣírò iye ẹrù ní ojú ọ̀nà kan pẹ̀lú ìyára bẹ́líìtì, àlàfo àárín ẹrù àti àkókò iṣẹ́.|Estimate how many items pass for one lane from belt speed, item spacing and working time.",
+    [
+      positive("beltMetresPerMinute","Belt speed (m/min)|Bandgeschwindigkeit (m/min)|Ìyára bẹ́líìtì (m/ìṣẹ́jú)|Belt speed (m/min)"),
+      positive("itemPitchCm","Centre-to-centre spacing (cm)|Mittenabstand (cm)|Àlàfo láàárín àárín ẹrù (cm)|Space from centre to centre (cm)"),
+      number("conveyorRunMinutes","Working time (min)|Betriebsdauer (min)|Àkókò iṣẹ́ (ìṣẹ́jú)|Working time (min)"),
+    ],[
+      "Items per minute|Stück pro Minute|Ẹrù ní ìṣẹ́jú kan|Items per minute",
+      "Estimated complete items|Geschätzte ganze Stück|Iye ẹrù odidi tí a fojú díwọ̀n|Estimated complete items",
+    ],(speed,pitch,minutes)=>{
+      const rate=speed*100/pitch;
+      return [rate,Math.floor(rate*minutes)];
+    }),
+
+  "inventory-reorder": tool("Business & Work",
+    "Stock reorder point|Bestellpunkt für Lagerbestand|Iye ọjà fún àṣẹ tuntun|Stock reorder point",
+    "Combine expected daily demand, supplier lead time and reserve stock to find when to reorder.|Tagesbedarf, Lieferzeit und Sicherheitsbestand zum Bestellpunkt kombinieren.|Lo iye tí a ń tà lójoojúmọ́, àkókò ìfijiṣẹ́ àti ọjà àfikún láti mọ ìgbà àṣẹ tuntun.|Use daily demand, supplier delivery time and reserve stock to know when to order again.",
+    [
+      number("dailyUnitsSold","Expected demand (units/day)|Erwarteter Bedarf (Stück/Tag)|Iye ọjà lójoojúmọ́|Expected demand (units/day)"),
+      number("supplierLeadDays","Supplier lead time (days)|Lieferzeit (Tage)|Àkókò ìfijiṣẹ́ (ọjọ́)|Supplier lead time (days)"),
+      whole("reserveStockUnits","Reserve stock (units)|Sicherheitsbestand (Stück)|Ọjà àfikún (ẹyọ)|Reserve stock (units)",0),
+      whole("stockPositionUnits","Stock on hand plus open orders (units)|Lagerbestand plus offene Bestellungen (Stück)|Ọjà lọ́wọ́ pẹ̀lú àṣẹ tó ṣì ń bọ̀ (ẹyọ)|Stock wey dey plus orders wey never land (units)",0),
+    ],[
+      "Expected demand during lead time|Erwarteter Bedarf während der Lieferzeit|Iye tí a ń retí ní àkókò ìfijiṣẹ́|Expected demand before delivery",
+      "Reorder at this stock position|Bestellpunkt|Iye ọjà fún àṣẹ tuntun|Stock level for new order",
+      "Units below reorder point|Fehlmenge bis zum Bestellpunkt|Ẹyọ tí ó kù sí ibi àṣẹ|Units below reorder point",
+    ],(demand,lead,reserve,position)=>{
+      const expected=demand*lead;
+      const point=roundUp(expected+reserve);
+      return [expected,point,Math.max(0,point-position)];
+    }),
+
+  "llm-output-capacity": tool("Token & AI",
+    "LLM output capacity|LLM-Ausgabekapazität|Agbára ìjáde LLM|LLM output capacity",
+    "Size identical inference instances for a target request rate using measured output throughput and average output length.|Anzahl gleicher Inferenzinstanzen aus gemessener Ausgaberate, durchschnittlicher Ausgabelänge und gewünschter Anfragerate berechnen.|Ṣírò iye ẹ̀rọ LLM láti inú ìyára ìjáde tí a wọn, gígùn ìjáde àárín àti iye ìbéèrè.|Work out how many identical LLM instances you need from measured token speed, average output length and request rate.",
+    [
+      positive("instanceOutputTokensSec","Measured output per instance (tokens/s)|Gemessene Ausgabe pro Instanz (Token/s)|Ìjáde ẹ̀rọ kan tí a wọn (tọ́kẹ́nì/s)|Measured output per instance (tokens/s)"),
+      positive("averageOutputTokenCount","Average output per request (tokens)|Mittlere Ausgabelänge je Anfrage (Token)|Ìjáde àárín fún ìbéèrè kan (tọ́kẹ́nì)|Average output per request (tokens)"),
+      number("targetRequestsPerMinute","Target requests per minute|Gewünschte Anfragen pro Minute|Ìbéèrè àfojúsùn ní ìṣẹ́jú kan|Target requests per minute"),
+      percent("instanceUtilizationPct","Planned utilization (%)|Geplante Auslastung (%)|Ìpín agbára tí a fẹ́ lò (%)|Planned usage (%)",0.01),
+    ],[
+      "Planned rate per instance (requests/min)|Geplante Rate je Instanz (Anfragen/min)|Ìbéèrè fún ẹ̀rọ kan (ìbéèrè/ìṣẹ́jú)|Planned rate per instance (requests/min)",
+      "Whole instances required|Benötigte Instanzen|Iye ẹ̀rọ odidi tí a nílò|Full instances wey you need",
+    ],(tokens,perRequest,target,utilization)=>{
+      const rate=tokens*60/perRequest*utilization/100;
+      return [rate,roundUp(target/rate)];
+    }),
+
+  "scripture-reading-plan": tool("World & Culture",
+    "Scripture reading schedule|Bibel-Leseplan|Ètò kíkà Ìwé Mímọ́|Scripture reading plan",
+    "Spread a chosen number of chapters over active reading days. Allocate at most one extra chapter to the busier days.|Eine gewählte Kapitelzahl auf Lesetage verteilen. An stärker belegten Tagen kommt höchstens ein Kapitel hinzu.|Pín iye orí tí o yàn sí àwọn ọjọ́ kíkà. Fi orí kan ṣoṣo kún ọjọ́ tí ó pọ̀ jù.|Share the chapters across reading days. The busier days get only one extra chapter.",
+    [
+      whole("chaptersToRead","Chapters to read|Zu lesende Kapitel|Orí láti kà|Chapters to read"),
+      whole("readingWeeks","Plan length (weeks)|Planlänge (Wochen)|Gígùn ètò (ọ̀sẹ̀)|Plan length (weeks)"),
+      {...whole("readingDaysPerWeek","Reading days per week|Lesetage pro Woche|Ọjọ́ kíkà ní ọ̀sẹ̀ kan|Reading days each week"),max:7},
+    ],[
+      "Active reading days|Aktive Lesetage|Ọjọ́ kíkà|Active reading days",
+      "Base chapters per day|Grundzahl der Kapitel pro Tag|Iye orí ìpìlẹ̀ ní ọjọ́ kan|Base chapters per day",
+      "Days with one extra chapter|Tage mit einem zusätzlichen Kapitel|Ọjọ́ pẹ̀lú orí àfikún kan|Days with one extra chapter",
+    ],(chapters,weeks,days)=>{
+      const active=weeks*days;
+      return [active,Math.floor(chapters/active),chapters%active];
+    }),
+
+  "community-event-seating": tool("Business & Work",
+    "Community event seating|Sitzplanung für Veranstaltungen|Ètò ìjókòó fún àpéjọ|Community event seating",
+    "Plan table quantities for attendees and a seating reserve using the actual seats per table.|Tischzahl für Teilnehmende und Sitzreserve anhand der Plätze je Tisch berechnen.|Ṣírò iye tábìlì fún àwọn tó ń bọ̀ àti àfikún, gẹ́gẹ́ bí iye àga tábìlì kan.|Work out tables for attendees and spare seats using the real number wey each table fit hold.",
+    [
+      whole("eventAttendees","Expected attendees|Erwartete Teilnehmende|Iye ènìyàn tí a ń retí|Expected attendees"),
+      whole("seatsPerTable","Seats per table|Sitzplätze je Tisch|Àga fún tábìlì kan|Seats per table"),
+      percent("seatingReservePct","Extra seating (%)|Sitzreserve (%)|Ìjókòó àfikún (%)|Extra seating (%)"),
+    ],[
+      "Seats to plan for|Einzuplanende Sitzplätze|Àga tí a nílò|Seats to plan for",
+      "Whole tables|Ganze Tische|Tábìlì odidi|Full tables",
+      "Spare seats after reserving|Weitere freie Plätze|Àga tó ṣì kù|Spare seats after reserve",
+    ],(guests,capacity,reserve)=>{
+      const seats=guests+roundUp(guests*reserve/100);
+      const tables=roundUp(seats/capacity);
+      return [seats,tables,tables*capacity-seats];
+    }),
+
+  "community-match-funding": tool("Business & Work",
+    "Community project match funding|Kofinanzierung für Gemeinschaftsprojekte|Owó àfikún fún iṣẹ́ àwùjọ|Community project match funding",
+    "Apply a matching rate and sponsor cap to eligible donations, then compare funds with the project budget. Use one currency.|Förderquote und Höchstbetrag auf förderfähige Spenden anwenden und mit dem Projektbudget vergleichen. Eine Währung verwenden.|Lo ìpín owó àfikún àti ààlà olùrànlọ́wọ́ sí ẹ̀bùn tó yẹ, kí o sì fi wé ètò ináwó. Lo owó kan náà.|Use match rate and sponsor limit for donations wey qualify, then compare total with project budget. Use one currency.",
+    [
+      number("eligibleDonations","Eligible donations|Förderfähige Spenden|Ẹ̀bùn tó yẹ|Donations wey qualify"),
+      number("sponsorMatchPct","Sponsor match rate (%)|Förderquote (%)|Ìpín owó àfikún (%)|Sponsor match rate (%)",0,1000),
+      number("sponsorMatchLimit","Sponsor matching cap|Förderhöchstbetrag|Ààlà owó olùrànlọ́wọ́|Sponsor matching cap"),
+      positive("communityProjectBudget","Project budget|Projektbudget|Ètò ináwó iṣẹ́|Project budget"),
+    ],[
+      "Sponsor contribution|Förderbeitrag|Owó olùrànlọ́wọ́|Sponsor contribution",
+      "Combined funds|Gesamtmittel|Gbogbo owó tó wà|Combined funds",
+      "Budget still unfunded|Noch nicht finanziertes Budget|Owó tí kò tíì pé|Money still needed",
+    ],(donations,rate,cap,budget)=>{
+      const match=Math.min(cap,donations*rate/100);
+      const total=donations+match;
+      return [match,total,Math.max(0,budget-total)];
+    }),
+
+  "trade-fee-break-even": tool("Finance",
+    "Trade fee break-even price|Gewinnschwelle nach Handelsgebühren|Iye tí ó bo owó ìdúnàádúrà|Trade fee break-even price",
+    "Find the exit price that covers your entry cost and fees on both orders. Use the same fee schedule and currency for each side.|Ausstiegspreis berechnen, der Einstiegskosten und Gebühren für beide Aufträge deckt. Auf beiden Seiten dasselbe Gebührenmodell und dieselbe Währung verwenden.|Rí iye títà tí ó bo iye rírà àti owó ìdúnàádúrà méjèèjì. Lo ìlànà owó àti owó orílẹ̀-èdè kan náà.|Find the sell price wey cover your buy cost and fees for both orders. Use the same fee rate and currency for both sides.",
+    [
+      positive("tradeEntryUnitPrice","Entry price per unit|Einstiegskurs je Einheit|Iye rírà fún ẹyọ kan|Buy price per unit"),
+      positive("tradeAssetQuantity","Quantity traded|Gehandelte Menge|Iye ohun tí a rà|Quantity traded"),
+      number("tradeFeePct","Fee per order (%)|Gebühr je Auftrag (%)|Owó ìdúnàádúrà kọ̀ọ̀kan (%)|Fee per order (%)",0,99.99),
+      number("fixedTradeFee","Fixed fee per order|Fixgebühr je Auftrag|Owó dúró fún ìdúnàádúrà kan|Fixed fee per order"),
+    ],[
+      "Total entry cost|Gesamte Einstiegskosten|Gbogbo owó rírà|Total buy cost",
+      "Break-even exit price per unit|Ausstiegskurs an der Gewinnschwelle|Iye títà ẹyọ kan láti bo ináwó|Break-even sell price per unit",
+      "Increase needed from entry (%)|Nötiger Kursanstieg (%)|Ìfikún tí a nílò láti iye rírà (%)|Increase wey price need (%)",
+    ],(entry,quantity,fee,fixed)=>{
+      const rate=fee/100;
+      const entryCost=entry*quantity*(1+rate)+fixed;
+      const exit=(entryCost+fixed)/(quantity*(1-rate));
+      return [entryCost,exit,Math.max(0,(exit/entry-1)*100)];
+    }),
+
+  "election-turnout": tool("World & Culture",
+    "Election turnout and ballot rates|Wahlbeteiligung und Stimmzettelquoten|Ìkópa ìdìbò àti ìpín ìwé ìbò|Election turnout and ballot rates",
+    "Calculate turnout from registered voters and ballot validity from ballots cast. Use counts from the same election and area.|Wahlbeteiligung aus Wahlberechtigten und Gültigkeitsquote aus abgegebenen Stimmzetteln berechnen. Zahlen derselben Wahl und Region verwenden.|Ṣírò ìkópa láti inú iye olùdìbò tí a forúkọ sílẹ̀, àti ìwúlò ìwé ìbò láti inú gbogbo ìwé tí a dì. Lo ìdìbò àti agbègbè kan náà.|Work out turnout from registered voters and ballot validity from all ballots cast. Use figures from the same election and area.",
+    [
+      whole("registeredVoterCount","Registered voters|Registrierte Wahlberechtigte|Olùdìbò tí a forúkọ sílẹ̀|Registered voters"),
+      whole("ballotsCastCount","Ballots cast|Abgegebene Stimmzettel|Iye ìwé ìbò tí a dì|Ballots cast",0),
+      whole("validBallotsCount","Valid ballots|Gültige Stimmzettel|Ìwé ìbò tó wúlò|Valid ballots",0),
+    ],[
+      "Registered voter turnout (%)|Wahlbeteiligung (%)|Ìpín olùdìbò tó dìbò (%)|Registered voter turnout (%)",
+      "Ballots not counted as valid|Nicht als gültig gezählte Stimmzettel|Ìwé ìbò tí a kò kà sí èyí tó wúlò|Ballots wey no count as valid",
+      "Valid ballot share (%)|Anteil gültiger Stimmzettel (%)|Ìpín ìwé ìbò tó wúlò (%)|Valid ballot share (%)",
+    ],(registered,cast,valid)=>{
+      above(cast<=registered,"ballotsCastCount");
+      above(valid<=cast,"validBallotsCount");
+      return [cast/registered*100,cast-valid,cast?valid/cast*100:null];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
@@ -345,6 +499,6 @@ export function calculatePracticalTool(key, data, locale = "en") {
     return value;
   });
   const values = definition.calculate(...inputs);
-  above(values.every(value => Number.isFinite(value) && value >= 0 && value <= Number.MAX_SAFE_INTEGER), definition.fields[0].key);
+  above(values.every(value => value === null || (Number.isFinite(value) && value >= 0 && value <= Number.MAX_SAFE_INTEGER)), definition.fields[0].key);
   return values.map((value, index) => [localize(definition.outputs[index], locale), value]);
 }

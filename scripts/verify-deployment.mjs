@@ -123,13 +123,16 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,57);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(keys.length,66);assert.equal(new Set(keys).size,keys.length);
   assert.equal(await page.locator(".category-chip").count(),15);
   await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
   const expectedGroups={
     "Home & Construction":["paint-coverage","concrete-slab","tile-order","fence-posts","ramp-geometry"],
     "Garden & Water":["rainwater-harvest","drip-irrigation","plant-spacing"],
-    "Business & Work":["product-break-even","shift-staffing"],
+    "Business & Work":["product-break-even","shift-staffing","pump-energy","conveyor-throughput","inventory-reorder","community-event-seating","community-match-funding"],
+    "Token & AI":["llm-output-capacity"],
+    "World & Culture":["scripture-reading-plan","election-turnout"],
+    Finance:["trade-fee-break-even"],
     "Education & Sport":["final-grade-target","running-pace","cycling-gear-speed"],
     "Conversion":["print-resolution","ev-charging-session","dough-hydration"],
     Developer:["download-time","pcm-audio-size"],
