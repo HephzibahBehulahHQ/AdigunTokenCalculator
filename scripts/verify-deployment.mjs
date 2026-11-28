@@ -228,7 +228,12 @@ async function verifyBrowser(){
   assert.equal(await page.evaluate(()=>window.__deploymentGeoCalls),0,"Location must not be requested automatically");
   assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});
   assert.deepEqual(errors,[],"Browser runtime errors");assert.deepEqual(external,[],"Unexpected external requests or writes");assert.deepEqual(failed,[],"Failed deployed assets");
-  console.log("PASS browser: four-locale navigation/calculation, mobile reflow, keyboard navigation, offline preparation, and privacy/network checks");
+  await context.setOffline(true);
+  await page.reload();
+  await page.locator('.offline-status[data-offline-state="ready"]').waitFor({timeout:30_000});
+  await fill({text:"Hello world!",encoding:"o200k_base"});
+  assert.ok((await calculate()).includes("3"),"Offline tokenization must survive a normal reload");
+  console.log("PASS browser: four-locale navigation/calculation, mobile reflow, keyboard navigation, offline reload/tokenization, and privacy/network checks");
   await context.close();
 }
 

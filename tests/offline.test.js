@@ -291,6 +291,10 @@ test("production first load prepares untouched tools; offline tokenization, stre
   const server=await preview({root,logLevel:"silent",build:{outDir:buildDirectory},preview:{host:"127.0.0.1",port:4194,strictPort:true},
     plugins:[{name:"offline-test-asset-failure",configurePreviewServer(server){
       server.middlewares.use((request,response,next)=>{
+        // Cloudflare static assets canonicalize /index.html to the directory URL.
+        if(request.url==="/index.html"){
+          response.writeHead(308,{Location:"/"});response.end();return;
+        }
         if(failedAsset&&request.url?.split("?")[0].endsWith(failedAsset)){response.statusCode=503;response.end("Test asset temporarily unavailable");return;}
         next();
       });
