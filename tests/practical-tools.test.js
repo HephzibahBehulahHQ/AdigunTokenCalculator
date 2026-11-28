@@ -52,4 +52,8 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.deepEqual(run(33,{currentAccountValue:0}), [1000,100,null]);
   assert.throws(() => run(34,{modelBitsPerParameter:65}), {field:"modelBitsPerParameter"});
   assert.deepEqual(run(36,{scheduledBusinessMinutes:90}), [0,0,0]);
+  assert.deepEqual(run(37,{transformerSecondaryAmps:0}), [12,0,0]);
+  assert.throws(() => run(38,{favorableExitPrice:21}), {field:"favorableExitPrice"});
+  assert.deepEqual(run(39,{reviewSamplePct:0}), [20,0,4]);
+  assert.throws(() => run(41,{membersPresentForQuorum:22}), {field:"membersPresentForQuorum"});
 });

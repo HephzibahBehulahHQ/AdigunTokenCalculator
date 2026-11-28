@@ -640,6 +640,97 @@ export const practicalTools = {
       const slots=Math.floor(available/block+Number.EPSILON*available/block);
       return [available,slots,Math.max(0,available-slots*block)];
     }),
+
+  "transformer-turns": tool("Home & Construction",
+    "Ideal transformer turns ratio|Ideales Transformator-Übersetzungsverhältnis|Ìpín yípo ẹ̀rọ amúná|Ideal transformer turns ratio",
+    "Calculate ideal secondary voltage and reflected primary current from winding turns and secondary load current.|Ideale Sekundärspannung und reflektierten Primärstrom aus Windungszahlen und Sekundärstrom berechnen.|Ṣírò foliteji ẹ̀ka kejì àti ìṣàn ẹ̀ka àkọ́kọ́ láti inú iye yípo àti ìṣàn ẹrù.|Work out ideal secondary voltage and primary current from winding turns and the current for the secondary load.",
+    [
+      positive("transformerPrimaryVolts","Primary voltage (V RMS)|Primärspannung (V effektiv)|Foliteji àkọ́kọ́ (V RMS)|Primary voltage (V RMS)"),
+      whole("transformerPrimaryTurns","Primary winding turns|Primärwindungen|Yípo ẹ̀ka àkọ́kọ́|Primary winding turns"),
+      whole("transformerSecondaryTurns","Secondary winding turns|Sekundärwindungen|Yípo ẹ̀ka kejì|Secondary winding turns"),
+      number("transformerSecondaryAmps","Secondary load current (A RMS)|Sekundärlaststrom (A effektiv)|Ìṣàn ẹrù ẹ̀ka kejì (A RMS)|Secondary load current (A RMS)"),
+    ],[
+      "Secondary voltage (V RMS)|Sekundärspannung (V effektiv)|Foliteji ẹ̀ka kejì (V RMS)|Secondary voltage (V RMS)",
+      "Primary load current (A RMS)|Primärlaststrom (A effektiv)|Ìṣàn ẹrù ẹ̀ka àkọ́kọ́ (A RMS)|Primary load current (A RMS)",
+      "Apparent load (VA)|Scheinleistung (VA)|Agbára tí ó hàn (VA)|Apparent load (VA)",
+    ],(volts,primary,secondary,amps)=>{
+      const ratio=secondary/primary;
+      return [volts*ratio,amps*ratio,volts*ratio*amps];
+    }),
+
+  "trade-payoff": tool("Finance",
+    "Trade payoff after costs|Handelsergebnis nach Kosten|Èrè ìdúnàádúrà lẹ́yìn ináwó|Trade payoff after costs",
+    "Use two hypothetical exit prices for a long position. The output shows the outcome if either price is reached and the win rate needed to break even across repeat trades.|Zwei hypothetische Ausstiegskurse für eine Long-Position verwenden. Ergebnis je Kurs und nötige Trefferquote für wiederholte Geschäfte berechnen.|Lo iye títà méjì tí o fojú díwọ̀n. Ṣírò ohun tó ṣẹlẹ̀ ní iye kọ̀ọ̀kan àti ìpín ìṣẹ́gun láti bo ináwó.|Use two possible sell prices for a long position. Check profit or loss for each and the win rate wey fit cover loss over repeated trades.",
+    [
+      positive("payoffEntryPrice","Entry price per unit|Einstiegskurs je Einheit|Iye rírà fún ẹyọ kan|Buy price per unit"),
+      positive("favorableExitPrice","Higher exit price per unit|Höherer Ausstiegskurs je Einheit|Iye títà tó ga fún ẹyọ kan|Higher sell price per unit"),
+      number("adverseExitPrice","Lower exit price per unit|Niedrigerer Ausstiegskurs je Einheit|Iye títà tó kéré fún ẹyọ kan|Lower sell price per unit"),
+      positive("payoffTradeQuantity","Position quantity|Positionsmenge|Iye ẹyọ àpapọ̀|Position quantity"),
+      number("payoffRoundTripCost","Total entry and exit costs|Gesamte Ein- und Ausstiegskosten|Gbogbo owó iṣẹ́ rírà àti títà|Total buy and sell costs"),
+    ],[
+      "Net gain at higher price|Nettogewinn zum höheren Kurs|Èrè gidi ní iye gíga|Net gain for higher price",
+      "Net loss at lower price|Nettoverlust zum niedrigeren Kurs|Òfo gidi ní iye kékeré|Net loss for lower price",
+      "Break-even win rate (%)|Trefferquote an der Gewinnschwelle (%)|Ìpín ìṣẹ́gun láti bo ináwó (%)|Break-even win rate (%)",
+    ],(entry,high,low,quantity,cost)=>{
+      above(high>entry&&quantity*(high-entry)>cost,"favorableExitPrice");
+      above(low<entry,"adverseExitPrice");
+      const gain=quantity*(high-entry)-cost;
+      const loss=quantity*(entry-low)+cost;
+      return [gain,loss,loss/(gain+loss)*100];
+    }),
+
+  "ai-annotation-capacity": tool("Token & AI",
+    "Dataset labeling and review effort|Aufwand für Datenannotation und Prüfung|Iṣẹ́ fífi àmì sí dátà àti àyẹ̀wò|Dataset labeling and review effort",
+    "Estimate separate labeling and quality-review hours, with team days if the two stages run in sequence.|Stunden für Annotation und Qualitätsprüfung getrennt schätzen und Teamtage für aufeinanderfolgende Stufen berechnen.|Ṣírò wákàtí fífi àmì àti àyẹ̀wò lọ́tọ̀, pẹ̀lú ọjọ́ ẹgbẹ́ bí iṣẹ́ méjèèjì bá tẹ̀léra.|Estimate hours for labeling and quality review apart, and team days if the work happens one stage after the other.",
+    [
+      whole("recordsToAnnotate","Records to label|Zu annotierende Datensätze|Àkọsílẹ̀ láti fi àmì sí|Records to label"),
+      positive("annotationMinutesPerRecord","Labeling time (min/record)|Annotationszeit (min/Datensatz)|Àkókò fífi àmì (ìṣẹ́jú/àkọsílẹ̀)|Labeling time (min/record)"),
+      percent("reviewSamplePct","Records to review (%)|Zu prüfende Datensätze (%)|Àkọsílẹ̀ fún àyẹ̀wò (%)|Records to review (%)"),
+      positive("reviewMinutesPerRecord","Review time (min/record)|Prüfzeit (min/Datensatz)|Àkókò àyẹ̀wò (ìṣẹ́jú/àkọsílẹ̀)|Review time (min/record)"),
+      positive("productiveTeamHoursDay","Combined team hours per day|Produktive Teamstunden pro Tag|Wákàtí iṣẹ́ ẹgbẹ́ lójoojúmọ́|Combined team hours per day"),
+    ],[
+      "Labeling hours|Annotationsstunden|Wákàtí fífi àmì|Labeling hours",
+      "Review hours|Prüfstunden|Wákàtí àyẹ̀wò|Review hours",
+      "Total team days|Teamtage insgesamt|Gbogbo ọjọ́ ẹgbẹ́|Total team days",
+    ],(records,label,review,minutes,team)=>{
+      const labelHours=records*label/60;
+      const reviewHours=roundUp(records*review/100)*minutes/60;
+      return [labelHours,reviewHours,(labelHours+reviewHours)/team];
+    }),
+
+  "service-livestream-data": tool("World & Culture",
+    "Service livestream data budget|Datenbudget für Gottesdienst-Livestreams|Ìwọ̀n dátà fún ìgbéjáde ìjọsìn|Service livestream data budget",
+    "Estimate upload bandwidth and data for a service streamed at a steady video and audio bitrate, including your overhead allowance.|Uploadrate und Datenmenge für einen Gottesdienst mit konstanter Video- und Audiorate samt Zuschlag schätzen.|Ṣírò ìyára àti iye dátà ìgbéjáde ìjọsìn pẹ̀lú ìṣàn fídíò àti ohùn tó dúró àti àfikún tí o yàn.|Estimate upload speed and data for service livestream when the video and audio rate stay steady. Add your overhead allowance.",
+    [
+      positive("serviceStreamMinutes","Stream length (min)|Streamdauer (min)|Àkókò ìgbéjáde (ìṣẹ́jú)|Stream length (min)"),
+      positive("churchVideoMbps","Video bitrate (Mbps)|Videobitrate (Mbit/s)|Ìṣàn fídíò (Mbps)|Video bitrate (Mbps)"),
+      number("churchAudioKbps","Audio bitrate (kbps)|Audiobitrate (kbit/s)|Ìṣàn ohùn (kbps)|Audio bitrate (kbps)"),
+      percent("streamOverheadPct","Overhead allowance (%)|Overhead-Zuschlag (%)|Ìṣàn àfikún (%)|Extra overhead (%)"),
+      whole("directUploadFeeds","Outgoing feeds from this connection|Ausgehende Streams über diesen Anschluss|Iye ìgbéjáde láti ìsopọ̀ yìí|Outgoing feeds from this connection"),
+    ],[
+      "Estimated total upload (Mbps)|Geschätzte gesamte Uploadrate (Mbit/s)|Ìyára fífi dátà ránṣẹ́ lápapọ̀ (Mbps)|Estimated total upload (Mbps)",
+      "Estimated upload data (GB)|Geschätzte Uploadmenge (GB)|Iye dátà tí a ránṣẹ́ (GB)|Estimated upload data (GB)",
+    ],(minutes,video,audio,extra,feeds)=>{
+      const bandwidth=(video+audio/1000)*(1+extra/100)*feeds;
+      return [bandwidth,bandwidth*minutes*60/8000];
+    }),
+
+  "meeting-quorum": tool("World & Culture",
+    "Meeting quorum count|Beschlussfähigkeitsgrenze|Iye ènìyàn tó yẹ fún ìpàdé|Meeting quorum count",
+    "Apply the attendance percentage in your meeting rules to eligible members, rounding up to a whole person.|Den Mindestanteil aus der Geschäftsordnung auf stimmberechtigte Mitglieder anwenden und aufrunden.|Lo ìpín wíwà nínú òfin ìpàdé fún ọmọ ẹgbẹ́ tó yẹ, yí i sókè sí ènìyàn odidi.|Use the attendance percentage for your own meeting rules. Round up to a whole person.",
+    [
+      whole("membersEligibleForQuorum","Eligible members|Stimmberechtigte Mitglieder|Ọmọ ẹgbẹ́ tó yẹ|Eligible members"),
+      percent("requiredQuorumPct","Required attendance (%)|Erforderlicher Anwesenheitsanteil (%)|Ìpín wíwà tó yẹ (%)|Required attendance (%)",0.01),
+      whole("membersPresentForQuorum","Eligible members present|Anwesende stimmberechtigte Mitglieder|Ọmọ ẹgbẹ́ tó yẹ tó wà|Eligible members present",0),
+    ],[
+      "Required members present|Erforderliche anwesende Mitglieder|Ọmọ ẹgbẹ́ tó gbọ́dọ̀ wà|Required members present",
+      "Attendance share (%)|Anwesenheitsanteil (%)|Ìpín ọmọ ẹgbẹ́ tó wà (%)|Attendance share (%)",
+      "Additional members needed|Noch benötigte Mitglieder|Ọmọ ẹgbẹ́ míì tí a nílò|Extra members wey you need",
+    ],(members,percentage,present)=>{
+      above(present<=members,"membersPresentForQuorum");
+      const needed=roundUp(members*percentage/100);
+      return [needed,present/members*100,Math.max(0,needed-present)];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
