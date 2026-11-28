@@ -16,8 +16,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: cloudflare-production
-    env:
-      VITE_PRODUCT_ACCOUNTS: optional
     timeout-minutes: 25
     steps:
       - name: Checkout
@@ -40,7 +38,7 @@ jobs:
           npx playwright-core install --with-deps chromium
           node --input-type=module -e 'import {chromium} from "playwright-core"; import {accessSync} from "node:fs"; accessSync(chromium.executablePath());'
           npm test
-          npm run build
+          VITE_PRODUCT_ACCOUNTS=optional npm run build
       - name: Publish the verified product Worker and static assets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -53,6 +51,8 @@ jobs:
           }
           npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --config wrangler.toml --env production --keep-vars
       - name: Verify the live product assets and calculator workflows
+        env:
+          VITE_PRODUCT_ACCOUNTS: optional
         run: node scripts/verify-deployment.mjs --url "https://adiguntokencalculator.hephzibahbehulah.com/" --artifact dist
       - name: Verify the production account endpoint
         run: |
