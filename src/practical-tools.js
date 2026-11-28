@@ -458,6 +458,98 @@ export const practicalTools = {
       above(valid<=cast,"validBallotsCount");
       return [cast/registered*100,cast-valid,cast?valid/cast*100:null];
     }),
+
+  "dc-cable-voltage-drop": tool("Home & Construction",
+    "DC cable voltage drop|Gleichspannungsabfall im Kabel|Ìdínkù foliteji nínú okùn DC|DC cable voltage drop",
+    "Estimate voltage drop and heating loss for a two-wire DC run using the conductor resistance supplied for one wire.|Spannungsabfall und Leitungsverlust einer zweiadrigen Gleichstromstrecke aus dem Widerstand eines einzelnen Leiters schätzen.|Ṣírò ìdínkù foliteji àti agbára tó sọnù nínú okùn DC méjì pẹ̀lú ìdènà okùn kan.|Estimate voltage drop and cable heat loss for a two-wire DC run using the resistance for one wire.",
+    [
+      positive("dcSupplyVolts","Supply voltage (V)|Versorgungsspannung (V)|Foliteji ìpèsè (V)|Supply voltage (V)"),
+      positive("dcOneWayMetres","One-way cable length (m)|Einfache Leitungslänge (m)|Gígùn okùn lọ ní ọ̀nà kan (m)|One-way cable length (m)"),
+      positive("conductorOhmsPerKm","Single-conductor resistance (Ω/km)|Widerstand eines Leiters (Ω/km)|Ìdènà okùn kan (Ω/km)|Resistance for one wire (Ω/km)"),
+      number("dcLoadAmps","Load current (A)|Laststrom (A)|Ìṣàn iná ẹrù (A)|Load current (A)"),
+    ],[
+      "Cable voltage drop (V)|Spannungsabfall (V)|Ìdínkù foliteji (V)|Cable voltage drop (V)",
+      "Voltage at load (V)|Spannung an der Last (V)|Foliteji ní ẹrù (V)|Voltage for load (V)",
+      "Cable power loss (W)|Leistungsverlust im Kabel (W)|Agbára tí ó sọnù nínú okùn (W)|Cable power loss (W)",
+    ],(supply,length,resistance,current)=>{
+      const drop=2*length/1000*resistance*current;
+      above(drop<=supply,"dcLoadAmps");
+      return [drop,supply-drop,drop*current];
+    }),
+
+  "two-lot-cost-basis": tool("Finance",
+    "Two-lot purchase cost|Einstandskosten zweier Käufe|Owó rírà ìpele méjì|Cost of two purchases",
+    "Combine two purchases of the same asset. Include acquisition fees to calculate your average cost per unit. Use one currency.|Zwei Käufe desselben Werts zusammenfassen. Kaufgebühren in den Einstandspreis je Einheit einrechnen. Eine Währung verwenden.|Darapọ̀ rírà ohun kan ní ìpele méjì. Ka owó iṣẹ́ rírà sí iye ẹyọ kan. Lo owó kan náà.|Join two buys of the same asset. Add buy fees to get average cost per unit. Use one currency.",
+    [
+      positive("firstLotUnits","First purchase quantity|Menge des ersten Kaufs|Iye rírà àkọ́kọ́|First buy quantity"),
+      positive("firstLotPrice","First purchase price per unit|Erster Kaufpreis je Einheit|Iye ẹyọ kan ní rírà àkọ́kọ́|First buy price per unit"),
+      positive("secondLotUnits","Second purchase quantity|Menge des zweiten Kaufs|Iye rírà kejì|Second buy quantity"),
+      positive("secondLotPrice","Second purchase price per unit|Zweiter Kaufpreis je Einheit|Iye ẹyọ kan ní rírà kejì|Second buy price per unit"),
+      number("acquisitionFees","Total fees for both buys|Summe der Kaufgebühren|Gbogbo owó iṣẹ́ rírà méjèèjì|Total fees for both buys"),
+    ],[
+      "Combined quantity|Gesamtmenge|Àpapọ̀ iye ẹyọ|Combined quantity",
+      "Total cost including fees|Gesamtkosten mit Gebühren|Gbogbo owó pẹ̀lú owó iṣẹ́|Total cost with fees",
+      "Average cost per unit|Einstandspreis je Einheit|Iye owó àárín fún ẹyọ kan|Average cost per unit",
+    ],(first,firstPrice,second,secondPrice,fees)=>{
+      const total=first*firstPrice+second*secondPrice+fees;
+      return [first+second,total,total/(first+second)];
+    }),
+
+  "ai-dataset-split": tool("Token & AI",
+    "AI dataset split sizes|Größen der KI-Datensatzaufteilung|Ìpín àkójọpọ̀ dátà AI|AI dataset split sizes",
+    "Allocate whole records to training, validation and test sets. Training gets the remaining share after the two holdouts.|Ganze Datensätze auf Training, Validierung und Test verteilen. Training erhält den Rest nach den beiden zurückgehaltenen Teilen.|Pín àkọsílẹ̀ odidi sí ìdánilẹ́kọ̀ọ́, àyẹ̀wò àti ìdánwò. Ìdánilẹ́kọ̀ọ́ gba ìpín tó kù.|Share whole records between training, validation and test sets. Training gets the share wey remain.",
+    [
+      whole("datasetRecordCount","Total records|Datensätze insgesamt|Àpapọ̀ àkọsílẹ̀|Total records"),
+      percent("validationSetPct","Validation share (%)|Validierungsanteil (%)|Ìpín àyẹ̀wò (%)|Validation share (%)"),
+      percent("testSetPct","Test share (%)|Testanteil (%)|Ìpín ìdánwò (%)|Test share (%)"),
+    ],[
+      "Training records|Trainingsdatensätze|Àkọsílẹ̀ ìdánilẹ́kọ̀ọ́|Training records",
+      "Validation records|Validierungsdatensätze|Àkọsílẹ̀ àyẹ̀wò|Validation records",
+      "Test records|Testdatensätze|Àkọsílẹ̀ ìdánwò|Test records",
+    ],(records,validation,test)=>{
+      const holdout=validation+test;
+      above(holdout<=100,"testSetPct");
+      const shares=[100-holdout,validation,test].map(share=>records*(share/100));
+      const counts=shares.map(Math.floor);
+      const ranking=[0,1,2].sort((a,b)=>(shares[b]-counts[b])-(shares[a]-counts[a]));
+      const remainder=records-counts.reduce((sum,count)=>sum+count,0);
+      for(const index of ranking.slice(0,remainder))counts[index]++;
+      return counts;
+    }),
+
+  "sermon-timing": tool("World & Culture",
+    "Sermon and reading timing|Zeitplanung für Predigt und Lesung|Àkókò ìwàásù àti kíkà|Sermon and reading timing",
+    "Estimate delivery and Scripture reading time separately, then include pauses or transitions.|Predigt und Schriftlesung getrennt schätzen und Pausen oder Übergänge berücksichtigen.|Ṣírò àkókò ìwàásù àti kíkà Ìwé Mímọ́ lọ́tọ̀, kí o sì fi ìsinmi tàbí ìyípadà kún un.|Estimate preaching and Scripture reading time apart, then add pauses or changeovers.",
+    [
+      whole("sermonWordCount","Sermon manuscript words|Wörter im Predigtmanuskript|Ọ̀rọ̀ inú ìwàásù|Sermon manuscript words",0),
+      positive("sermonWordsPerMinute","Sermon delivery (words/min)|Predigttempo (Wörter/min)|Ìyára ìwàásù (ọ̀rọ̀/ìṣẹ́jú)|Sermon delivery (words/min)"),
+      whole("scriptureWordCount","Scripture reading words|Wörter der Schriftlesung|Ọ̀rọ̀ inú kíkà Ìwé Mímọ́|Scripture reading words",0),
+      positive("readingWordsPerMinute","Reading pace (words/min)|Lesetempo (Wörter/min)|Ìyára kíkà (ọ̀rọ̀/ìṣẹ́jú)|Reading speed (words/min)"),
+      number("transitionMinutes","Pauses and transitions (min)|Pausen und Übergänge (min)|Ìsinmi àti ìyípadà (ìṣẹ́jú)|Pauses and changeovers (min)"),
+    ],[
+      "Sermon delivery (min)|Predigtdauer (min)|Àkókò ìwàásù (ìṣẹ́jú)|Sermon delivery (min)",
+      "Scripture reading (min)|Schriftlesung (min)|Àkókò kíkà Ìwé Mímọ́ (ìṣẹ́jú)|Scripture reading (min)",
+      "Total time needed (min)|Gesamtdauer (min)|Gbogbo àkókò tí a nílò (ìṣẹ́jú)|Total time wey you need (min)",
+    ],(sermon,delivery,scripture,reading,pauses)=>{
+      const speaking=sermon/delivery, read=scripture/reading;
+      return [speaking,read,speaking+read+pauses];
+    }),
+
+  "public-service-backlog": tool("Business & Work",
+    "Public service backlog|Rückstand im Bürgerservice|Iṣẹ́ araalu tí ó kù|Public service backlog",
+    "Project open requests at steady intake and closure rates. A dash means the existing backlog cannot clear at those rates.|Offene Anfragen bei konstantem Eingang und Abschluss schätzen. Ein Strich bedeutet, dass der bestehende Rückstand so nicht abgebaut wird.|Fojú díwọ̀n ìbéèrè tí ó ṣì ṣí pẹ̀lú iye tí ń wọlé àti tí a ń parí. Àmì gígùn túmọ̀ sí pé iṣẹ́ tó kù kò lè tán ní ìyára yẹn.|Estimate open requests if intake and closures stay steady. A dash means the backlog no fit clear at those rates.",
+    [
+      whole("openServiceRequests","Open requests now|Aktuell offene Anfragen|Ìbéèrè tó ṣì ṣí báyìí|Open requests now",0),
+      number("incomingRequestsWeek","New requests per week|Neue Anfragen pro Woche|Ìbéèrè tuntun lọ́sẹ̀ kan|New requests per week"),
+      number("closedRequestsWeek","Requests closed per week|Abgeschlossene Anfragen pro Woche|Ìbéèrè tí a parí lọ́sẹ̀ kan|Requests closed per week"),
+      whole("serviceForecastWeeks","Forecast period (weeks)|Prognosezeitraum (Wochen)|Àkókò ìfojúdíwọ̀n (ọ̀sẹ̀)|Forecast period (weeks)"),
+    ],[
+      "Expected open requests at end|Erwartete offene Anfragen am Ende|Ìbéèrè tí ó lè kù ní ìparí|Expected open requests at end",
+      "Full weeks to clear current backlog|Volle Wochen bis zum Abbau des Rückstands|Ọ̀sẹ̀ odidi láti parí iṣẹ́ tó kù|Full weeks to clear current backlog",
+    ],(open,incoming,closed,weeks)=>{
+      const netClosed=closed-incoming;
+      return [Math.max(0,open-netClosed*weeks),open===0?0:netClosed>0?roundUp(open/netClosed):null];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];

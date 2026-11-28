@@ -26,4 +26,9 @@ export const practicalExamples = [
   ["community-match-funding", {eligibleDonations:1500,sponsorMatchPct:50,sponsorMatchLimit:600,communityProjectBudget:2500}, [600,2100,400]],
   ["trade-fee-break-even", {tradeEntryUnitPrice:20,tradeAssetQuantity:10,tradeFeePct:0,fixedTradeFee:5}, [205,21,5]],
   ["election-turnout", {registeredVoterCount:1000,ballotsCastCount:600,validBallotsCount:570}, [60,30,95]],
+  ["dc-cable-voltage-drop", {dcSupplyVolts:24,dcOneWayMetres:30,conductorOhmsPerKm:10,dcLoadAmps:2}, [1.2,22.8,2.4]],
+  ["two-lot-cost-basis", {firstLotUnits:10,firstLotPrice:15,secondLotUnits:20,secondLotPrice:20,acquisitionFees:20}, [30,570,19]],
+  ["ai-dataset-split", {datasetRecordCount:101,validationSetPct:10,testSetPct:20}, [71,10,20]],
+  ["sermon-timing", {sermonWordCount:1800,sermonWordsPerMinute:120,scriptureWordCount:250,readingWordsPerMinute:100,transitionMinutes:2.5}, [15,2.5,20]],
+  ["public-service-backlog", {openServiceRequests:90,incomingRequestsWeek:30,closedRequestsWeek:50,serviceForecastWeeks:3}, [30,5]],
 ];
