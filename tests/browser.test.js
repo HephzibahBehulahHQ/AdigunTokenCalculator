@@ -38,7 +38,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.reload();
     assert.equal(await page.locator("#theme").getAttribute("aria-pressed"),"true");
     await page.locator("#theme").click();
-    assert.equal(await page.locator(".tool-card").count(),96);
+    assert.equal(await page.locator(".tool-card").count(),101);
     assert.equal(await page.locator(".category-chip").count(),19);
     await page.locator(".category-chip").nth(5).click();
     assert.ok(await page.locator(".tool-card").count()>0);
@@ -84,10 +84,10 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.match(await page.locator(".result").innerText(),/Do NOT use this to decide whether to drive/);
     await page.locator(".back-directory").click();
     await page.waitForFunction(()=>!document.querySelector("aside")?.hidden);
-    assert.equal(await page.locator(".tool-card").count(),96);
+    assert.equal(await page.locator(".tool-card").count(),101);
     await page.setViewportSize({width:375,height:812});
     const cardData=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(n=>({name:n.getAttribute("aria-label"),key:n.dataset.toolKey})));
-    assert.equal(new Set(cardData.map(card=>card.key)).size,96,"tool keys must be unique");
+    assert.equal(new Set(cardData.map(card=>card.key)).size,101,"tool keys must be unique");
     for(const card of cardData){
       await page.locator('.tool-card[data-tool-key="'+card.key+'"]').click();
       await page.waitForFunction(key=>document.querySelector("#panel")?.dataset.toolKey===key,card.key);
@@ -688,13 +688,13 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         await page.goto("http://127.0.0.1:4173/"+hash);
         await page.reload();
         await page.locator(".tool-card").first().waitFor();
-        assert.equal(await page.locator(".tool-card").count(),96);
+        assert.equal(await page.locator(".tool-card").count(),101);
         assert.equal(await page.locator("#panel").isVisible(),false);
       }
       await openTool("bmi");
       await page.evaluate(()=>{location.hash="#/%";});
       await page.waitForFunction(()=>!document.querySelector("aside").hidden);
-      assert.equal(await page.locator(".tool-card").count(),96);
+      assert.equal(await page.locator(".tool-card").count(),101);
     });
 
     assert.deepEqual(pageErrors,[]);

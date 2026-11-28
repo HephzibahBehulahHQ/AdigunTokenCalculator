@@ -1017,6 +1017,92 @@ export const practicalTools = {
       const minimum=roundUp(denominator*share/100);
       return [minimum,yes/denominator*100,Math.max(0,minimum-yes)];
     }),
+
+  "lc-resonance": tool("Electronics & Automation",
+    "LC resonant frequency|LC-Resonanzfrequenz|Igbohunsafẹfẹ ìfaradà LC|LC resonant frequency",
+    "Estimate the resonant frequency and characteristic impedance of an ideal inductor and capacitor. Real components add losses.|Resonanzfrequenz und charakteristische Impedanz einer idealen Spule und eines Kondensators schätzen. Reale Bauteile verursachen Verluste.|Ṣírò igbohunsafẹfẹ àti ìdènà àbùdá fofò fún inductor àti capacitor. Ohun gidi lè ní ìsọnù.|Estimate resonance and characteristic impedance for an ideal inductor and capacitor. Real parts get losses.",
+    [
+      positive("inductanceMicrohenry","Inductance (µH)|Induktivität (µH)|Inductance (µH)|Inductance (µH)"),
+      positive("capacitanceNanofarad","Capacitance (nF)|Kapazität (nF)|Capacitance (nF)|Capacitance (nF)"),
+    ],[
+      "Resonant frequency (kHz)|Resonanzfrequenz (kHz)|Igbohunsafẹfẹ ìfaradà (kHz)|Resonant frequency (kHz)",
+      "Characteristic impedance (Ω)|Charakteristische Impedanz (Ω)|Ìdènà àbùdá (Ω)|Characteristic impedance (Ω)",
+    ],(microhenry,nanofarad)=>{
+      const inductance=microhenry/1e6, capacitance=nanofarad/1e9;
+      return [1/(2*Math.PI*Math.sqrt(inductance*capacitance))/1000,Math.sqrt(inductance/capacitance)];
+    }),
+
+  "long-call-expiry": tool("Trading",
+    "Long call at expiration|Gekaufte Kaufoption am Verfall|Àṣàyàn rírà ní ọjọ́ ìparí|Long call at expiration",
+    "Model a bought call at expiration using a strike, premium, contract multiplier and trade fees. Enter money amounts in one currency.|Eine gekaufte Kaufoption am Verfall mit Basispreis, Prämie, Kontraktmultiplikator und Gebühren modellieren. Eine Währung verwenden.|Ṣírò àṣàyàn rírà ní ìparí pẹ̀lú iye ìmúṣẹ, owó àṣàyàn, iye ẹyọ àti owó iṣẹ́. Lo owó kan náà.|Model a bought call at expiry using strike, premium, contract size and fees. Use one currency.",
+    [
+      positive("callStrikeUnitPrice","Strike price per underlying unit|Basispreis je Einheit|Iye ìmúṣẹ ẹyọ kan|Strike price per underlying unit"),
+      number("callExpiryUnderlyingPrice","Underlying price at expiration|Basiswertkurs am Verfall|Iye ohun náà ní ìparí|Underlying price at expiration"),
+      number("callPremiumPerUnit","Premium paid per underlying unit|Gezahlte Prämie je Einheit|Owó àṣàyàn tí a san fún ẹyọ|Premium paid per underlying unit"),
+      whole("callUnitsEach","Underlying units per contract|Basiseinheiten je Kontrakt|Ẹyọ inú àdéhùn kan|Underlying units per contract"),
+      whole("longCallContractCount","Call contracts bought|Gekaufte Kaufoptionskontrakte|Iye àṣàyàn rírà tí a rà|Call contracts bought"),
+      number("longCallTotalFees","Total fees|Gesamtgebühren|Gbogbo owó iṣẹ́|Total fees"),
+    ],[
+      "Gross exercise value|Bruttoausübungswert|Àpapọ̀ iye ìmúṣẹ|Gross exercise value",
+      "Net result at expiration|Nettoergebnis am Verfall|Àbájáde gidi ní ìparí|Net result at expiration",
+      "Break-even underlying price|Basiswertkurs an der Gewinnschwelle|Iye láti bo ináwó|Break-even underlying price",
+    ],(strike, price, premium, units, contracts, fees)=>{
+      const covered=units*contracts;
+      const exercise=Math.max(0,price-strike)*covered;
+      return [exercise,exercise-covered*premium-fees,strike+premium+fees/covered];
+    }),
+
+  "llm-context-budget": tool("Token & AI",
+    "LLM context budget|LLM-Kontextbudget|Ààlà àyíká LLM|LLM context budget",
+    "Subtract fixed prompt and response reservations from a context window. Then count how many whole, equal-size retrieval chunks fit.|Reservierte Prompt- und Antworttoken vom Kontextfenster abziehen. Danach ganze gleich große Retrieval-Blöcke zählen.|Yọ tọ́kẹ́nì ìbéèrè àti ìdáhùn tí a pèsè kúrò ní àyíká. Ka àwọn ìpín ìwádìí odidi tó lè wọlé.|Remove fixed prompt and reply tokens from the context window, then count full retrieval chunks of the same size.",
+    [
+      whole("llmContextWindowTokens","Context window (tokens)|Kontextfenster (Token)|Àyíká (tọ́kẹ́nì)|Context window (tokens)"),
+      whole("llmFixedPromptTokens","Fixed prompt and formatting (tokens)|Fester Prompt und Formatierung (Token)|Ìbéèrè dúró àti fọ́ọ̀mù (tọ́kẹ́nì)|Fixed prompt and formatting (tokens)",0),
+      whole("llmReplyReservationTokens","Reserved reply (tokens)|Reservierte Antwort (Token)|Ìdáhùn tí a pèsè (tọ́kẹ́nì)|Reserved reply (tokens)",0),
+      whole("llmChunkTokensWithOverhead","One chunk including its header (tokens)|Ein Block mit Kopfzeile (Token)|Ìpín kan pẹ̀lú orí rẹ̀ (tọ́kẹ́nì)|One chunk with its header (tokens)"),
+    ],[
+      "Available retrieval tokens|Verfügbare Retrieval-Token|Tọ́kẹ́nì ìwádìí tó wà|Available retrieval tokens",
+      "Whole retrieval chunks|Ganze Retrieval-Blöcke|Ìpín ìwádìí odidi|Full retrieval chunks",
+      "Unused tokens after fitting chunks|Freie Token nach Befüllung|Tọ́kẹ́nì tó ṣì kù|Tokens wey remain after chunks",
+    ],(window,prompt,reply,chunk)=>{
+      const available=window-prompt-reply;
+      above(available>=0,"llmReplyReservationTokens");
+      return [available,Math.floor(available/chunk),available%chunk];
+    }),
+
+  "service-booklet-printing": tool("Faith & Outreach",
+    "Service booklet paper count|Papierbedarf für Gottesdiensthefte|Iye bébà ìwé ìjọsìn|Service booklet paper count",
+    "Plan folded, double-sided booklets with four finished pages per sheet. Blank pages fill the last sheet where needed.|Gefalzte, beidseitig bedruckte Hefte mit vier fertigen Seiten pro Bogen planen. Leerseiten füllen bei Bedarf den letzten Bogen.|Ṣètò ìwé kékeré tí a tẹ̀ ní ẹ̀gbẹ́ méjèèjì, ojú mẹ́rin fún bébà kan. Ojú òfo kún bébà ìkẹyìn bí ó bá yẹ.|Plan folded double-sided booklets with four finished pages per sheet. Add blank pages to the last sheet if needed.",
+    [
+      whole("bookletPagesPerCopy","Content pages per booklet|Inhaltsseiten je Heft|Ojú àkóónú fún ìwé kan|Content pages per booklet"),
+      whole("serviceBookletCopies","Booklets to print|Zu druckende Hefte|Ìwé kékeré láti tẹ̀|Booklets to print"),
+      percent("bookletPaperSparePct","Extra paper for printing (%)|Papierreserve für den Druck (%)|Bébà àfikún fún ìtẹ̀wé (%)|Extra paper for printing (%)"),
+    ],[
+      "Sheets per booklet|Bögen je Heft|Bébà nínú ìwé kan|Sheets per booklet",
+      "Blank pages per booklet|Leerseiten je Heft|Ojú òfo fún ìwé kan|Blank pages per booklet",
+      "Total sheets with reserve|Bögen insgesamt mit Reserve|Gbogbo bébà pẹ̀lú àfikún|Total sheets with spare paper",
+    ],(pages,copies,reserve)=>{
+      const sheets=roundUp(pages/4);
+      const total=sheets*copies;
+      return [sheets,sheets*4-pages,total+roundUp(total*reserve/100)];
+    }),
+
+  "ballot-stock-reconciliation": tool("Civics & Politics",
+    "Ballot paper reconciliation|Stimmzettelbestand abgleichen|Ìbámu iye ìwé ìbò|Ballot paper reconciliation",
+    "Compare received papers with four separate end-of-count totals. Use mutually exclusive counts so each paper appears only once.|Erhaltene Stimmzettel mit vier getrennten Schlussbeständen vergleichen. Jeden Zettel nur einer Kategorie zuordnen.|Fi iye ìwé tí a gbà wé iye mẹ́rin ní ìparí. Ka ìwé kọ̀ọ̀kan sí ẹ̀ka kan ṣoṣo.|Compare papers wey arrive with four separate final counts. Count each paper only once.",
+    [
+      whole("ballotPapersReceived","Ballot papers received|Erhaltene Stimmzettel|Ìwé ìbò tí a gbà|Ballot papers received"),
+      whole("unusedBallotPapers","Unused papers at closing|Ungenutzte Stimmzettel am Ende|Ìwé ìbò tí a kò lò ní ìparí|Unused papers at closing",0),
+      whole("spoiledBallotPapersOutsideBox","Spoiled papers outside the box|Ungültig gemachte Zettel außerhalb der Urne|Ìwé ìbò tó bàjẹ́ níta àpótí|Spoiled papers outside box",0),
+      whole("ballotPapersFoundInBox","Papers found in the box|Stimmzettel in der Urne|Ìwé ìbò tí a rí nínú àpótí|Papers found in the box",0),
+      whole("issuedNotReturnedPapers","Issued papers not returned|Ausgegebene, nicht zurückgegebene Zettel|Ìwé tí a fún tí a kò dá padà|Issued papers wey never return",0),
+    ],[
+      "Total papers accounted for|Stimmzettel insgesamt erfasst|Gbogbo ìwé tí a ti kà|Total papers accounted for",
+      "Received minus accounted for|Erhalten minus erfasst|Ìwé tí a gbà dín iye tí a kà kù|Received minus accounted for",
+    ],(received,unused,spoiled,box,unreturned)=>{
+      const accounted=unused+spoiled+box+unreturned;
+      return [accounted,received-accounted];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
