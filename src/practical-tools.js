@@ -731,6 +731,102 @@ export const practicalTools = {
       const needed=roundUp(members*percentage/100);
       return [needed,present/members*100,Math.max(0,needed-present)];
     }),
+
+  "shaft-torque": tool("Home & Construction",
+    "Motor shaft torque|Motordrehmoment an der Welle|Yíyí agbára ọ̀pá mọ́tò|Motor shaft torque",
+    "Convert mechanical shaft power and rotational speed to torque. Use the mechanical output power of the motor.|Mechanische Wellenleistung und Drehzahl in Drehmoment umrechnen. Mechanische Ausgangsleistung des Motors eingeben.|Yí agbára ọ̀pá mọ́tò àti ìyára yíyí padà sí agbára yíyí. Lo agbára tí mọ́tò ń fún ọ̀pá.|Use shaft output power and rotational speed to work out torque.",
+    [
+      number("mechanicalShaftKw","Mechanical shaft power (kW)|Mechanische Wellenleistung (kW)|Agbára ọ̀pá mọ́tò (kW)|Mechanical shaft power (kW)"),
+      positive("shaftRevolutionsMinute","Shaft speed (rpm)|Wellendrehzahl (U/min)|Ìyára ọ̀pá mọ́tò (rpm)|Shaft speed (rpm)"),
+    ],[
+      "Rotational speed (rad/s)|Winkelgeschwindigkeit (rad/s)|Ìyára yíyí (rad/s)|Rotational speed (rad/s)",
+      "Shaft torque (N·m)|Wellendrehmoment (N·m)|Agbára yíyí ọ̀pá (N·m)|Shaft torque (N·m)",
+    ],(power,rpm)=>{
+      const speed=rpm*2*Math.PI/60;
+      return [speed,power*1000/speed];
+    }),
+
+  "fx-round-trip": tool("Finance",
+    "FX spread and round-trip cost|Devisenspread und Kosten für Kauf und Rückverkauf|Àlàfo iye owó àjèjì àti ináwó rírà padà|FX spread and round-trip cost",
+    "Estimate an immediate buy and sell at the quoted ask and bid. Use quote currency per one base unit and one commission rate for both orders.|Sofortigen Kauf und Rückverkauf zum Brief- und Geldkurs schätzen. Kurswährung je Basiseinheit und gleichen Provisionssatz verwenden.|Fojú díwọ̀n rírà àti títà lẹ́sẹ̀kẹsẹ̀. Lo owó kejì fún ẹyọ owó ìpìlẹ̀ kan àti ìpín owó iṣẹ́ kan náà.|Estimate a buy and sell at the quoted ask and bid. Use quote currency per base unit and the same commission for both.",
+    [
+      positive("fxBaseUnits","Base currency units|Einheiten der Basiswährung|Ẹyọ owó ìpìlẹ̀|Base currency units"),
+      positive("fxBidQuote","Bid (quote currency per base unit)|Geldkurs (Kurswährung pro Basiseinheit)|Iye títà fún ẹyọ ìpìlẹ̀ kan|Bid (quote currency per base unit)"),
+      positive("fxAskQuote","Ask (quote currency per base unit)|Briefkurs (Kurswährung pro Basiseinheit)|Iye rírà fún ẹyọ ìpìlẹ̀ kan|Ask (quote currency per base unit)"),
+      percent("fxCommissionPct","Commission per order (%)|Provision pro Auftrag (%)|Owó iṣẹ́ ìdúnàádúrà kan (%)|Commission per order (%)"),
+    ],[
+      "Buy cost in quote currency|Kaufkosten in Kurswährung|Ináwó rírà nínú owó kejì|Buy cost in quote currency",
+      "Immediate sale proceeds|Sofortiger Verkaufserlös|Owó títà lẹ́sẹ̀kẹsẹ̀|Immediate sell proceeds",
+      "Round-trip cost|Kosten für Kauf und Rückverkauf|Gbogbo ináwó rírà àti títà|Round-trip cost",
+      "Spread around midpoint (basis points)|Spread um Mittelkurs (Basispunkte)|Àlàfo yíká iye àárín (bp)|Spread around midpoint (basis points)",
+    ],(units,bid,ask,commission)=>{
+      above(ask>=bid,"fxAskQuote");
+      const buy=units*ask*(1+commission/100);
+      const sell=units*bid*(1-commission/100);
+      return [buy,sell,buy-sell,(ask-bid)/((ask+bid)/2)*10000];
+    }),
+
+  "llm-batch-token-cost": tool("Token & AI",
+    "LLM batch token cost|Tokenkosten eines LLM-Batches|Ináwó tọ́kẹ́nì fún ìdì LLM|LLM batch token cost",
+    "Estimate input and output charges from token counts and rates you enter. Use one currency and prices per million tokens.|Eingabe- und Ausgabekosten aus eigenen Tokenzahlen und Tarifen schätzen. Eine Währung und Preise pro Million Token verwenden.|Ṣírò ináwó ìwọlé àti ìjáde láti inú iye tọ́kẹ́nì àti owó tí o tẹ̀. Lo owó kan náà àti iye fún mílíọ̀nù tọ́kẹ́nì.|Estimate input and output charges from the token counts and rates you put in. Use one currency and prices per million tokens.",
+    [
+      whole("batchRequestCount","Requests in batch|Anfragen im Batch|Ìbéèrè nínú ìdì|Requests in batch"),
+      number("meanInputTokens","Average input tokens per request|Mittlere Eingabetoken je Anfrage|Tọ́kẹ́nì ìwọlé àárín fún ìbéèrè kan|Average input tokens each request"),
+      number("meanOutputTokens","Average output tokens per request|Mittlere Ausgabetoken je Anfrage|Tọ́kẹ́nì ìjáde àárín fún ìbéèrè kan|Average output tokens each request"),
+      number("inputCostPerMillion","Input price per million tokens|Eingabepreis pro Million Token|Owó ìwọlé fún mílíọ̀nù tọ́kẹ́nì|Input price per million tokens"),
+      number("outputCostPerMillion","Output price per million tokens|Ausgabepreis pro Million Token|Owó ìjáde fún mílíọ̀nù tọ́kẹ́nì|Output price per million tokens"),
+    ],[
+      "Estimated input charge|Geschätzte Eingabekosten|Ináwó ìwọlé tí a fojú díwọ̀n|Estimated input charge",
+      "Estimated output charge|Geschätzte Ausgabekosten|Ináwó ìjáde tí a fojú díwọ̀n|Estimated output charge",
+      "Estimated batch charge|Geschätzte Batchkosten|Ináwó gbogbo ìdì|Estimated total batch charge",
+    ],(requests,input,output,inputPrice,outputPrice)=>{
+      const inputCost=requests*input/1e6*inputPrice;
+      const outputCost=requests*output/1e6*outputPrice;
+      return [inputCost,outputCost,inputCost+outputCost];
+    }),
+
+  "worship-song-range": tool("World & Culture",
+    "Worship song transposition range|Transpositionsbereich für Gemeindelieder|Àlàfo yíyí ohùn orin ìjọsìn|Worship song transposition range",
+    "Compare the melody range with the comfortable singing range. Use MIDI note numbers. Negative shifts lower the key, and dashes mean the range is too wide.|Melodieumfang und bequemen Stimmumfang vergleichen. MIDI-Notennummern verwenden. Negative Werte senken die Tonart. Striche zeigen einen zu großen Umfang.|Fi àlàfo orin wé àlàfo ohùn tó rọrùn. Lo nọ́mbà MIDI. Iye òdì dín ohùn kù, àmì gígùn sì fi hàn pé àlàfo tóbi jù.|Compare the melody range with the range wey easy to sing. Use MIDI note numbers. Negative shifts lower the key. Dashes mean the melody range too wide.",
+    [
+      {...whole("melodyLowestMidi","Lowest melody note (MIDI)|Tiefster Melodieton (MIDI)|Ohùn orin tó rẹlẹ̀ jù (MIDI)|Lowest melody note (MIDI)",0),max:127},
+      {...whole("melodyHighestMidi","Highest melody note (MIDI)|Höchster Melodieton (MIDI)|Ohùn orin tó ga jù (MIDI)|Highest melody note (MIDI)",0),max:127},
+      {...whole("comfortableLowestMidi","Lowest comfortable note (MIDI)|Tiefster bequemer Stimmton (MIDI)|Ohùn tó rẹlẹ̀ tí ó rọrùn (MIDI)|Lowest comfortable note (MIDI)",0),max:127},
+      {...whole("comfortableHighestMidi","Highest comfortable note (MIDI)|Höchster bequemer Stimmton (MIDI)|Ohùn tó ga tí ó rọrùn (MIDI)|Highest comfortable note (MIDI)",0),max:127},
+    ],[
+      "Melody span (semitones)|Melodieumfang (Halbtöne)|Àlàfo orin (ìdajì-ohùn)|Melody span (semitones)",
+      "Lowest allowed shift (semitones)|Niedrigste mögliche Verschiebung (Halbtöne)|Ìyípadà tó rẹlẹ̀ jù (ìdajì-ohùn)|Lowest allowed shift (semitones)",
+      "Highest allowed shift (semitones)|Höchste mögliche Verschiebung (Halbtöne)|Ìyípadà tó ga jù (ìdajì-ohùn)|Highest allowed shift (semitones)",
+    ],(low,high,comfortableLow,comfortableHigh)=>{
+      above(high>=low,"melodyHighestMidi");
+      above(comfortableHigh>=comfortableLow,"comfortableHighestMidi");
+      const min=comfortableLow-low, max=comfortableHigh-high;
+      return [high-low,min<=max?min:null,min<=max?max:null];
+    }),
+
+  "council-seat-projection": tool("World & Culture",
+    "Three-list seat projection|Sitzprojektion für drei Listen|Ìṣírò ìjókòó fún àtòjọ mẹ́ta|Three-list seat projection",
+    "Model proportional seats for three lists with the largest-remainder method. Equal remainders follow the listed order. No vote threshold is applied.|Proportionale Sitze für drei Listen nach dem Verfahren der größten Reste modellieren. Bei Gleichstand gilt die Reihenfolge. Keine Sperrklausel.|Ṣírò ìjókòó díẹ̀-díẹ̀ fún àtòjọ mẹ́ta pẹ̀lú àṣẹ́kù tó ga jù. Bí wọ́n bá dọ́gba, tẹ̀lé bí a ṣe tò wọ́n. Kò sí iye ìbò tó kéré jù.|Estimate seats for three lists with the largest-remainder method. Ties follow list order. This model no use vote threshold.",
+    [
+      whole("seatsToAllocate","Seats to allocate|Zu verteilende Sitze|Ìjókòó láti pín|Seats to allocate"),
+      whole("firstListVotes","Votes for first list|Stimmen für erste Liste|Ìbò fún àtòjọ àkọ́kọ́|Votes for first list",0),
+      whole("secondListVotes","Votes for second list|Stimmen für zweite Liste|Ìbò fún àtòjọ kejì|Votes for second list",0),
+      whole("thirdListVotes","Votes for third list|Stimmen für dritte Liste|Ìbò fún àtòjọ kẹta|Votes for third list",0),
+    ],[
+      "First list seats|Sitze der ersten Liste|Ìjókòó àtòjọ àkọ́kọ́|First list seats",
+      "Second list seats|Sitze der zweiten Liste|Ìjókòó àtòjọ kejì|Second list seats",
+      "Third list seats|Sitze der dritten Liste|Ìjókòó àtòjọ kẹta|Third list seats",
+    ],(seats,first,second,third)=>{
+      const total=BigInt(first+second+third);
+      above(total>0n,"firstListVotes");
+      const shares=[first,second,third].map(votes=>BigInt(votes)*BigInt(seats));
+      const allocations=shares.map(weight=>Number(weight/total));
+      const remainders=shares.map(weight=>weight%total);
+      const ranking=[0,1,2].sort((a,b)=>remainders[a]===remainders[b]?a-b:remainders[a]>remainders[b]?-1:1);
+      const left=seats-allocations.reduce((sum,count)=>sum+count,0);
+      for(const index of ranking.slice(0,left))allocations[index]++;
+      return allocations;
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
@@ -772,6 +868,6 @@ export function calculatePracticalTool(key, data, locale = "en") {
     return value;
   });
   const values = definition.calculate(...inputs);
-  above(values.every(value => value === null || (Number.isFinite(value) && value >= 0 && value <= Number.MAX_SAFE_INTEGER)), definition.fields[0].key);
+  above(values.every(value => value === null || (Number.isFinite(value) && Math.abs(value) <= Number.MAX_SAFE_INTEGER)), definition.fields[0].key);
   return values.map((value, index) => [localize(definition.outputs[index], locale), value]);
 }

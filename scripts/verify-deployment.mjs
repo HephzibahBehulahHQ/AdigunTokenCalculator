@@ -123,16 +123,16 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,81);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(keys.length,86);assert.equal(new Set(keys).size,keys.length);
   assert.equal(await page.locator(".category-chip").count(),15);
   await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
   const expectedGroups={
-    "Home & Construction":["paint-coverage","concrete-slab","tile-order","fence-posts","ramp-geometry","dc-cable-voltage-drop","led-series-resistor","transformer-turns"],
+    "Home & Construction":["paint-coverage","concrete-slab","tile-order","fence-posts","ramp-geometry","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque"],
     "Garden & Water":["rainwater-harvest","drip-irrigation","plant-spacing"],
     "Business & Work":["product-break-even","shift-staffing","pump-energy","conveyor-throughput","inventory-reorder","community-event-seating","community-match-funding","public-service-backlog","public-comment-slots"],
-    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity"],
-    "World & Culture":["scripture-reading-plan","election-turnout","sermon-timing","outreach-print-order","service-livestream-data","meeting-quorum"],
-    Finance:["trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff"],
+    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost"],
+    "World & Culture":["scripture-reading-plan","election-turnout","sermon-timing","outreach-print-order","service-livestream-data","meeting-quorum","worship-song-range","council-seat-projection"],
+    Finance:["trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff","fx-round-trip"],
     "Education & Sport":["final-grade-target","running-pace","cycling-gear-speed"],
     "Conversion":["print-resolution","ev-charging-session","dough-hydration"],
     Developer:["download-time","pcm-audio-size"],
