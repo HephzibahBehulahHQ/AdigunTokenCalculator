@@ -73,7 +73,7 @@ On a production visit, the application prepares a browser cache of its published
 
 This cache contains application files only. It does not save calculator entries, URL/query history, generated exports or customer details. Browser site-data controls or automatic eviction can remove cached files, so offline readiness is rechecked when the page becomes visible or connectivity changes. Clearing site data also removes the separately saved electrical profile.
 
-An update is prepared separately while current work remains open. The update control warns that reloading clears unsaved entries/results and asks you to close other calculator tabs before applying a waiting update. The app never automatically reloads an open page. See [architecture](docs/ARCHITECTURE.md) for the version and cache lifecycle, and [current status](docs/PROJECT_STATUS.md) for verification of the relevant release.
+A normal reload checks for the current release online. The app keeps a verified offline copy while it prepares the new release. If the reloaded page matches the verified update and it is the only calculator tab, the update activates without a second reload. The update control remains available for waiting updates and warns that reloading clears unsaved entries/results. The app never automatically reloads an open page. See [architecture](docs/ARCHITECTURE.md) for the version and cache lifecycle, and [current status](docs/PROJECT_STATUS.md) for verification of the relevant release.
 
 ## Local development
 

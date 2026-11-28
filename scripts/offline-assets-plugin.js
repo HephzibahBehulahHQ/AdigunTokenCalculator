@@ -69,8 +69,15 @@ function offlineWorkerRuntime(config){
     if(navigation){
       // Routes live in the hash. Queries and visited URLs are never cache keys.
       event.respondWith((async()=>{
+        // Keep queries out of the network request and preserve the verified offline copy.
+        try{
+          const response=await fetch(new Request(indexURL,{mode:"same-origin",cache:"no-store",credentials:"omit",redirect:"follow"}));
+          if(response.ok&&new URL(response.url).origin===scope.origin&&/^text\/html\b/i.test(response.headers.get("content-type")||""))return response;
+        }catch{
+          // Offline or the request failed.
+        }
         const cached=await (await caches.open(cacheName)).match(indexURL);
-        return cached||fetchAsset(indexURL,manifest.get(indexURL));
+        return cached||Response.error();
       })());
       return;
     }

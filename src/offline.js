@@ -36,16 +36,34 @@ export function mountOfflineStatus(container,{language="en",enabled=import.meta.
     try{worker.postMessage({type},[channel.port2]);}
     catch(error){window.clearTimeout(timeout);channel.port1.close();reject(error);}
   });
+  let checkingUpdate=false;
+  const checkWaitingUpdate=async()=>{
+    const waiting=registration.waiting;
+    if(checkingUpdate)return;
+    checkingUpdate=true;
+    try{
+      const result=await message(waiting,"CHECK");
+      if(disposed||updating||registration.waiting!==waiting)return;
+      // This document is already on the new release, so it needs no extra reload.
+      if(result.ok&&result.ready&&result.version===expected){
+        const activation=await message(waiting,"ACTIVATE");
+        if(activation.ok)return;
+      }
+      if(!updating&&registration.waiting===waiting)setState("update");
+    }catch{
+      if(!updating&&registration.waiting===waiting)setState("update");
+    }finally{checkingUpdate=false;}
+  };
   const refresh=async()=>{
     const request=++sequence;
     if(disposed||updating)return;
     try{
-      if(registration?.waiting){setState("update");return;}
+      if(registration?.waiting){await checkWaitingUpdate();return;}
       const controller=serviceWorker.controller;
       if(!isOwnWorker(controller)){setState("preparing");return;}
       const result=await message(controller,"CHECK");
       if(disposed||request!==sequence||updating)return;
-      if(registration?.waiting){setState("update");return;}
+      if(registration?.waiting){await checkWaitingUpdate();return;}
       if(result.version!==expected){setState(result.ok&&result.ready?"update":"error");return;}
       setState(result.ok&&result.ready?"ready":"error");
     }catch{if(request===sequence&&!updating)setState("error");}
