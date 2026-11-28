@@ -1,3 +1,4 @@
+import {electronicsExpansion} from "./electronicsExpansion.js";
 import {I} from "./i18n.js";
 
 const locales = ["en", "de", "yo", "pcm"];
@@ -1103,6 +1104,7 @@ export const practicalTools = {
       const accounted=unused+spoiled+box+unreturned;
       return [accounted,received-accounted];
     }),
+  ...electronicsExpansion,
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];
