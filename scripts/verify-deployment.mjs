@@ -123,7 +123,7 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,101);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(keys.length,121);assert.equal(new Set(keys).size,keys.length);
   assert.equal(await page.locator(".category-chip").count(),19);
   await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
   const expectedGroups={
@@ -134,7 +134,7 @@ async function verifyBrowser(){
     "Conversion":["print-resolution","ev-charging-session","dough-hydration"],
     "Developer":["download-time","pcm-audio-size"],
     "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost","classification-metrics","embedding-index-storage","llm-context-budget"],
-    "Electronics & Automation":["pump-energy","conveyor-throughput","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque","loaded-voltage-divider","current-loop-scaling","lc-resonance"],
+    "Electronics & Automation":["pump-energy","conveyor-throughput","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque","loaded-voltage-divider","current-loop-scaling","lc-resonance","ohms-law-series","parallel-resistor-load","rc-charge-time","capacitor-stored-energy","inductor-current-ramp","pwm-resistive-power","stepper-travel-resolution","encoder-machine-speed","gearbox-output","vfd-synchronous-speed","ac-power-triangle","digital-sampling-rate","adc-code-step","uart-frame-transmission","thermal-resistance-rise","hydraulic-cylinder-force","process-cycle-takt","oee-machine-effectiveness","synchronous-belt-ratio","tank-fill-duration"],
     "Trading":["inventory-reorder","trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff","fx-round-trip","futures-tick-result","position-loss-budget","long-call-expiry"],
     "Faith & Outreach":["scripture-reading-plan","sermon-timing","outreach-print-order","service-livestream-data","worship-song-range","food-relief-parcels","wireless-mic-batteries","service-booklet-printing"],
     "Civics & Politics":["community-match-funding","election-turnout","public-service-backlog","public-comment-slots","meeting-quorum","council-seat-projection","civic-survey-interval","motion-approval","ballot-stock-reconciliation"],
