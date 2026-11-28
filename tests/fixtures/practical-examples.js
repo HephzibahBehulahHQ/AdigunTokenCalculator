@@ -31,4 +31,9 @@ export const practicalExamples = [
   ["ai-dataset-split", {datasetRecordCount:101,validationSetPct:10,testSetPct:20}, [71,10,20]],
   ["sermon-timing", {sermonWordCount:1800,sermonWordsPerMinute:120,scriptureWordCount:250,readingWordsPerMinute:100,transitionMinutes:2.5}, [15,2.5,20]],
   ["public-service-backlog", {openServiceRequests:90,incomingRequestsWeek:30,closedRequestsWeek:50,serviceForecastWeeks:3}, [30,5]],
+  ["led-series-resistor", {ledSupplyVolts:12,ledForwardVolts:2,ledsInSeries:3,ledTargetMilliamps:20}, [6,300,0.12]],
+  ["drawdown-recovery", {accountPeakValue:1000,currentAccountValue:800}, [200,20,25]],
+  ["ai-model-weight-memory", {modelParametersBillions:8,modelBitsPerParameter:4,modelRuntimeAllowanceGib:2}, [4,3.725290298461914,5.725290298461914]],
+  ["outreach-print-order", {outreachRecipients:120,extraHandoutPct:10,handoutsPerPack:50,outreachPackPrice:12}, [132,3,36]],
+  ["public-comment-slots", {meetingDurationMinutes:90,scheduledBusinessMinutes:53,speakerMinutesEach:3,speakerChangeMinutes:0.5}, [37,10,2]],
 ];
