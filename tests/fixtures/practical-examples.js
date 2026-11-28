@@ -11,4 +11,10 @@ export const practicalExamples = [
   ["running-pace", {distanceRunKm:5, elapsedRunMinutes:25, finishDistanceKm:10}, [5, 12, 50]],
   ["print-resolution", {imageWidthPx:3000, imageHeightPx:2400, printWidthCm:25.4, printHeightCm:20.32, targetPrintPpi:300}, [300, 300, 25.4, 20.32]],
   ["download-time", {downloadSizeGb:9, linkSpeedMbps:100, linkEfficiencyPct:80}, [80, 15]],
+  ["fence-posts", {fenceRunM:11,maxPostSpacingM:2.5}, [5,6,2.2]],
+  ["ramp-geometry", {rampRiseCm:30,rampRunCm:40}, [75,36.86989764584402,50]],
+  ["cycling-gear-speed", {frontChainringTeeth:48,rearSprocketTeeth:16,wheelRolloutCm:210,pedalCadenceRpm:80}, [6.3,30.24]],
+  ["ev-charging-session", {usableBatteryKwh:60,batteryStartPct:20,batteryTargetPct:80,averageWallKw:8,chargingEfficiencyPct:90}, [36,40,5]],
+  ["dough-hydration", {totalFlourG:500,totalWaterG:350,doughSaltG:10}, [70,2]],
+  ["pcm-audio-size", {audioMinutes:10,samplesPerSecond:48000,bytesPerAudioSample:3,audioChannels:2}, [172.8,2.304]],
 ];

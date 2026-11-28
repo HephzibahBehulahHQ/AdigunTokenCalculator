@@ -213,6 +213,97 @@ export const practicalTools = {
       const effective = speed * efficiency / 100;
       return [effective, size * 8000 / effective / 60];
     }),
+
+  "fence-posts": tool("Home & Construction",
+    "Fence posts and bays|Zaunpfosten und Felder|Òpó àti ààyè ọgbà|Fence posts and sections",
+    "Plan evenly spaced posts for one straight fence with a post at each end. Measure each side separately.|Gleichmäßig gesetzte Pfosten für eine gerade Zaunseite mit zwei Endpfosten planen. Jede Seite separat messen.|Ṣètò òpó tó jìnnà síra déédéé fún ọgbà tààrà pẹ̀lú òpó ní òpin méjèèjì. Wọn ẹ̀gbẹ́ kọ̀ọ̀kan lọ́tọ̀.|Plan even spacing for one straight fence with one post for each end. Measure each side on its own.",
+    [
+      positive("fenceRunM","Straight fence length (m)|Gerade Zaunlänge (m)|Gígùn ọgbà tààrà (m)|Straight fence length (m)"),
+      positive("maxPostSpacingM","Maximum post spacing (m)|Maximaler Pfostenabstand (m)|Àlàfo tó pọ̀ jù láàárín òpó (m)|Biggest space between posts (m)"),
+    ],[
+      "Fence bays|Zaunfelder|Ààyè láàárín òpó|Fence sections",
+      "Total posts|Pfosten insgesamt|Àpapọ̀ òpó|Total posts",
+      "Actual spacing (m)|Tatsächlicher Abstand (m)|Àlàfo gidi (m)|Actual spacing (m)",
+    ],(length, spacing)=>{
+      const bays=roundUp(length/spacing);
+      return [bays,bays+1,length/bays];
+    }),
+
+  "ramp-geometry": tool("Home & Construction",
+    "Ramp geometry|Rampengeometrie|Ìwọ̀n ọ̀nà òkè|Ramp geometry",
+    "Calculate incline and ramp length from a rise and horizontal run.|Steigung und Rampenlänge aus Höhe und horizontaler Strecke berechnen.|Ṣírò ìtẹ̀sí àti gígùn ọ̀nà òkè láti inú gíga àti jíjìn lórí ilẹ̀.|Work out the slope and ramp length from the rise and the flat distance.",
+    [
+      number("rampRiseCm","Vertical rise (cm)|Höhenunterschied (cm)|Ìgòkè (cm)|Vertical rise (cm)"),
+      positive("rampRunCm","Horizontal run (cm)|Waagerechte Strecke (cm)|Jíjìn lórí ilẹ̀ (cm)|Flat distance (cm)"),
+    ],[
+      "Slope (%)|Steigung (%)|Ìtẹ̀sí (%)|Slope (%)",
+      "Incline (°)|Neigungswinkel (°)|Igun (°)|Incline (°)",
+      "Ramp length (cm)|Rampenlänge (cm)|Gígùn ọ̀nà òkè (cm)|Ramp length (cm)",
+    ],(rise, run)=>[rise/run*100,Math.atan2(rise,run)*180/Math.PI,Math.hypot(rise,run)]),
+
+  "cycling-gear-speed": tool("Education & Sport",
+    "Cycling gear speed|Geschwindigkeit aus Fahrradübersetzung|Ìyára kẹ̀kẹ́ ní jíà|Bicycle gear speed",
+    "Calculate distance per pedal revolution and speed from gearing, wheel rollout and cadence.|Weg je Kurbelumdrehung und Geschwindigkeit aus Übersetzung, Radumfang und Trittfrequenz berechnen.|Ṣírò jíjìn fún yíyí ẹsẹ̀ kan àti ìyára láti inú jíà, àyíká kẹ̀kẹ́ àti iye yíyí.|Use gear teeth, wheel rollout and pedalling rate to work out distance per turn and speed.",
+    [
+      whole("frontChainringTeeth","Front chainring teeth|Zähne am Kettenblatt|Eyín jíà iwájú|Front chainring teeth"),
+      whole("rearSprocketTeeth","Rear sprocket teeth|Zähne am Ritzel|Eyín jíà ẹ̀yìn|Rear sprocket teeth"),
+      positive("wheelRolloutCm","Wheel rollout (cm)|Radumfang (cm)|Àyíká kẹ̀kẹ́ (cm)|Wheel rollout (cm)"),
+      number("pedalCadenceRpm","Cadence (rpm)|Trittfrequenz (U/min)|Yíyí ẹsẹ̀ ní ìṣẹ́jú kan|Pedalling rate (rpm)"),
+    ],[
+      "Distance per pedal revolution (m)|Weg je Kurbelumdrehung (m)|Jíjìn fún yíyí ẹsẹ̀ kan (m)|Distance per pedal turn (m)",
+      "Ground speed (km/h)|Geschwindigkeit (km/h)|Ìyára (km/h)|Ground speed (km/h)",
+    ],(front,rear,rollout,cadence)=>{
+      const metres=front/rear*rollout/100;
+      return [metres,metres*cadence*60/1000];
+    }),
+
+  "ev-charging-session": tool("Conversion",
+    "EV charging session|Ladevorgang für E-Autos|Àkókò fífi iná sínú ọkọ̀|EV charging session",
+    "Estimate wall energy and duration from usable battery capacity, charge targets and average wall power.|Netzenergie und Dauer aus nutzbarer Akkukapazität, Ladeständen und mittlerer Ladeleistung schätzen.|Ṣírò iná láti ògiri àti àkókò láti inú agbára batiri, ìpele tí o fẹ́ àti agbára ìpíndọ́gba.|Estimate energy from the wall and charging time with usable battery size, charge targets and average wall power.",
+    [
+      positive("usableBatteryKwh","Usable battery capacity (kWh)|Nutzbare Akkukapazität (kWh)|Agbára batiri tí a lè lò (kWh)|Usable battery capacity (kWh)"),
+      percent("batteryStartPct","Starting charge (%)|Ladestand zu Beginn (%)|Ìpele batiri ní ìbẹ̀rẹ̀ (%)|Starting charge (%)"),
+      percent("batteryTargetPct","Target charge (%)|Gewünschter Ladestand (%)|Ìpele batiri tí o fẹ́ (%)|Target charge (%)"),
+      positive("averageWallKw","Average wall power (kW)|Mittlere Netzleistung (kW)|Agbára iná ìpíndọ́gba (kW)|Average wall power (kW)"),
+      percent("chargingEfficiencyPct","Charging efficiency (%)|Ladewirkungsgrad (%)|Ìpín iná tó wọ batiri (%)|Charging efficiency (%)",0.01),
+    ],[
+      "Energy added to battery (kWh)|Energie im Akku (kWh)|Iná tó wọ batiri (kWh)|Energy wey enter battery (kWh)",
+      "Energy drawn from wall (kWh)|Energie aus dem Netz (kWh)|Iná láti ògiri (kWh)|Energy wey come from wall (kWh)",
+      "Estimated charging time (h)|Geschätzte Ladezeit (h)|Àkókò fífi iná (wákàtí)|Estimated charging time (h)",
+    ],(capacity,start,target,power,efficiency)=>{
+      above(target>=start,"batteryTargetPct");
+      const battery=capacity*(target-start)/100;
+      const wall=battery*100/efficiency;
+      return [battery,wall,wall/power];
+    }),
+
+  "dough-hydration": tool("Conversion",
+    "Bread dough hydration|Teighydration|Ìpín omi nínú ìyẹ̀fun búrẹ́dì|Bread dough hydration",
+    "Calculate water and salt as percentages of total flour. Include any preferment flour and water in your totals.|Wasser und Salz als Prozentsatz der gesamten Mehlmenge berechnen. Mehl und Wasser aus Vorteig mitrechnen.|Ṣírò ìpín omi àti iyọ̀ sí gbogbo ìyẹ̀fun. Ka omi àti ìyẹ̀fun inú ìpèsè àkọ́kọ́ pẹ̀lú.|Work out water and salt as percentages of all flour. Count flour and water inside any starter too.",
+    [
+      positive("totalFlourG","Total flour (g)|Mehl gesamt (g)|Gbogbo ìyẹ̀fun (g)|Total flour (g)"),
+      number("totalWaterG","Total water (g)|Wasser gesamt (g)|Gbogbo omi (g)|Total water (g)"),
+      number("doughSaltG","Salt (g)|Salz (g)|Iyọ̀ (g)|Salt (g)"),
+    ],[
+      "Hydration (%)|Hydration (%)|Ìpín omi (%)|Hydration (%)",
+      "Salt percentage (%)|Salzanteil (%)|Ìpín iyọ̀ (%)|Salt percentage (%)",
+    ],(flour,water,salt)=>[water/flour*100,salt/flour*100]),
+
+  "pcm-audio-size": tool("Developer",
+    "Uncompressed audio size|Größe unkomprimierter Audiodaten|Ìwọ̀n ohùn tí a kò fún pọ̀|Uncompressed audio size",
+    "Estimate raw PCM data size and bitrate from duration, sample rate, stored bytes per sample and channels. File headers are excluded.|PCM-Rohgröße und Bitrate aus Dauer, Abtastrate, Bytes pro Abtastwert und Kanälen schätzen. Dateiköpfe bleiben unberücksichtigt.|Ṣírò ìwọ̀n PCM àti ìṣàn bítì láti inú àkókò, iye àpẹẹrẹ, báìtì fún àpẹẹrẹ àti ikanni. A kò ka orí fáìlì.|Estimate PCM data size and bitrate from time, sample rate, stored bytes and channels. File header no dey inside.",
+    [
+      positive("audioMinutes","Audio duration (min)|Audiodauer (min)|Àkókò ohùn (ìṣẹ́jú)|Audio duration (min)"),
+      whole("samplesPerSecond","Sample rate (Hz)|Abtastrate (Hz)|Iye àpẹẹrẹ ní ìṣẹ́jú-àáyá (Hz)|Sample rate (Hz)"),
+      whole("bytesPerAudioSample","Stored bytes per sample|Bytes je Abtastwert|Báìtì tí a tọ́jú fún àpẹẹrẹ|Stored bytes per sample"),
+      whole("audioChannels","Audio channels|Audiokanäle|Ikanni ohùn|Audio channels"),
+    ],[
+      "Raw size (decimal MB)|Rohgröße (dezimale MB)|Ìwọ̀n gidi (MB eleemewa)|Raw size (decimal MB)",
+      "Data rate (Mbps)|Datenrate (Mbit/s)|Ìṣàn dátà (Mbps)|Data rate (Mbps)",
+    ],(minutes,rate,bytes,channels)=>{
+      const bytesPerSecond=rate*bytes*channels;
+      return [bytesPerSecond*minutes*60/1e6,bytesPerSecond*8/1e6];
+    }),
 };
 
 const localize = (text, locale) => text.split("|")[Math.max(0, locales.indexOf(locale))];

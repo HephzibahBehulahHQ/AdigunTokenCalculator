@@ -33,4 +33,8 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.throws(() => run(7,{downtimeMinutes:480}), {field:"downtimeMinutes"});
   assert.deepEqual(run(8,{targetGradePct:100}), [130,88]);
   assert.throws(() => run(11,{linkEfficiencyPct:0}), {field:"linkEfficiencyPct"});
+  assert.deepEqual(run(12,{fenceRunM:2}), [1,2,2]);
+  assert.deepEqual(run(13,{rampRiseCm:0}), [0,0,40]);
+  assert.deepEqual(run(15,{batteryTargetPct:20}), [0,0,0]);
+  assert.throws(() => run(15,{batteryTargetPct:10}), {field:"batteryTargetPct"});
 });
