@@ -6,6 +6,10 @@ export const practicalCategories = [
   ["Garden & Water", "Garden & Water|Garten & Wasser|Ọgbà àti Omi|Garden & Water"],
   ["Business & Work", "Business & Work|Geschäft & Arbeit|Òwò àti Iṣẹ́|Business & Work"],
   ["Education & Sport", "Education & Sport|Bildung & Sport|Ẹ̀kọ́ àti Eré Ìdárayá|School & Sport"],
+  ["Electronics & Automation", "Electronics & Automation|Elektronik & Automatisierung|Ẹ̀rọ Iná àti Ìṣàkóso Aládàáṣe|Electronics & Automation"],
+  ["Trading", "Trading|Handel|Ìṣòwò|Trading"],
+  ["Faith & Outreach", "Faith & Outreach|Glaube & Gemeindearbeit|Ìgbàgbọ́ àti Ìtànkálẹ̀|Faith & Outreach"],
+  ["Civics & Politics", "Civics & Politics|Bürgerkunde & Politik|Ìlú àti Òṣèlú|Civics & Politics"],
 ];
 
 const number = (key, label, min = 0, max = 1e12) => ({key, label, min, max});
@@ -305,7 +309,7 @@ export const practicalTools = {
       return [bytesPerSecond*minutes*60/1e6,bytesPerSecond*8/1e6];
     }),
 
-  "pump-energy": tool("Business & Work",
+  "pump-energy": tool("Electronics & Automation",
     "Water pump power and energy|Pumpenleistung und Energie|Agbára fifa omi|Water pump power and energy",
     "Estimate hydraulic power, input power and energy for fresh water at a steady flow and head.|Hydraulische Leistung, Eingangsleistung und Energie für Frischwasser bei konstantem Durchfluss und Förderhöhe schätzen.|Ṣírò agbára omi, agbára tí fifa ń gba àti iná tí ó lò fún omi tútù ní ìṣàn tó dúró.|Estimate water power, input power and energy when fresh water dey flow steady.",
     [
@@ -323,7 +327,7 @@ export const practicalTools = {
       return [hydraulic,input,input*hours];
     }),
 
-  "conveyor-throughput": tool("Business & Work",
+  "conveyor-throughput": tool("Electronics & Automation",
     "Conveyor throughput|Förderbanddurchsatz|Iye ẹrù lórí bẹ́líìtì|Conveyor throughput",
     "Estimate steady single-lane output using belt speed, centre-to-centre item spacing and working time.|Konstante einspurige Leistung aus Bandgeschwindigkeit, Mittenabstand und Betriebsdauer schätzen.|Ṣírò iye ẹrù ní ojú ọ̀nà kan pẹ̀lú ìyára bẹ́líìtì, àlàfo àárín ẹrù àti àkókò iṣẹ́.|Estimate how many items pass for one lane from belt speed, item spacing and working time.",
     [
@@ -338,7 +342,7 @@ export const practicalTools = {
       return [rate,Math.floor(rate*minutes)];
     }),
 
-  "inventory-reorder": tool("Business & Work",
+  "inventory-reorder": tool("Trading",
     "Stock reorder point|Bestellpunkt für Lagerbestand|Iye ọjà fún àṣẹ tuntun|Stock reorder point",
     "Combine expected daily demand, supplier lead time and reserve stock to find when to reorder.|Tagesbedarf, Lieferzeit und Sicherheitsbestand zum Bestellpunkt kombinieren.|Lo iye tí a ń tà lójoojúmọ́, àkókò ìfijiṣẹ́ àti ọjà àfikún láti mọ ìgbà àṣẹ tuntun.|Use daily demand, supplier delivery time and reserve stock to know when to order again.",
     [
@@ -372,7 +376,7 @@ export const practicalTools = {
       return [rate,roundUp(target/rate)];
     }),
 
-  "scripture-reading-plan": tool("World & Culture",
+  "scripture-reading-plan": tool("Faith & Outreach",
     "Scripture reading schedule|Bibel-Leseplan|Ètò kíkà Ìwé Mímọ́|Scripture reading plan",
     "Spread a chosen number of chapters over active reading days. Allocate at most one extra chapter to the busier days.|Eine gewählte Kapitelzahl auf Lesetage verteilen. An stärker belegten Tagen kommt höchstens ein Kapitel hinzu.|Pín iye orí tí o yàn sí àwọn ọjọ́ kíkà. Fi orí kan ṣoṣo kún ọjọ́ tí ó pọ̀ jù.|Share the chapters across reading days. The busier days get only one extra chapter.",
     [
@@ -405,7 +409,7 @@ export const practicalTools = {
       return [seats,tables,tables*capacity-seats];
     }),
 
-  "community-match-funding": tool("Business & Work",
+  "community-match-funding": tool("Civics & Politics",
     "Community project match funding|Kofinanzierung für Gemeinschaftsprojekte|Owó àfikún fún iṣẹ́ àwùjọ|Community project match funding",
     "Apply a matching rate and sponsor cap to eligible donations, then compare funds with the project budget. Use one currency.|Förderquote und Höchstbetrag auf förderfähige Spenden anwenden und mit dem Projektbudget vergleichen. Eine Währung verwenden.|Lo ìpín owó àfikún àti ààlà olùrànlọ́wọ́ sí ẹ̀bùn tó yẹ, kí o sì fi wé ètò ináwó. Lo owó kan náà.|Use match rate and sponsor limit for donations wey qualify, then compare total with project budget. Use one currency.",
     [
@@ -423,7 +427,7 @@ export const practicalTools = {
       return [match,total,Math.max(0,budget-total)];
     }),
 
-  "trade-fee-break-even": tool("Finance",
+  "trade-fee-break-even": tool("Trading",
     "Trade fee break-even price|Gewinnschwelle nach Handelsgebühren|Iye tí ó bo owó ìdúnàádúrà|Trade fee break-even price",
     "Find the exit price that covers your entry cost and fees on both orders. Use the same fee schedule and currency for each side.|Ausstiegspreis berechnen, der Einstiegskosten und Gebühren für beide Aufträge deckt. Auf beiden Seiten dasselbe Gebührenmodell und dieselbe Währung verwenden.|Rí iye títà tí ó bo iye rírà àti owó ìdúnàádúrà méjèèjì. Lo ìlànà owó àti owó orílẹ̀-èdè kan náà.|Find the sell price wey cover your buy cost and fees for both orders. Use the same fee rate and currency for both sides.",
     [
@@ -442,7 +446,7 @@ export const practicalTools = {
       return [entryCost,exit,Math.max(0,(exit/entry-1)*100)];
     }),
 
-  "election-turnout": tool("World & Culture",
+  "election-turnout": tool("Civics & Politics",
     "Election turnout and ballot rates|Wahlbeteiligung und Stimmzettelquoten|Ìkópa ìdìbò àti ìpín ìwé ìbò|Election turnout and ballot rates",
     "Calculate turnout from registered voters and ballot validity from ballots cast. Use counts from the same election and area.|Wahlbeteiligung aus Wahlberechtigten und Gültigkeitsquote aus abgegebenen Stimmzetteln berechnen. Zahlen derselben Wahl und Region verwenden.|Ṣírò ìkópa láti inú iye olùdìbò tí a forúkọ sílẹ̀, àti ìwúlò ìwé ìbò láti inú gbogbo ìwé tí a dì. Lo ìdìbò àti agbègbè kan náà.|Work out turnout from registered voters and ballot validity from all ballots cast. Use figures from the same election and area.",
     [
@@ -459,7 +463,7 @@ export const practicalTools = {
       return [cast/registered*100,cast-valid,cast?valid/cast*100:null];
     }),
 
-  "dc-cable-voltage-drop": tool("Home & Construction",
+  "dc-cable-voltage-drop": tool("Electronics & Automation",
     "DC cable voltage drop|Gleichspannungsabfall im Kabel|Ìdínkù foliteji nínú okùn DC|DC cable voltage drop",
     "Estimate voltage drop and heating loss for a two-wire DC run using the conductor resistance supplied for one wire.|Spannungsabfall und Leitungsverlust einer zweiadrigen Gleichstromstrecke aus dem Widerstand eines einzelnen Leiters schätzen.|Ṣírò ìdínkù foliteji àti agbára tó sọnù nínú okùn DC méjì pẹ̀lú ìdènà okùn kan.|Estimate voltage drop and cable heat loss for a two-wire DC run using the resistance for one wire.",
     [
@@ -477,7 +481,7 @@ export const practicalTools = {
       return [drop,supply-drop,drop*current];
     }),
 
-  "two-lot-cost-basis": tool("Finance",
+  "two-lot-cost-basis": tool("Trading",
     "Two-lot purchase cost|Einstandskosten zweier Käufe|Owó rírà ìpele méjì|Cost of two purchases",
     "Combine two purchases of the same asset. Include acquisition fees to calculate your average cost per unit. Use one currency.|Zwei Käufe desselben Werts zusammenfassen. Kaufgebühren in den Einstandspreis je Einheit einrechnen. Eine Währung verwenden.|Darapọ̀ rírà ohun kan ní ìpele méjì. Ka owó iṣẹ́ rírà sí iye ẹyọ kan. Lo owó kan náà.|Join two buys of the same asset. Add buy fees to get average cost per unit. Use one currency.",
     [
@@ -517,7 +521,7 @@ export const practicalTools = {
       return counts;
     }),
 
-  "sermon-timing": tool("World & Culture",
+  "sermon-timing": tool("Faith & Outreach",
     "Sermon and reading timing|Zeitplanung für Predigt und Lesung|Àkókò ìwàásù àti kíkà|Sermon and reading timing",
     "Estimate delivery and Scripture reading time separately, then include pauses or transitions.|Predigt und Schriftlesung getrennt schätzen und Pausen oder Übergänge berücksichtigen.|Ṣírò àkókò ìwàásù àti kíkà Ìwé Mímọ́ lọ́tọ̀, kí o sì fi ìsinmi tàbí ìyípadà kún un.|Estimate preaching and Scripture reading time apart, then add pauses or changeovers.",
     [
@@ -535,7 +539,7 @@ export const practicalTools = {
       return [speaking,read,speaking+read+pauses];
     }),
 
-  "public-service-backlog": tool("Business & Work",
+  "public-service-backlog": tool("Civics & Politics",
     "Public service backlog|Rückstand im Bürgerservice|Iṣẹ́ araalu tí ó kù|Public service backlog",
     "Project open requests at steady intake and closure rates. A dash means the existing backlog cannot clear at those rates.|Offene Anfragen bei konstantem Eingang und Abschluss schätzen. Ein Strich bedeutet, dass der bestehende Rückstand so nicht abgebaut wird.|Fojú díwọ̀n ìbéèrè tí ó ṣì ṣí pẹ̀lú iye tí ń wọlé àti tí a ń parí. Àmì gígùn túmọ̀ sí pé iṣẹ́ tó kù kò lè tán ní ìyára yẹn.|Estimate open requests if intake and closures stay steady. A dash means the backlog no fit clear at those rates.",
     [
@@ -551,7 +555,7 @@ export const practicalTools = {
       return [Math.max(0,open-netClosed*weeks),open===0?0:netClosed>0?roundUp(open/netClosed):null];
     }),
 
-  "led-series-resistor": tool("Home & Construction",
+  "led-series-resistor": tool("Electronics & Automation",
     "LED series resistor|LED-Vorwiderstand|Resístọ̀ LED ní tẹ̀léra|LED series resistor",
     "Estimate resistance and resistor dissipation for a steady DC supply and a string of identical LEDs in series.|Widerstand und Verlustleistung für eine konstante Gleichspannungsquelle und gleiche LEDs in Reihe schätzen.|Ṣírò ìdènà àti agbára tó sọnù fún orísun DC tó dúró àti LED kan náà ní tẹ̀léra.|Estimate resistor value and heat for steady DC and matching LEDs for one series.",
     [
@@ -570,7 +574,7 @@ export const practicalTools = {
       return [voltage,voltage/current,voltage*current];
     }),
 
-  "drawdown-recovery": tool("Finance",
+  "drawdown-recovery": tool("Trading",
     "Drawdown and recovery|Verlust und Erholung|Ìdínkù àti ìpadà bọ̀|Drawdown and recovery",
     "Compare a current account value with its earlier peak. Use the same currency and exclude the effect of deposits and withdrawals.|Aktuellen Kontowert mit früherem Höchststand vergleichen. Gleiche Währung verwenden und Ein- und Auszahlungen herausrechnen.|Fi iye owó lọ́wọ́ wé iye tó ga jù tẹ́lẹ̀. Lo owó kan náà, yọ owó tí a fi kún tàbí yọ kúrò.|Compare current account value with the old peak. Use one currency and leave deposits and withdrawals out.",
     [
@@ -603,7 +607,7 @@ export const practicalTools = {
       return [gb,gib,gib+allowance];
     }),
 
-  "outreach-print-order": tool("World & Culture",
+  "outreach-print-order": tool("Faith & Outreach",
     "Outreach print order|Druckauftrag für Gemeindearbeit|Àṣẹ ìtẹ̀wé fún ìtànkálẹ̀|Outreach print order",
     "Plan outreach handouts with spare copies, pack rounding and a printing budget. Use one currency.|Handzettel für Gemeindearbeit mit Reserve, Packungsrundung und Druckbudget planen. Eine Währung verwenden.|Ṣètò ìwé ìtànkálẹ̀ pẹ̀lú àfikún, àpò odidi àti ètò owó. Lo owó kan náà.|Plan outreach handouts with spare copies, full packs and print cost. Use one currency.",
     [
@@ -621,7 +625,7 @@ export const practicalTools = {
       return [copies,packs,packs*price];
     }),
 
-  "public-comment-slots": tool("Business & Work",
+  "public-comment-slots": tool("Civics & Politics",
     "Public meeting comment slots|Redeplätze für öffentliche Sitzungen|Àyè ọ̀rọ̀ ní ìpàdé gbogbogbò|Public meeting comment slots",
     "Reserve time for agenda business, then count how many equal speaker slots fit in the remainder, including changeovers.|Zeit für Tagesordnungspunkte abziehen und gleich lange Redeplätze einschließlich Wechselzeiten zählen.|Yọ àkókò iṣẹ́ ìpàdé kúrò, kí o sì ka iye àyè ọ̀rọ̀ tó dọ́gba pẹ̀lú ìyípadà.|Keep time for meeting business, then count equal speaker slots wey fit, including changeovers.",
     [
@@ -641,7 +645,7 @@ export const practicalTools = {
       return [available,slots,Math.max(0,available-slots*block)];
     }),
 
-  "transformer-turns": tool("Home & Construction",
+  "transformer-turns": tool("Electronics & Automation",
     "Ideal transformer turns ratio|Ideales Transformator-Übersetzungsverhältnis|Ìpín yípo ẹ̀rọ amúná|Ideal transformer turns ratio",
     "Calculate ideal secondary voltage and reflected primary current from winding turns and secondary load current.|Ideale Sekundärspannung und reflektierten Primärstrom aus Windungszahlen und Sekundärstrom berechnen.|Ṣírò foliteji ẹ̀ka kejì àti ìṣàn ẹ̀ka àkọ́kọ́ láti inú iye yípo àti ìṣàn ẹrù.|Work out ideal secondary voltage and primary current from winding turns and the current for the secondary load.",
     [
@@ -658,7 +662,7 @@ export const practicalTools = {
       return [volts*ratio,amps*ratio,volts*ratio*amps];
     }),
 
-  "trade-payoff": tool("Finance",
+  "trade-payoff": tool("Trading",
     "Trade payoff after costs|Handelsergebnis nach Kosten|Èrè ìdúnàádúrà lẹ́yìn ináwó|Trade payoff after costs",
     "Use two hypothetical exit prices for a long position. The output shows the outcome if either price is reached and the win rate needed to break even across repeat trades.|Zwei hypothetische Ausstiegskurse für eine Long-Position verwenden. Ergebnis je Kurs und nötige Trefferquote für wiederholte Geschäfte berechnen.|Lo iye títà méjì tí o fojú díwọ̀n. Ṣírò ohun tó ṣẹlẹ̀ ní iye kọ̀ọ̀kan àti ìpín ìṣẹ́gun láti bo ináwó.|Use two possible sell prices for a long position. Check profit or loss for each and the win rate wey fit cover loss over repeated trades.",
     [
@@ -698,7 +702,7 @@ export const practicalTools = {
       return [labelHours,reviewHours,(labelHours+reviewHours)/team];
     }),
 
-  "service-livestream-data": tool("World & Culture",
+  "service-livestream-data": tool("Faith & Outreach",
     "Service livestream data budget|Datenbudget für Gottesdienst-Livestreams|Ìwọ̀n dátà fún ìgbéjáde ìjọsìn|Service livestream data budget",
     "Estimate upload bandwidth and data for a service streamed at a steady video and audio bitrate, including your overhead allowance.|Uploadrate und Datenmenge für einen Gottesdienst mit konstanter Video- und Audiorate samt Zuschlag schätzen.|Ṣírò ìyára àti iye dátà ìgbéjáde ìjọsìn pẹ̀lú ìṣàn fídíò àti ohùn tó dúró àti àfikún tí o yàn.|Estimate upload speed and data for service livestream when the video and audio rate stay steady. Add your overhead allowance.",
     [
@@ -715,7 +719,7 @@ export const practicalTools = {
       return [bandwidth,bandwidth*minutes*60/8000];
     }),
 
-  "meeting-quorum": tool("World & Culture",
+  "meeting-quorum": tool("Civics & Politics",
     "Meeting quorum count|Beschlussfähigkeitsgrenze|Iye ènìyàn tó yẹ fún ìpàdé|Meeting quorum count",
     "Apply the attendance percentage in your meeting rules to eligible members, rounding up to a whole person.|Den Mindestanteil aus der Geschäftsordnung auf stimmberechtigte Mitglieder anwenden und aufrunden.|Lo ìpín wíwà nínú òfin ìpàdé fún ọmọ ẹgbẹ́ tó yẹ, yí i sókè sí ènìyàn odidi.|Use the attendance percentage for your own meeting rules. Round up to a whole person.",
     [
@@ -732,7 +736,7 @@ export const practicalTools = {
       return [needed,present/members*100,Math.max(0,needed-present)];
     }),
 
-  "shaft-torque": tool("Home & Construction",
+  "shaft-torque": tool("Electronics & Automation",
     "Motor shaft torque|Motordrehmoment an der Welle|Yíyí agbára ọ̀pá mọ́tò|Motor shaft torque",
     "Convert mechanical shaft power and rotational speed to torque. Use the mechanical output power of the motor.|Mechanische Wellenleistung und Drehzahl in Drehmoment umrechnen. Mechanische Ausgangsleistung des Motors eingeben.|Yí agbára ọ̀pá mọ́tò àti ìyára yíyí padà sí agbára yíyí. Lo agbára tí mọ́tò ń fún ọ̀pá.|Use shaft output power and rotational speed to work out torque.",
     [
@@ -746,7 +750,7 @@ export const practicalTools = {
       return [speed,power*1000/speed];
     }),
 
-  "fx-round-trip": tool("Finance",
+  "fx-round-trip": tool("Trading",
     "FX spread and round-trip cost|Devisenspread und Kosten für Kauf und Rückverkauf|Àlàfo iye owó àjèjì àti ináwó rírà padà|FX spread and round-trip cost",
     "Estimate an immediate buy and sell at the quoted ask and bid. Use quote currency per one base unit and one commission rate for both orders.|Sofortigen Kauf und Rückverkauf zum Brief- und Geldkurs schätzen. Kurswährung je Basiseinheit und gleichen Provisionssatz verwenden.|Fojú díwọ̀n rírà àti títà lẹ́sẹ̀kẹsẹ̀. Lo owó kejì fún ẹyọ owó ìpìlẹ̀ kan àti ìpín owó iṣẹ́ kan náà.|Estimate a buy and sell at the quoted ask and bid. Use quote currency per base unit and the same commission for both.",
     [
@@ -785,7 +789,7 @@ export const practicalTools = {
       return [inputCost,outputCost,inputCost+outputCost];
     }),
 
-  "worship-song-range": tool("World & Culture",
+  "worship-song-range": tool("Faith & Outreach",
     "Worship song transposition range|Transpositionsbereich für Gemeindelieder|Àlàfo yíyí ohùn orin ìjọsìn|Worship song transposition range",
     "Compare the melody range with the comfortable singing range. Use MIDI note numbers. Negative shifts lower the key, and dashes mean the range is too wide.|Melodieumfang und bequemen Stimmumfang vergleichen. MIDI-Notennummern verwenden. Negative Werte senken die Tonart. Striche zeigen einen zu großen Umfang.|Fi àlàfo orin wé àlàfo ohùn tó rọrùn. Lo nọ́mbà MIDI. Iye òdì dín ohùn kù, àmì gígùn sì fi hàn pé àlàfo tóbi jù.|Compare the melody range with the range wey easy to sing. Use MIDI note numbers. Negative shifts lower the key. Dashes mean the melody range too wide.",
     [
@@ -804,7 +808,7 @@ export const practicalTools = {
       return [high-low,min<=max?min:null,min<=max?max:null];
     }),
 
-  "council-seat-projection": tool("World & Culture",
+  "council-seat-projection": tool("Civics & Politics",
     "Three-list seat projection|Sitzprojektion für drei Listen|Ìṣírò ìjókòó fún àtòjọ mẹ́ta|Three-list seat projection",
     "Model proportional seats for three lists with the largest-remainder method. Equal remainders follow the listed order. No vote threshold is applied.|Proportionale Sitze für drei Listen nach dem Verfahren der größten Reste modellieren. Bei Gleichstand gilt die Reihenfolge. Keine Sperrklausel.|Ṣírò ìjókòó díẹ̀-díẹ̀ fún àtòjọ mẹ́ta pẹ̀lú àṣẹ́kù tó ga jù. Bí wọ́n bá dọ́gba, tẹ̀lé bí a ṣe tò wọ́n. Kò sí iye ìbò tó kéré jù.|Estimate seats for three lists with the largest-remainder method. Ties follow list order. This model no use vote threshold.",
     [
@@ -828,7 +832,7 @@ export const practicalTools = {
       return allocations;
     }),
 
-  "loaded-voltage-divider": tool("Home & Construction",
+  "loaded-voltage-divider": tool("Electronics & Automation",
     "Loaded voltage divider|Belasteter Spannungsteiler|Olùpín foliteji pẹ̀lú ẹrù|Loaded voltage divider",
     "Compare the divider output before and after you connect a resistive load across the lower resistor.|Teilerausgang ohne Last und mit einem Lastwiderstand parallel zum unteren Widerstand vergleichen.|Fi foliteji olùpín wé ṣáájú àti lẹ́yìn fífi ẹrù so mọ́ resístọ̀ ìsàlẹ̀.|Compare output before and after you put a resistive load across the bottom resistor.",
     [
@@ -846,7 +850,7 @@ export const practicalTools = {
       return [input*lower/(upper+lower),loaded,loaded/load*1000];
     }),
 
-  "futures-tick-result": tool("Finance",
+  "futures-tick-result": tool("Trading",
     "Futures tick profit and loss|Gewinn und Verlust je Futures-Tick|Èrè àti òfo fún ìgbésẹ̀ futures|Futures tick profit and loss",
     "Calculate the result of a long futures position from the price movement, contract tick size and value, and total fees. Use one currency.|Ergebnis einer Long-Futures-Position aus Kursbewegung, Tickgröße, Tickwert und Gebühren berechnen. Eine Währung verwenden.|Ṣírò èrè tàbí òfo futures rírà láti inú ìyípadà iye, ìgbésẹ̀ àti owó iṣẹ́. Lo owó kan náà.|Work out a long futures trade from price movement, tick size, tick value and all fees. Use one currency.",
     [
@@ -887,7 +891,7 @@ export const practicalTools = {
       return [ratio(tp,tp+fp),ratio(tp,tp+fn),ratio(tn,tn+fp),ratio(2*tp,2*tp+fp+fn)];
     }),
 
-  "food-relief-parcels": tool("World & Culture",
+  "food-relief-parcels": tool("Faith & Outreach",
     "Food relief parcel capacity|Kapazität für Lebensmittelpakete|Iye àpò oúnjẹ ìrànlọ́wọ́|Food relief parcel capacity",
     "Find how many households can receive one complete parcel with the available staple food and packed items.|Haushalte mit einem vollständigen Paket aus verfügbaren Grundnahrungsmitteln und Packartikeln ermitteln.|Rí iye ìdílé tí ó lè gba àpò oúnjẹ pípé pẹ̀lú oúnjẹ àti ohun tí ó wà.|Check how many households fit get one complete food parcel with the staple and packed items wey dey.",
     [
@@ -906,7 +910,7 @@ export const practicalTools = {
       return [complete,households-complete,Math.max(0,households*kilos-stock),Math.max(0,households*perParcel-items)];
     }),
 
-  "civic-survey-interval": tool("World & Culture",
+  "civic-survey-interval": tool("Civics & Politics",
     "Civic survey support interval|Intervall für Zustimmung in Umfragen|Àlàfo ìtìlẹ́yìn nínú ìwádìí|Civic survey support interval",
     "Estimate a Wilson interval for a simple random sample. Enter 1.96 for an approximate 95% interval. Weighting and nonresponse are excluded.|Wilson-Intervall für eine einfache Zufallsstichprobe schätzen. Für etwa 95 % den Wert 1,96 eingeben. Gewichtung und Antwortausfall bleiben unberücksichtigt.|Ṣírò àlàfo Wilson fún àpẹẹrẹ tí a yàn laileto. Tẹ 1.96 fún àlàfo 95% ní ìsúnmọ́. A kò ka ìwọ̀n àfikún tàbí àìdáhùn.|Estimate a Wilson interval for a simple random sample. Enter 1.96 for about 95%. The model no include weighting or missing replies.",
     [
@@ -923,6 +927,95 @@ export const practicalTools = {
       const midpoint=(p+z2/(2*total))/scale;
       const half=z*Math.sqrt((p*(1-p)+z2/(4*total))/total)/scale;
       return [p*100,Math.max(0,midpoint-half)*100,Math.min(1,midpoint+half)*100];
+    }),
+
+  "current-loop-scaling": tool("Electronics & Automation",
+    "4–20 mA sensor scaling|4–20-mA-Sensorskalierung|Ìyípadà ìwọ̀n sensọ 4–20 mA|4–20 mA sensor scaling",
+    "Convert a current reading to the sensor’s engineering units and percent of span. Readings outside the range extrapolate linearly.|Strommesswert in die physikalische Einheit und Prozent des Messbereichs umrechnen. Außerhalb des Bereichs wird linear extrapoliert.|Yí ìṣàn tí a wọn padà sí ìwọ̀n sensọ àti ìpín ààyè rẹ̀. Iye tó jáde kúrò ní ààyè ń tẹ̀síwájú ní ìlà tààrà.|Convert current to the sensor’s unit and percent of span. Outside the range, the line keeps going.",
+    [
+      {...number("loopMeasuredMilliamps","Measured current (mA)|Gemessener Strom (mA)|Ìṣàn tí a wọn (mA)|Measured current (mA)"),max:40},
+      number("loopSignalAtFour","Sensor value at 4 mA|Sensorwert bei 4 mA|Iye sensọ ní 4 mA|Sensor value for 4 mA",-1e12),
+      number("loopSignalAtTwenty","Sensor value at 20 mA|Sensorwert bei 20 mA|Iye sensọ ní 20 mA|Sensor value for 20 mA",-1e12),
+    ],[
+      "Scaled sensor value|Skalierter Sensorwert|Iye sensọ lẹ́yìn ìṣírò|Scaled sensor value",
+      "Measured span (%)|Anteil der Messspanne (%)|Ìpín ààyè ìwọ̀n (%)|Measured span (%)",
+    ],(milliamps,lower,upper)=>{
+      above(upper!==lower,"loopSignalAtTwenty");
+      const share=(milliamps-4)/16;
+      return [lower+share*(upper-lower),100*share];
+    }),
+
+  "position-loss-budget": tool("Trading",
+    "Position size from a loss budget|Positionsgröße aus Verlustbudget|Iye ẹyọ gẹ́gẹ́ bí ààlà òfo|Position size from loss budget",
+    "Model a whole-unit long position under a hypothetical exit loss and per-unit costs. Price gaps can change the actual loss.|Ganze Stückzahl einer Long-Position aus hypothetischem Ausstiegsverlust und Stückkosten modellieren. Kurslücken können den tatsächlichen Verlust verändern.|Ṣírò iye ẹyọ odidi fún rírà pẹ̀lú òfo tí a fojú díwọ̀n àti owó iṣẹ́ ẹyọ. Ìfo iye lè yí òfo gidi padà.|Work out whole units for a long position using a possible exit and fees. Price jumps fit change the real loss.",
+    [
+      positive("positionEntryPrice","Entry price per unit|Einstiegskurs je Einheit|Iye ìwọlé fún ẹyọ|Entry price per unit"),
+      number("positionAssumedExitPrice","Assumed lower exit price|Angenommener niedrigerer Ausstiegskurs|Iye ìjáde kékeré tí a fojú díwọ̀n|Assumed lower exit price"),
+      number("positionFeePerUnit","Estimated total fees per unit|Geschätzte Gesamtgebühren je Einheit|Owó iṣẹ́ ẹyọ kan|Estimated total fees per unit"),
+      number("positionMaximumLoss","Maximum modeled loss budget|Maximales modelliertes Verlustbudget|Ààlà òfo tí a fojú díwọ̀n|Maximum modeled loss budget"),
+    ],[
+      "Modeled loss per unit|Modellierter Verlust je Einheit|Òfo ẹyọ kan tí a ṣírò|Modeled loss per unit",
+      "Maximum whole units|Maximale ganze Stückzahl|Iye ẹyọ odidi tó pọ̀ jù|Maximum full units",
+      "Modeled loss at that size|Modellierter Verlust bei dieser Größe|Òfo tí a ṣírò ní iye yẹn|Modeled loss for that size",
+    ],(entry,exit,fees,budget)=>{
+      above(exit<entry,"positionAssumedExitPrice");
+      const exposure=Number((entry-exit+fees).toPrecision(14));
+      const quantity=Math.floor(budget/exposure);
+      return [exposure,quantity,quantity*exposure];
+    }),
+
+  "embedding-index-storage": tool("Token & AI",
+    "Embedding index storage|Speicher für Embedding-Indizes|Ìpamọ́ atọ́ka embedding|Embedding index storage",
+    "Estimate raw vector storage and add a measured per-vector allowance for metadata and indexing. Uses decimal gigabytes.|Rohspeicher für Vektoren plus einen gemessenen Zuschlag je Vektor für Metadaten und Index berechnen. Verwendet dezimale Gigabyte.|Ṣírò ibi ìpamọ́ vector àti àfikún tí a wọn fún dátà àfikún àti atọ́ka. Lo GB eleemewa.|Estimate raw vector storage and add your measured metadata and indexing bytes per vector. Uses decimal GB.",
+    [
+      whole("storedEmbeddingCount","Embeddings to store|Zu speichernde Embeddings|Iye embedding láti tọ́jú|Embeddings to store"),
+      whole("embeddingDimensionCount","Dimensions per embedding|Dimensionen je Embedding|Ìwọ̀n inú embedding kan|Dimensions per embedding"),
+      {...whole("bytesPerVectorDimension","Stored bytes per dimension|Gespeicherte Bytes je Dimension|Báìtì fún ìwọ̀n kan|Stored bytes per dimension"),max:8},
+      whole("indexExtraBytesPerVector","Metadata and index bytes per vector|Metadaten- und Indexbytes je Vektor|Báìtì àfikún fún vector kan|Metadata and index bytes per vector",0),
+    ],[
+      "Raw vectors (GB)|Rohvektoren (GB)|Vector gidi (GB)|Raw vectors (GB)",
+      "Metadata and index (GB)|Metadaten und Index (GB)|Dátà àfikún àti atọ́ka (GB)|Metadata and index (GB)",
+      "Estimated storage (GB)|Geschätzter Speicher (GB)|Ìpamọ́ tí a fojú díwọ̀n (GB)|Estimated storage (GB)",
+    ],(count,dimensions,bytes,extra)=>{
+      const raw=count*dimensions*bytes/1e9;
+      const overhead=count*extra/1e9;
+      return [raw,overhead,raw+overhead];
+    }),
+
+  "wireless-mic-batteries": tool("Faith & Outreach",
+    "Service microphone batteries|Mikrofonbatterien für Gottesdienste|Batiri gbohùngbohùn ìjọsìn|Service microphone batteries",
+    "Plan battery sets for identical wireless microphones used throughout a service. Enter measured runtime per fresh set and any spare sets.|Batteriesätze für gleiche Funkmikrofone während eines Gottesdienstes planen. Gemessene Laufzeit eines neuen Satzes und Reserve eingeben.|Ṣètò batiri fún gbohùngbohùn aláìlókùn tó jọra ní ìjọsìn. Tẹ àkókò ìdánwò batiri tuntun àti iye àfikún.|Plan battery sets for identical wireless mics used throughout service. Enter the measured runtime and your spare sets.",
+    [
+      whole("wirelessMicCount","Microphones in use|Verwendete Mikrofone|Iye gbohùngbohùn tí a lò|Microphones in use"),
+      positive("micUseHours","Service runtime (h)|Einsatzdauer (h)|Àkókò iṣẹ́ (wákàtí)|Service runtime (h)"),
+      positive("micSetHours","Measured runtime per set (h)|Gemessene Laufzeit je Satz (h)|Àkókò tí batiri kan lè ṣiṣẹ́ (wákàtí)|Measured runtime per set (h)"),
+      whole("cellsPerMicSet","Batteries in one set|Batterien je Satz|Batiri nínú ìdì kan|Batteries in one set"),
+      whole("eventMicSpareSets","Extra sets for the whole event|Reservesätze für die Veranstaltung|Ìdì batiri àfikún fún àpéjọ|Extra sets for the whole event",0),
+    ],[
+      "Changes per microphone|Wechsel je Mikrofon|Ìyípadà fún gbohùngbohùn kan|Changes per microphone",
+      "Sets to pack including spares|Einzupackende Sätze mit Reserve|Ìdì batiri pẹ̀lú àfikún|Sets to pack including spares",
+      "Individual batteries to pack|Einzupackende Einzelbatterien|Iye batiri kọ̀ọ̀kan|Individual batteries to pack",
+    ],(count,hours,runtime,cells,spares)=>{
+      const sets=roundUp(hours/runtime);
+      const total=count*sets+spares;
+      return [sets-1,total,total*cells];
+    }),
+
+  "motion-approval": tool("Civics & Politics",
+    "Motion approval threshold|Zustimmungsgrenze für Anträge|Ààlà ìtẹ́wọ́gbà àbá|Motion approval threshold",
+    "Apply an at-least percentage rule to the denominator your meeting uses. The result rounds the minimum yes votes up to a whole vote.|Eine Mindestquote auf die maßgebliche Grundgesamtheit anwenden. Die erforderlichen Ja-Stimmen werden aufgerundet.|Lo ìpín tó kéré jù sí iye ìbò tí ìpàdé ń lò. Yí iye ìbò bẹ́ẹ̀ni sókè sí odidi.|Use the denominator for your meeting rules and the at-least share you need. Round the required yes votes up.",
+    [
+      whole("motionCountedVoteBase","Votes or seats in the rule’s denominator|Stimmen oder Sitze in der Regelbasis|Ìbò tàbí ìjókòó tí òfin ń kà|Votes or seats wey the rule counts"),
+      percent("motionApprovalShare","Approval required, at least (%)|Erforderliche Zustimmung, mindestens (%)|Ìpín ìtẹ́wọ́gbà tó kéré jù (%)|Approval required, at least (%)",0.01),
+      whole("motionYesVotes","Yes votes received|Erhaltene Ja-Stimmen|Ìbò bẹ́ẹ̀ni tí a rí|Yes votes received",0),
+    ],[
+      "Minimum yes votes|Erforderliche Ja-Stimmen|Ìbò bẹ́ẹ̀ni tó kéré jù|Minimum yes votes",
+      "Actual yes share (%)|Tatsächlicher Ja-Anteil (%)|Ìpín bẹ́ẹ̀ni gidi (%)|Actual yes share (%)",
+      "Additional yes votes needed|Noch benötigte Ja-Stimmen|Ìbò bẹ́ẹ̀ni míì tí a nílò|Extra yes votes wey you need",
+    ],(denominator,share,yes)=>{
+      above(yes<=denominator,"motionYesVotes");
+      const minimum=roundUp(denominator*share/100);
+      return [minimum,yes/denominator*100,Math.max(0,minimum-yes)];
     }),
 };
 
