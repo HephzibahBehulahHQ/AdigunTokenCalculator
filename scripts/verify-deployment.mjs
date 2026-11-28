@@ -123,19 +123,21 @@ async function verifyBrowser(){
   await page.locator(".tool-card").first().waitFor();
   if(optionalAccounts)await page.getByRole("button",{name:/Account · Signed out/}).waitFor();
   const keys=await page.locator(".tool-card").evaluateAll(nodes=>nodes.map(node=>node.dataset.toolKey));
-  assert.equal(keys.length,91);assert.equal(new Set(keys).size,keys.length);
-  assert.equal(await page.locator(".category-chip").count(),15);
+  assert.equal(keys.length,96);assert.equal(new Set(keys).size,keys.length);
+  assert.equal(await page.locator(".category-chip").count(),19);
   await page.locator("#search").fill("offline currency");assert.equal(await page.locator(".tool-card").count(),1);await page.locator("#search").fill("");
   const expectedGroups={
-    "Home & Construction":["paint-coverage","concrete-slab","tile-order","fence-posts","ramp-geometry","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque","loaded-voltage-divider"],
+    "Home & Construction":["paint-coverage","concrete-slab","tile-order","fence-posts","ramp-geometry"],
     "Garden & Water":["rainwater-harvest","drip-irrigation","plant-spacing"],
-    "Business & Work":["product-break-even","shift-staffing","pump-energy","conveyor-throughput","inventory-reorder","community-event-seating","community-match-funding","public-service-backlog","public-comment-slots"],
-    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost","classification-metrics"],
-    "World & Culture":["scripture-reading-plan","election-turnout","sermon-timing","outreach-print-order","service-livestream-data","meeting-quorum","worship-song-range","council-seat-projection","food-relief-parcels","civic-survey-interval"],
-    Finance:["trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff","fx-round-trip","futures-tick-result"],
+    "Business & Work":["product-break-even","shift-staffing","community-event-seating"],
     "Education & Sport":["final-grade-target","running-pace","cycling-gear-speed"],
     "Conversion":["print-resolution","ev-charging-session","dough-hydration"],
-    Developer:["download-time","pcm-audio-size"],
+    "Developer":["download-time","pcm-audio-size"],
+    "Token & AI":["llm-output-capacity","ai-dataset-split","ai-model-weight-memory","ai-annotation-capacity","llm-batch-token-cost","classification-metrics","embedding-index-storage"],
+    "Electronics & Automation":["pump-energy","conveyor-throughput","dc-cable-voltage-drop","led-series-resistor","transformer-turns","shaft-torque","loaded-voltage-divider","current-loop-scaling"],
+    "Trading":["inventory-reorder","trade-fee-break-even","two-lot-cost-basis","drawdown-recovery","trade-payoff","fx-round-trip","futures-tick-result","position-loss-budget"],
+    "Faith & Outreach":["scripture-reading-plan","sermon-timing","outreach-print-order","service-livestream-data","worship-song-range","food-relief-parcels","wireless-mic-batteries"],
+    "Civics & Politics":["community-match-funding","election-turnout","public-service-backlog","public-comment-slots","meeting-quorum","council-seat-projection","civic-survey-interval","motion-approval"],
   };
   const categorized=[];
   const filters=page.locator(".category-chip");

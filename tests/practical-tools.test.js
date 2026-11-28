@@ -64,4 +64,9 @@ test("rejects invalid domains and handles real boundary conditions", () => {
   assert.deepEqual(run(49,{truePositiveCount:0,falsePositiveCount:0,falseNegativeCount:0}), [null,null,100,null]);
   assert.deepEqual(run(50,{packedItemsAvailable:300,stapleKgInStock:300}), [100,0,0,0]);
   assert.throws(() => run(51,{civicSurveySupporters:101}), {field:"civicSurveySupporters"});
+  assert.deepEqual(run(52,{loopMeasuredMilliamps:0}), [-60,-25]);
+  assert.deepEqual(run(53,{positionMaximumLoss:1}), [3.25,0,0]);
+  assert.throws(() => run(54,{bytesPerVectorDimension:9}), {field:"bytesPerVectorDimension"});
+  assert.deepEqual(run(55,{micUseHours:2,eventMicSpareSets:0}), [0,4,8]);
+  assert.throws(() => run(56,{motionYesVotes:26}), {field:"motionYesVotes"});
 });

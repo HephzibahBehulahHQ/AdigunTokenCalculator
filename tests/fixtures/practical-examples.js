@@ -51,4 +51,9 @@ export const practicalExamples = [
   ["classification-metrics", {truePositiveCount:80,falsePositiveCount:20,trueNegativeCount:90,falseNegativeCount:10}, [80,800/9,900/11,16000/190]],
   ["food-relief-parcels", {recipientHouseholds:100,stapleKgPerParcel:2,stapleKgInStock:170,packedItemsPerParcel:3,packedItemsAvailable:240}, [80,20,30,60]],
   ["civic-survey-interval", {civicSurveyRespondents:100,civicSurveySupporters:50,surveyNormalCritical:2}, [50,50-10/Math.sqrt(1.04),50+10/Math.sqrt(1.04)]],
+  ["current-loop-scaling", {loopMeasuredMilliamps:12,loopSignalAtFour:-40,loopSignalAtTwenty:40}, [0,50]],
+  ["position-loss-budget", {positionEntryPrice:25,positionAssumedExitPrice:22,positionFeePerUnit:0.25,positionMaximumLoss:100}, [3.25,30,97.5]],
+  ["embedding-index-storage", {storedEmbeddingCount:1000000,embeddingDimensionCount:768,bytesPerVectorDimension:4,indexExtraBytesPerVector:128}, [3.072,0.128,3.2]],
+  ["wireless-mic-batteries", {wirelessMicCount:4,micUseHours:5,micSetHours:2,cellsPerMicSet:2,eventMicSpareSets:2}, [2,14,28]],
+  ["motion-approval", {motionCountedVoteBase:25,motionApprovalShare:60,motionYesVotes:14}, [15,56,1]],
 ];
