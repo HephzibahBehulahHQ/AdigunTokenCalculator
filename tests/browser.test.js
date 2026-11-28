@@ -2,32 +2,28 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {existsSync} from "node:fs";
 import {createHash} from "node:crypto";
-import {spawn} from "node:child_process";
-import {setTimeout as delay} from "node:timers/promises";
+import {createServer} from "vite";
 import {chromium} from "playwright-core";
 import {RESULT_COPY,RESULT_LABELS,resultText} from "../src/result-i18n.js";
 import "../src/feature-i18n.js";
 import {I} from "../src/i18n.js";
 
-const browserAvailable=existsSync(chromium.executablePath());
+const executablePath=process.env.PRODUCT_TEST_CHROMIUM||chromium.executablePath();
+const browserAvailable=existsSync(executablePath);
 
 test("browser directory, filters, deep links and calculator workflow", {skip:!browserAvailable,timeout:120000}, async(t)=>{
-  const server=spawn(process.execPath,["node_modules/vite/bin/vite.js","--host","127.0.0.1","--port","4173","--strictPort"],{stdio:"ignore"});
+  const server=await createServer({logLevel:"silent",server:{host:"127.0.0.1",port:0}});
   let browser;
   try{
-    let ready=false;
-    for(let i=0;i<50;i++){
-      try{const response=await fetch("http://127.0.0.1:4173/");if(response.ok){ready=true;break;}}catch{}
-      await delay(300);
-    }
-    assert.ok(ready,"Vite development server should start");
-    browser=await chromium.launch({headless:true});
+    await server.listen();
+    const url=server.resolvedUrls.local[0],origin=new URL(url).origin;
+    browser=await chromium.launch({executablePath,headless:true});
     const page=await browser.newPage({locale:"en-US"}),pageErrors=[],externalRequests=[],strengthRequests=[];
     page.on("pageerror",e=>pageErrors.push(e.message));
-    page.on("request",request=>{try{if(new URL(request.url()).host!=="127.0.0.1:4173")externalRequests.push(request.url());}catch{externalRequests.push(request.url());}});
+    page.on("request",request=>{try{if(new URL(request.url()).origin!==origin)externalRequests.push(request.url());}catch{externalRequests.push(request.url());}});
     page.on("request",request=>{if(/password-strength|zxcvbn/.test(request.url()))strengthRequests.push(request.url());});
     await page.addInitScript(()=>{window.__geoCalls=0;window.__geoRequests=[];Object.defineProperty(navigator,"geolocation",{configurable:true,value:{getCurrentPosition(success,error){window.__geoCalls++;window.__geoRequests.push({success,error});}}});});
-    await page.goto("http://127.0.0.1:4173/");
+    await page.goto(url);
     await page.locator("#panel[data-tool-key=token] h1").waitFor();
     assert.equal(await page.locator('textarea[name="text"]').inputValue(),"Hello world!");
     await page.locator('#panel button[type="submit"]').click();
@@ -39,12 +35,12 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.equal(await page.locator("#theme").getAttribute("aria-pressed"),"true");
     await page.locator("#theme").click();
     assert.equal(await page.locator(".tool-card").count(),200);
-    assert.equal(await page.locator(".category-chip").count(),19);
-    await page.locator(".category-chip").nth(5).click();
+    assert.equal(await page.locator(".category-chip").count(),6);
+    await page.locator('[data-track-filter="civics"]').click();
     assert.ok(await page.locator(".tool-card").count()>0);
     await page.locator(".category-chip").first().click();
     await page.locator("#search").fill("offline currency");
-    assert.equal(await page.locator(".tool-card").count(),1);
+    assert.equal(await page.locator(".tool-card").first().getAttribute("data-tool-key"),"currency");
     await page.locator("#search").fill("");
     await page.locator('.tool-card[data-tool-key="currency"]').click();
     await page.waitForFunction(()=>document.querySelector("#panel h2")?.textContent==="Offline currency converter");
@@ -109,7 +105,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await page.keyboard.press("Enter");
     await page.waitForFunction(()=>!document.querySelector("#panel")?.hidden);
     assert.equal(await page.evaluate(()=>window.__geoCalls),0,"Qibla must not request geolocation before explicit activation");
-    await page.goto("http://127.0.0.1:4173/#/timezone");
+    await page.goto(url+"#/timezone");
     assert.match(await page.locator("#panel h2").innerText(),/Time zone converter/);
     assert.equal(await page.locator("#panel form").count(),1);
 
@@ -162,7 +158,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     await t.test("keyboard focus follows filters, tool entry and back navigation",async()=>{
       await page.locator(".back-directory").click();
       await page.waitForFunction(()=>!document.querySelector("aside").hidden);
-      await page.locator(".category-chip").nth(5).click();
+      await page.locator('[data-track-filter="civics"]').click();
       assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute("aria-pressed")),"true");
       await page.locator(".category-chip").first().click();
       await page.locator('.tool-card[data-tool-key="bmi"]').focus();await page.keyboard.press("Enter");
@@ -383,7 +379,7 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
       try{
         const agePage=await context.newPage();agePage.on("pageerror",e=>pageErrors.push(e.message));
         await agePage.clock.setFixedTime(new Date("2026-01-01T00:30:00Z"));
-        await agePage.goto("http://127.0.0.1:4173/#/age");
+        await agePage.goto(url+"#/age");
         for(const locale of ["en","de","yo","pcm"]){
           await agePage.locator("#language").selectOption(locale);
           await agePage.locator('input[name="birth"]').fill("2000-12-31");
@@ -678,14 +674,14 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
         await cancel.click();await assertDirectory();
       }
       await page.locator("#language").selectOption("en");
-      await page.goto("http://127.0.0.1:4173/#/bac");
+      await page.goto(url+"#/bac");
       await dialog.waitFor();
       assert.equal(await accept.isDisabled(),true,"direct links require fresh consent");
       await page.keyboard.press("Escape");await assertDirectory();
     });
     await t.test("malformed and unknown fragments recover to the directory",async()=>{
       for(const hash of ["#/%","#/%E0%A4%A","#/missing"]){
-        await page.goto("http://127.0.0.1:4173/"+hash);
+        await page.goto(url+hash);
         await page.reload();
         await page.locator(".tool-card").first().waitFor();
         assert.equal(await page.locator(".tool-card").count(),200);
@@ -701,6 +697,6 @@ test("browser directory, filters, deep links and calculator workflow", {skip:!br
     assert.deepEqual(externalRequests,[],"calculator workflows must not make third-party network requests");
   }finally{
     if(browser)await browser.close();
-    server.kill("SIGTERM");
+    await server.close();
   }
 });

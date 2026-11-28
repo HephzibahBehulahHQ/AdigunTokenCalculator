@@ -15,7 +15,9 @@ import {mountBacGate} from "./bac-gate.js";
 import {errorFields,attachFormError,clearFormError} from "./form-errors.js";
 import {createQr} from "./qr.js";
 import {registerLoadCalculator,mountLoadCalculator} from "./tools/loadCalculatorUI.js";
-import {calculatePracticalTool,practicalCategories,practicalTools,registerPracticalCategories,registerPracticalTools} from "./practical-tools.js";
+import {calculatePracticalTool,practicalTools,registerPracticalCategories,registerPracticalTools} from "./practical-tools.js";
+import {directoryLocation,directoryText} from "./calculator-directory.js";
+import {mountCalculatorDirectory} from "./calculator-directory-ui.js";
 import {ACCESSIBILITY_COPY} from "./accessibility-i18n.js";
 import "./styles.css";
 import { mountProductAccount } from "./product-account.js";
@@ -27,7 +29,7 @@ if (accountMode === "true" || accountMode === "optional") {
   mountProductAccount({ requireAccess: accountMode === "true" });
 }
 
-const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel"),search=$("#search");
+const $=s=>document.querySelector(s),nav=$("#nav"),panel=$("#panel");
 const main=$("#main");
 const offlineStatus=mountOfflineStatus($("footer"),{language:"en"});
 main.tabIndex=-1;
@@ -37,7 +39,7 @@ $(".skip").addEventListener("click",event=>{
  main.focus();
  main.scrollIntoView({block:"start"});
 });
-let lang="en",active=-1,memoryValue=0,calculationRequest=0,activeCategory="All";
+let lang="en",active=-1,memoryValue=0,calculationRequest=0;
 const keys=["token","math","text","temp","age","bmi","percent","world","demographics","practice","zakat","qibla","units","loan","dates","gpa","fuel","sleep","timezone","currency","inflation","tip","calories","pregnancy","water","bac","roman","bases","password","qr","hash","json","color","discount","recipe","holidays","morse","stats"];
 registerLoadCalculator(keys);
 const schema={
@@ -98,15 +100,18 @@ function makeField(form,spec){const [key,type,opts,def]=spec,wrap=el("label","fi
  else if(type==="textarea"){input=el("textarea");input.rows=key==="text"?7:5;input.required=true;if(key==="shares")input.placeholder="Christianity, 30\nIslam, 25\nUnaffiliated, 20";}
  else{input=el("input");input.type=type;if(type==="number"){input.step="any";input.required=true;if(!["lat","lon","value","a","b"].includes(key))input.min="0";if(key==="lat"){input.min="-90";input.max="90";}if(key==="lon"){input.min="-180";input.max="180";}}else input.required=true;}
  input.name=key;if(def!==undefined)input.value=def;wrap.append(input);form.append(wrap);return input;}
-function renderNav(){
- nav.replaceChildren();const q=search.value.toLocaleLowerCase(),categories=tr().categories||["All"],values=["All","Token & AI","Math","Text & Language","Conversion","Health","Finance","Time & Date","World & Culture","Developer","Security & Privacy",...practicalCategories.map(([id])=>id)],chips=$("#categories");
- chips.replaceChildren();categories.forEach((name,i)=>{const b=el("button","category-chip",name);b.type="button";b.setAttribute("aria-pressed",values[i]===activeCategory?"true":"false");b.addEventListener("click",()=>{activeCategory=values[i]||"All";renderNav();chips.querySelector('[aria-pressed="true"]')?.focus();});chips.append(b);});
- const icons={"Token & AI":"🔤","Math":"∑","Text & Language":"文","Conversion":"⇄","Health":"♥","Finance":"¤","Time & Date":"◷","World & Culture":"◎","Developer":"{}","Security & Privacy":"⌑","Home & Construction":"⌂","Garden & Water":"♧","Business & Work":"▤","Education & Sport":"◇","Electronics & Automation":"⚡","Trading":"↗","Faith & Outreach":"✝","Civics & Politics":"▥"};
- keys.forEach((key,i)=>{const category=tr().toolCategoryByKey[key]||tr().groups[i];if(activeCategory!=="All"&&category!==activeCategory)return;if(q&&!tr().names[i].toLocaleLowerCase().includes(q)&&!tr().descriptions[i].toLocaleLowerCase().includes(q))return;
-  const card=el("button","tool-card");card.type="button";card.dataset.toolKey=key;card.setAttribute("aria-label",tr().names[i]);const glyph=el("span","tool-icon",icons[category]||"•");glyph.setAttribute("aria-hidden","true");const title=el("strong","tool-card-title",tr().names[i]);const desc=el("span","tool-card-description",tr().descriptions[i]);const tag=el("span","tool-card-category",tr().toolCategoryLabels?.[category]||category);card.append(glyph,title,desc,tag);card.addEventListener("click",()=>{location.hash="#/"+key;});nav.append(card);
- });
- if(!nav.children.length)nav.append(el("p","muted",tr().noResults||"No matching tools."));
-}
+const renderNav=mountCalculatorDirectory({
+ keys,
+ labels(position,language){
+  return {title:I[language].names[position],description:I[language].descriptions[position],
+    alternates:Object.values(I).map(copy=>copy.names[position])};
+ },
+ fields(key,language){
+  return (schema[key]||[]).flatMap(([field])=>[I[language].fields[field]||"",I.en.fields[field]||""]);
+ },
+ getLanguage:()=>lang,
+ openCalculator:key=>{location.hash="#/"+key;},
+});
 function out(k){if(RESULT_LABELS[lang]?.[k])return RESULT_LABELS[lang][k];if(tr().additionalOutputs?.[k])return tr().additionalOutputs[k];if(tr().outputs?.[k])return tr().outputs[k];if(k.startsWith("Category "))return (tr().outputs?.Category||"Category")+" "+k.slice(9);if(k.startsWith("After "))return (tr().outputs?.["After cycles"]||"After cycles")+" "+k.slice(6).replace(" cycles","");return k;}
 function result(rows,note="",kind="status"){clearFormError(panel.querySelector("form"));panel.querySelector(".result")?.remove();const box=el("section","result");box.className="result "+(kind==="error"?"result-error":"");box.setAttribute("role",kind==="error"?"alert":"status");box.setAttribute("aria-live","polite");box.append(el("h3","",tr().result));rows.forEach(([k,v])=>{const r=el("div","result-row");r.append(el("span","",out(k)),el("strong","",String(v)));box.append(r);});if(note)box.append(el("p","notice",note));panel.append(box);return box;}
 const fmt=(n,d=3,preserveSmall=false)=>formatNumber(n,lang,d,preserveSmall);
@@ -211,7 +216,7 @@ function renderTool(){
  aside.hidden=!home;panel.hidden=false;
  const i=home?keys.indexOf("token"):active,k=keys[i];panel.dataset.toolKey=k;panel.replaceChildren();
  const back=el("button","secondary back-directory",tr().backToDirectory||"Back to all tools");back.type="button";back.addEventListener("click",()=>{location.hash="#/";});if(!home)panel.append(back);
- const head=el("div","tool-heading");head.append(el("p","eyebrow",tr().groups[i]),el(home?"h1":"h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);head.querySelector("h1,h2").tabIndex=-1;
+ const head=el("div","tool-heading");head.append(el("p","eyebrow",directoryText(directoryLocation(k).group.label,lang)),el(home?"h1":"h2","",tr().names[i]),el("p","tool-description",tr().descriptions[i]));panel.append(head);head.querySelector("h1,h2").tabIndex=-1;
  if(k==="electrical-load"){mountLoadCalculator(panel,{lang});return;}
  if(k==="world"){const r=c.populationEstimate(new Date());const box=result([["Estimated population",fmt(r.rounded,0)],["Estimated net change per day",fmt(r.perDay,0)],["Reference baseline",fmt(r.baseline,0)+" · "+r.baselineDate]],tr().worldEstimateNotice||"Estimate, not live data. Population is linearly interpolated from two UN medium-variant mid-year estimates. Births, deaths and CO₂ are withheld until separately verified baselines are available.");const p=el("p","notice");p.append(document.createTextNode((tr().sourceLabel||"Source")+": "));const a=el("a","", "UN DESA — World Population Prospects 2024");a.href="https://population.un.org/wpp/";a.target="_blank";a.rel="noopener noreferrer";p.append(a);box.append(p);return;}
  const form=el("form","form"),inputs={};let bacConsent=null;(schema[k]||[]).forEach(s=>inputs[s[0]]=makeField(form,s));
@@ -307,15 +312,15 @@ function renderTool(){
  }
  if(bacConsent)mountBacGate({panel,form,...bacConsent,copy:{title:resultText(lang,"bacDialogTitle"),continueLabel:resultText(lang,"bacDialogContinue"),cancelLabel:resultText(lang,"bacDialogCancel")},onCancel:()=>{location.hash="#/";}});
 }
-function setLang(v){lang=v;document.documentElement.lang=v;offlineStatus.setLanguage(v);$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;themeButton.textContent=workspaceCopy[lang].dark;$("#welcome").textContent=tr().choose;$("#welcome-copy").textContent=tr().help;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
-search.addEventListener("input",renderNav);$("#language").addEventListener("change",e=>setLang(e.target.value));
+function setLang(v){lang=v;document.documentElement.lang=v;offlineStatus.setLanguage(v);$("#language-label").textContent=tr().language;$("#search-label").textContent=tr().search;themeButton.textContent=workspaceCopy[lang].dark;$("#welcome").textContent=tr().choose;$("#footer-privacy").textContent=tr().privacy;$("#third-party-notices").textContent=tr().thirdPartyNotices;const access=ACCESSIBILITY_COPY[lang];$(".skip").textContent=access.skipToTools;nav.setAttribute("aria-label",access.toolDirectory);$("#categories").setAttribute("aria-label",access.categoryFilter);renderNav();renderTool();}
+$("#language").addEventListener("change",e=>setLang(e.target.value));
 function routeIndex(){
  try{return keys.indexOf(decodeURIComponent(location.hash.replace(/^#\/?/,"")));}
  catch{return -1;}
 }
 window.addEventListener("hashchange",()=>{
- const previousKey=keys[active];active=routeIndex();renderNav();renderTool();
+ const previousKey=keys[active];active=routeIndex();renderTool();
  if(active>=0){if(!panel.querySelector("dialog[open]"))panel.querySelector("h2")?.focus();}
- else if(previousKey){const card=[...nav.querySelectorAll(".tool-card")].find(node=>node.dataset.toolKey===previousKey);(card||search).focus();}
+ else if(previousKey){const card=[...nav.querySelectorAll(".tool-card")].find(node=>node.dataset.toolKey===previousKey);(card||$("#search")).focus();}
 });
 active=routeIndex();setLang("en");mountCompanyFooter();mountProductBot();

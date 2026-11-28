@@ -15,7 +15,8 @@ import {LOAD_PROFILE_STORAGE_KEY} from "../src/tools/loadProfileStorage.js";
 const root=fileURLToPath(new URL("../",import.meta.url));
 const source=()=>readFileSync(path.join(root,"src/main.js"),"utf8");
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8*Math.max(1,Math.abs(b)),`${a} ≈ ${b}`);
-const browserAvailable=existsSync(chromium.executablePath());
+const executablePath=process.env.PRODUCT_TEST_CHROMIUM||chromium.executablePath();
+const browserAvailable=existsSync(executablePath);
 const buildDirectory=path.join(root,"test-results/electrical-load-preview");
 
 let built;
@@ -64,14 +65,14 @@ test("load UI: production-preview device editing, live calculations, four locale
   const server=await preview({root,logLevel:"silent",build:{outDir:buildDirectory},preview:{host:"127.0.0.1",port:4175,strictPort:true}});
   let browser;
   try{
-    browser=await chromium.launch({headless:true});
+    browser=await chromium.launch({executablePath,headless:true});
     const page=await browser.newPage({locale:"en-US"});
     const errors=[],external=[];
     page.on("pageerror",error=>errors.push(error.message));
     page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});
     await page.goto("http://127.0.0.1:4175/");
     assert.equal(await page.locator(".tool-card").count(),200);
-    await page.locator('#search').fill("Electrical");assert.equal(await page.locator('.tool-card').count(),1);
+    await page.locator('#search').fill("electrical load calculator");assert.equal(await page.locator('.tool-card').first().getAttribute("data-tool-key"),"electrical-load");
     await page.locator('[data-tool-key="electrical-load"]').click();
     const ui=page.locator(".load-calculator"),field=name=>ui.locator(`[name="${name}"]`);
     const result=async key=>Number(await ui.locator(`[data-result="${key}"]`).getAttribute("data-value"));
@@ -135,7 +136,7 @@ test("load UI: explicit local save/load/delete, recovery and unfinished edit pre
   const server=await preview({root,logLevel:"silent",build:{outDir:buildDirectory},preview:{host:"127.0.0.1",port:4175,strictPort:true}});
   let browser;
   try{
-    browser=await chromium.launch({headless:true});
+    browser=await chromium.launch({executablePath,headless:true});
     const page=await browser.newPage({locale:"en-US"}),errors=[],external=[];
     page.on("pageerror",error=>errors.push(error.message));
     page.on("request",request=>{const url=new URL(request.url());if(/^https?:$/.test(url.protocol)&&url.host!=="127.0.0.1:4175")external.push(request.url());});

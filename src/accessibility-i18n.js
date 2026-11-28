@@ -1,7 +1,7 @@
 export const ACCESSIBILITY_COPY = {
   en: {
     skipToTools: "Skip to tools",
-    categoryFilter: "Filter tools by category",
+    categoryFilter: "Filter tools by track",
     toolDirectory: "Calculator directory",
     memoryControls: "Calculator memory and editing",
     memoryAdd: "M+ — Add the first value to memory",
@@ -15,7 +15,7 @@ export const ACCESSIBILITY_COPY = {
   },
   de: {
     skipToTools: "Zu den Werkzeugen springen",
-    categoryFilter: "Werkzeuge nach Kategorie filtern",
+    categoryFilter: "Werkzeuge nach Bereich filtern",
     toolDirectory: "Rechnerverzeichnis",
     memoryControls: "Rechnerspeicher und Eingabebearbeitung",
     memoryAdd: "M+ — Ersten Wert zum Speicher addieren",
@@ -43,7 +43,7 @@ export const ACCESSIBILITY_COPY = {
   },
   pcm: {
     skipToTools: "Jump go tools",
-    categoryFilter: "Filter tools by category",
+    categoryFilter: "Filter tools by track",
     toolDirectory: "Calculator list",
     memoryControls: "Calculator memory and editing controls",
     memoryAdd: "M+ — Add di first value join memory",
