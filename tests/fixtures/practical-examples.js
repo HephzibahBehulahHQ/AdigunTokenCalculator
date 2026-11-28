@@ -46,4 +46,9 @@ export const practicalExamples = [
   ["llm-batch-token-cost", {batchRequestCount:100,meanInputTokens:2000,meanOutputTokens:500,inputCostPerMillion:1,outputCostPerMillion:4}, [0.2,0.2,0.4]],
   ["worship-song-range", {melodyLowestMidi:60,melodyHighestMidi:72,comfortableLowestMidi:55,comfortableHighestMidi:69}, [12,-5,-3]],
   ["council-seat-projection", {seatsToAllocate:10,firstListVotes:53,secondListVotes:32,thirdListVotes:15}, [5,3,2]],
+  ["loaded-voltage-divider", {dividerInputVoltage:12,upperDividerOhms:1000,lowerDividerOhms:1000,dividerLoadOhms:1000}, [6,4,4]],
+  ["futures-tick-result", {futuresEntryPrice:100,futuresExitPrice:99.75,contractTickSize:0.25,contractTickValue:12.5,numberOfFuturesContracts:2,futuresTotalFees:4}, [-1,-25,-29]],
+  ["classification-metrics", {truePositiveCount:80,falsePositiveCount:20,trueNegativeCount:90,falseNegativeCount:10}, [80,800/9,900/11,16000/190]],
+  ["food-relief-parcels", {recipientHouseholds:100,stapleKgPerParcel:2,stapleKgInStock:170,packedItemsPerParcel:3,packedItemsAvailable:240}, [80,20,30,60]],
+  ["civic-survey-interval", {civicSurveyRespondents:100,civicSurveySupporters:50,surveyNormalCritical:2}, [50,50-10/Math.sqrt(1.04),50+10/Math.sqrt(1.04)]],
 ];
