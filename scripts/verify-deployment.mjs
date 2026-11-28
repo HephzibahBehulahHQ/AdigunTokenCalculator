@@ -107,6 +107,9 @@ async function verifyBrowser(){
   context.on("requestfailed",request=>{
     // Leaving a tool deliberately terminates its worker and may cancel its fetch.
     const reason=request.failure()?.errorText||"unknown";
+    const url=new URL(request.url());
+    if(reason==="net::ERR_INTERNET_DISCONNECTED"&&request.method()==="POST"
+      &&url.origin===site.origin&&url.pathname==="/cdn-cgi/rum")return;
     if(reason!=="net::ERR_ABORTED"&&request.url().startsWith(site.href))failed.push(`${reason} ${request.url()}`);
   });
   await page.addInitScript(()=>{
